@@ -1,2 +1,1 @@
-# eva
-Task adaptive exploratory visualization reocommendation system
+# Columbus: Intent Adaptive Exploratory Visual Anlytics System
