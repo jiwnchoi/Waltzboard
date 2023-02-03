@@ -1,1 +1,1 @@
-# Columbus: Intent Adaptive Exploratory Visual Anlytics System
+# Columbus: Intent-adaptive Exploratory Visual Anlytics System
