@@ -1,8 +1,26 @@
+import pandas as pd
+import numpy as np
+import altair as alt
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
-import pandas as pd
+from . import (
+    Aggregation,
+    Filter,
+    Sort,
+    Binning,
+    SingleBar,
+    Scatter,
+    SingleLine,
+    StackedBar,
+    MultiLine,
+    Heatmap,
+    GroupedBar,
+    Pie,
+    ColoredScatter,
+)
+
 
 if TYPE_CHECKING:
     from space import TransformType, EncodingType
@@ -62,28 +80,39 @@ class VISNode:
         return f"dim: {self.dim} attrs: {self.attrs} transforms: {self.transforms} encodings: {self.encodings}"
 
 
-# class Visualizations:
-#     def __init__(self, node: "VISNode", encoding: EncodingType) -> None:
-#         self.attrs = node.attrs
-#         self.transforms = node.transforms
-#         self.encoding = encoding
-#         self.raw_df = node.raw_df
+class Visualizations:
+    def __init__(self, node: "VISNode", encoding: EncodingType) -> None:
+        self.attrs = node.attrs
+        self.transforms = node.transforms
+        self.encoding = encoding
+        self.raw_df = node.raw_df
 
-#     def __str__(self) -> str:
-#         return f"encoding: {self.encoding} attrs: {self.attrs} transforms: {self.transforms}"
+    def __str__(self) -> str:
+        return f"encoding: {self.encoding} attrs: {self.attrs} transforms: {self.transforms}"
 
-#     def get_df(self) -> pd.DataFrame:
-#         df = self.raw_df.copy()
-#         for transform in self.transforms:
-#             if type(transform) == Aggregation:
-#                 df = df.groupby(transform.by).agg(transform.type)
-#             elif type(transform) == Filter:
-#                 df = df[df[transform.by] == transform.value]
-#             elif type(transform) == Sort:
-#                 df = df.sort_values(by=transform.by, ascending=True if transform.type == "asc" else False)
-#             elif type(transform) == Binning:
-#                 df = df.groupby(pd.cut(df[transform.by], transform.bins)).count()
-
-
-#     def get_altair(self, df) -> alt.Chart:
-#         altair_encodings = {}
+    def get_df(self) -> pd.DataFrame:
+        df = self.raw_df.copy()
+        for transform in self.transforms:
+            if isinstance(transform, Aggregation):
+                df = df.groupby(transform.by).agg(transform.type)
+            elif isinstance(transform, Filter):
+                df = df[df[transform.by] == transform.value]
+            elif isinstance(transform, Sort):
+                df = df.sort_values(
+                    by=transform.by,
+                    ascending=True if transform.type == "asc" else False,
+                )
+            elif isinstance(transform, Binning):
+                N = df[transform.by].count()
+                step = min(int(N / 6), 1)
+                bin_edges = df[transform.by].sort_values().unique()[::step]
+                round_edges = np.round(
+                    bin_edges, -int(np.log10(bin_edges[1] - bin_edges[0]))
+                ).tolist()
+                df[transform.by] = pd.cut(
+                    df[transform.by],
+                    bins=round_edges,
+                    labels=round_edges[:-1],
+                    right=False,
+                )
+        return df

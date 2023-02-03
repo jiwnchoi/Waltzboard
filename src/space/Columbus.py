@@ -17,7 +17,7 @@ from . import (
 agg_types: list[AggregationType] = ["max", "min", "mean", "count", "sum"]
 
 
-class TAEVA:
+class Columbus:
     def __init__(self, df: pd.DataFrame):
         self.df = df
         self.types: list[Literal["Q", "N", "T", "O"]] = [
@@ -35,7 +35,7 @@ class TAEVA:
                 self.queue.append(VISNode(list(comb), df))
 
         print(len(self.queue))
-
+        
         while len(self.queue) > 0:
             node = self.queue.pop()
 
