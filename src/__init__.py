@@ -1,1 +1,1 @@
-from .space import Columbus
+from .space.Columbus import Columbus

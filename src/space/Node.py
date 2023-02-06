@@ -2,41 +2,16 @@ import pandas as pd
 import numpy as np
 import altair as alt
 from copy import deepcopy
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
-from . import (
-    Aggregation,
-    Filter,
-    Sort,
-    Binning,
-    SingleBar,
-    Scatter,
-    SingleLine,
-    StackedBar,
-    MultiLine,
-    Heatmap,
-    GroupedBar,
-    Pie,
-    ColoredScatter,
-)
+from .DataTransformsModel import Aggregation, Filter, Sort, Binning, TransformType
+from .EncodingsModel import EncodingType
 
+from config import MAX_BINS, MIN_ROWS
+from typing import Union
 
 if TYPE_CHECKING:
-    from space import TransformType, EncodingType
-
-
-@dataclass
-class Attribute:
-    name: str
-    type: Literal["Q", "N", "T", "O"]
-    immutable: bool = False
-
-    def __str__(self):
-        return self.name
-
-    def get_copy(self) -> "Attribute":
-        return Attribute(self.name, self.type, self.immutable)
+    from .DataModel import Attribute
 
 
 class VISNode:
@@ -52,6 +27,7 @@ class VISNode:
         self.transforms = []
         self.encodings = []
         self.raw_df = df[[attr.name for attr in attrs]]
+        self.df = self.raw_df
 
     def is_transformable(self) -> bool:
         # check if there is any immutable attribute
@@ -71,6 +47,67 @@ class VISNode:
     def get_copy(self) -> "VISNode":
         return deepcopy(self)
 
+    def get_df(self) -> Union[pd.DataFrame, None]:
+        df = self.raw_df.copy()
+        # print(df)
+        for transform in self.transforms:
+            if len(df.dropna()) < MIN_ROWS:
+                return None
+
+            # print(transform)
+            if isinstance(transform, Aggregation):
+                if transform.type == "count":
+                    df = df.groupby(transform.by).size().reset_index(name=f"count")
+
+                df = df.groupby(transform.by).agg(transform.type).reset_index()
+            elif isinstance(transform, Filter):
+                df = df[df[transform.by] == transform.value]
+                df = df.drop(columns=transform.by)
+            elif isinstance(transform, Sort):
+                df = df.sort_values(
+                    by=transform.by,
+                    ascending=True if transform.type == "asc" else False,
+                )
+            elif isinstance(transform, Binning):
+                N = df[transform.by].count()
+                MAX_BINS = 10
+                num_bins = min(MAX_BINS, N)
+                unique_values = df[transform.by].sort_values().unique()
+
+                step = (
+                    int(len(unique_values) / num_bins)
+                    if len(unique_values) > num_bins
+                    else 1
+                )
+                bin_edges = unique_values[::step]
+
+                labels = [
+                    [bin_edges[i], bin_edges[i + 1]] for i in range(len(bin_edges) - 1)
+                ]
+                labels[0][0] = min(unique_values)
+                labels[-1][1] = max(unique_values)
+                labels = [f"{label[0]}-{label[1]}" for label in labels]
+
+                df[transform.by] = pd.cut(
+                    df[transform.by],
+                    bins=bin_edges.tolist(),
+                    right=True,
+                    labels=labels,
+                    duplicates="raise",
+                    include_lowest=True,
+                    precision=0,
+                )  # type: ignore
+            self.df = df
+        return df
+
+    def get_altair(self) -> list[alt.Chart]:
+        altair_list: list[alt.Chart] = []
+        df = self.get_df()
+        if df is None:
+            return []
+        df = df.dropna()
+        return [encoding.get_altair(df) for encoding in self.encodings]
+
     def print(self):
         print(
             f"dim: {self.dim} attrs: {self.attrs} transforms: {self.transforms} encodings: {self.encodings}"
@@ -89,30 +126,3 @@ class Visualizations:
 
     def __str__(self) -> str:
         return f"encoding: {self.encoding} attrs: {self.attrs} transforms: {self.transforms}"
-
-    def get_df(self) -> pd.DataFrame:
-        df = self.raw_df.copy()
-        for transform in self.transforms:
-            if isinstance(transform, Aggregation):
-                df = df.groupby(transform.by).agg(transform.type)
-            elif isinstance(transform, Filter):
-                df = df[df[transform.by] == transform.value]
-            elif isinstance(transform, Sort):
-                df = df.sort_values(
-                    by=transform.by,
-                    ascending=True if transform.type == "asc" else False,
-                )
-            elif isinstance(transform, Binning):
-                N = df[transform.by].count()
-                step = min(int(N / 6), 1)
-                bin_edges = df[transform.by].sort_values().unique()[::step]
-                round_edges = np.round(
-                    bin_edges, -int(np.log10(bin_edges[1] - bin_edges[0]))
-                ).tolist()
-                df[transform.by] = pd.cut(
-                    df[transform.by],
-                    bins=round_edges,
-                    labels=round_edges[:-1],
-                    right=False,
-                )
-        return df

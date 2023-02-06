@@ -1,39 +1,12 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, Union
-from . import Attribute
+from .DataModel import Attribute
+from .DataTransformsModel import Aggregation, Filter, Sort, Binning
 from copy import deepcopy
 from config import AggregationType
 
 if TYPE_CHECKING:
     from .Node import VISNode
-
-
-@dataclass
-class Aggregation:
-    by: list[str]
-    type: Literal["max", "min", "mean", "count", "sum"]
-
-
-@dataclass
-class Filter:
-    by: str
-    value: Union[str, int, float]
-    type: Literal["eq", "neq"]
-
-
-@dataclass
-class Sort:
-    by: str
-    type: Literal["asc", "desc"]
-
-
-@dataclass
-class Binning:
-    by: str
-    type: Literal["bin"] = "bin"
-
-
-TransformType = Union[Aggregation, Filter, Sort, Binning]
 
 
 def apply_aggregation(
@@ -43,13 +16,14 @@ def apply_aggregation(
     new_node.transforms.append(Aggregation(by, type))
     if type == "count":
         new_node.dim += 1
-        new_node.attrs.append(Attribute(f"{by}_{type}", "Q", True))
+        new_node.attrs.append(Attribute(f"count", "Q", True))
 
     for i in range(len(new_node.attrs)):
         if new_node.attrs[i].name in by:
             new_node.attrs[i].immutable = True
         else:
-            new_node.attrs[i] = Attribute(f"{new_node.attrs[i].name}_{type}", "Q", True)
+            new_node.attrs[i].immutable = True
+            # new_node.attrs[i] = Attribute(f"{new_node.attrs[i].name}_{type}", "Q", True)
     return new_node
 
 

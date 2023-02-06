@@ -1,119 +1,30 @@
-from dataclasses import dataclass
-from typing import Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-from . import Attribute, apply_aggregation, apply_binning
-import altair as alt
+from .DataTransforms import apply_aggregation, apply_binning
+from .EncodingsModel import *
+
+from config import MAX_UNIQUE_CATEGORY, MAX_UNIQUE_AXIS
 
 if TYPE_CHECKING:
-    from . import VISNode
+    from .Node import VISNode
 
 
 # 2D Encoding
-@dataclass
-class SingleBar:
-    x: Attribute
-    y: Attribute
-
-    def __str__(self) -> str:
-        return f"SingleBar({self.x.name}, {self.y.name})"
 
 
-@dataclass
-class SingleLine:
-    x: Attribute
-    y: Attribute
-
-    def __str__(self) -> str:
-        return f"SingleLine({self.x.name}, {self.y.name})"
-
-
-@dataclass
-class Scatter:
-    x: Attribute
-    y: Attribute
-
-    def __str__(self) -> str:
-        return f"Scatter({self.x.name}, {self.y.name})"
-
-
-@dataclass
-class Pie:
-    color: Attribute
-    theta: Attribute
-
-    def __str__(self) -> str:
-        return f"Pie({self.color.name}, {self.theta.name})"
-
-
-# 3D Encoding
-@dataclass
-class Heatmap:
-    x: Attribute
-    y: Attribute
-    color: Attribute
-
-    def __str__(self) -> str:
-        return f"Heatmap({self.x.name}, {self.y.name}, {self.color.name})"
-
-
-@dataclass
-class GroupedBar:
-    x: Attribute
-    y: Attribute
-    group: Attribute
-
-    def __str__(self) -> str:
-        return f"GroupedBar({self.x.name}, {self.y.name}, {self.group.name})"
-
-
-@dataclass
-class StackedBar:
-    x: Attribute
-    y: Attribute
-    color: Attribute
-
-    def __str__(self) -> str:
-        return f"StackedBar({self.x.name}, {self.y.name}, {self.color.name})"
-
-
-@dataclass
-class ColoredScatter:
-    x: Attribute
-    y: Attribute
-    color: Attribute
-
-    def __str__(self) -> str:
-        return f"ColoredScatter({self.x.name}, {self.y.name}, {self.color.name})"
-
-
-@dataclass
-class MultiLine:
-    x: Attribute
-    y: Attribute
-    color: Attribute
-
-    def __str__(self) -> str:
-        return f"MultiLine({self.x.name}, {self.y.name}, {self.color.name})"
-
-
-EncodingType = Union[
-    Scatter,
-    SingleBar,
-    SingleLine,
-    Heatmap,
-    Pie,
-    StackedBar,
-    GroupedBar,
-    ColoredScatter,
-    MultiLine,
-]
-
-
-def get_encoded_node(node: "VISNode") -> "VISNode":
+def encode_node(node: "VISNode") -> "VISNode":
     attr_types = node.get_number_of_types()
     node = node.get_copy()
+    df = node.get_df()
+    if df is None:
+        return node
+    row, _ = df.shape
+
     if node.dim == 1:
-        if node.attrs[0].type == "N":
+        if (
+            node.attrs[0].type == "N"
+            and df[node.attrs[0].name].nunique() < MAX_UNIQUE_CATEGORY + 1
+        ):
             node = apply_aggregation(node, [node.attrs[0].name], "count")
             node.encodings = [
                 SingleBar(node.attrs[0], node.attrs[1]),
@@ -135,7 +46,11 @@ def get_encoded_node(node: "VISNode") -> "VISNode":
             ]
 
         # QN -> Bar
-        if len(attr_types["Q"]) == 1 and len(attr_types["N"]) == 1:
+        elif (
+            len(attr_types["Q"]) == 1
+            and len(attr_types["N"]) == 1
+            and df[node.attrs[attr_types["N"][0]].name].nunique() < MAX_UNIQUE_AXIS + 1
+        ):
             node.encodings = [
                 SingleBar(
                     node.attrs[attr_types["N"][0]], node.attrs[attr_types["Q"][0]]
@@ -143,44 +58,69 @@ def get_encoded_node(node: "VISNode") -> "VISNode":
             ]
 
         # OQ -> Line, Bar
-        if len(attr_types["O"]) == 1 and len(attr_types["Q"]) == 1:
+        elif len(attr_types["O"]) == 1 and len(attr_types["Q"]) == 1:
             node.encodings = [
-                SingleLine(
-                    node.attrs[attr_types["O"][0]], node.attrs[attr_types["Q"][0]]
-                ),
+                # SingleLine(
+                #     node.attrs[attr_types["O"][0]], node.attrs[attr_types["Q"][0]]
+                # ),
                 SingleBar(
                     node.attrs[attr_types["O"][0]], node.attrs[attr_types["Q"][0]]
                 ),
             ]
 
         # NN -> Heatmap
-        if len(attr_types["N"]) == 2:
+        elif (
+            len(attr_types["N"]) == 2
+            and df[node.attrs[0].name].nunique() < MAX_UNIQUE_AXIS + 1
+            and df[node.attrs[1].name].nunique() < MAX_UNIQUE_AXIS + 1
+        ):
             node = apply_aggregation(node, [attr.name for attr in node.attrs], "count")
-            node.encodings = [
-                Heatmap(node.attrs[0], node.attrs[1], node.attrs[2]),
-            ]
+            df = node.get_df()
+            if isinstance(df, pd.DataFrame) and df["count"].nunique() > 3:
+                node.encodings = [
+                    Heatmap(node.attrs[0], node.attrs[1], node.attrs[2]),
+                ]
+            else:
+                node.encodings = []
 
         # ON -> Heatmap
-        if len(attr_types["O"]) == 1 and len(attr_types["N"]) == 1:
+        elif (
+            len(attr_types["O"]) == 1
+            and len(attr_types["N"]) == 1
+            and df[node.attrs[attr_types["N"][0]].name].nunique() < MAX_UNIQUE_AXIS + 1
+        ):
             node = apply_aggregation(node, [attr.name for attr in node.attrs], "count")
-            node.encodings = [
-                Heatmap(
-                    node.attrs[attr_types["O"][0]],
-                    node.attrs[attr_types["N"][0]],
-                    node.attrs[2],
-                ),
-            ]
+            df = node.get_df()
+            if isinstance(df, pd.DataFrame) and df["count"].nunique() > 3:
+                node.encodings = [
+                    Heatmap(
+                        node.attrs[attr_types["O"][0]],
+                        node.attrs[attr_types["N"][0]],
+                        node.attrs[2],
+                    ),
+                ]
+            else:
+                node.encodings = []
 
         # OO -> Heatmap
-        if len(attr_types["O"]) == 2:
+        elif len(attr_types["O"]) == 2:
             node = apply_aggregation(node, [attr.name for attr in node.attrs], "count")
-            node.encodings = [
-                Heatmap(node.attrs[0], node.attrs[1], node.attrs[2]),
-            ]
+            df = node.get_df()
+            if isinstance(df, pd.DataFrame) and df["count"].nunique() > 3:
+                node.encodings = [
+                    Heatmap(node.attrs[0], node.attrs[1], node.attrs[2]),
+                ]
+            else:
+                node.encodings = []
 
     elif node.dim == 3:
         # Q2 N1
-        if len(attr_types["Q"]) == 2 and len(attr_types["N"]) == 1:
+        if (
+            len(attr_types["Q"]) == 2
+            and len(attr_types["N"]) == 1
+            and 1 < df[node.attrs[attr_types["N"][0]].name].nunique()
+            < MAX_UNIQUE_CATEGORY + 1
+        ):
             node.encodings = [
                 ColoredScatter(
                     x=node.attrs[attr_types["Q"][0]],
@@ -190,16 +130,38 @@ def get_encoded_node(node: "VISNode") -> "VISNode":
             ]
 
         # Q1 N2
-        if len(attr_types["Q"]) == 1 and len(attr_types["N"]) == 2:
+        elif (
+            len(attr_types["Q"]) == 1
+            and len(attr_types["N"]) == 2
+            and 1 < df[node.attrs[attr_types["N"][0]].name].nunique()
+            < MAX_UNIQUE_CATEGORY + 1
+            and 1 < df[node.attrs[attr_types["N"][1]].name].nunique() < MAX_UNIQUE_AXIS + 1
+        ):
+            node.encodings = [
+                GroupedBar(
+                    group=node.attrs[attr_types["N"][0]],
+                    x=node.attrs[attr_types["N"][1]],
+                    y=node.attrs[attr_types["Q"][0]],
+                ),
+                StackedBar(
+                    x=node.attrs[attr_types["N"][1]],
+                    y=node.attrs[attr_types["Q"][0]],
+                    color=node.attrs[attr_types["N"][0]],
+                ),
+            ]
+
+        elif (
+            len(attr_types["Q"]) == 1
+            and len(attr_types["N"]) == 2
+            and 1
+            < df[node.attrs[attr_types["N"][1]].name].nunique()
+            < MAX_UNIQUE_CATEGORY + 1
+            and df[node.attrs[attr_types["N"][0]].name].nunique() < MAX_UNIQUE_AXIS + 1
+        ):
             node.encodings = [
                 GroupedBar(
                     group=node.attrs[attr_types["N"][1]],
                     x=node.attrs[attr_types["N"][0]],
-                    y=node.attrs[attr_types["Q"][0]],
-                ),
-                GroupedBar(
-                    group=node.attrs[attr_types["N"][0]],
-                    x=node.attrs[attr_types["N"][1]],
                     y=node.attrs[attr_types["Q"][0]],
                 ),
                 StackedBar(
@@ -207,11 +169,16 @@ def get_encoded_node(node: "VISNode") -> "VISNode":
                     y=node.attrs[attr_types["Q"][0]],
                     color=node.attrs[attr_types["N"][1]],
                 ),
-                StackedBar(
-                    x=node.attrs[attr_types["N"][1]],
-                    y=node.attrs[attr_types["Q"][0]],
-                    color=node.attrs[attr_types["N"][0]],
-                ),
+            ]
+
+        elif (
+            len(attr_types["Q"]) == 1
+            and len(attr_types["N"]) == 2
+            and 1 < df[node.attrs[attr_types["N"][0]].name].nunique() < MAX_UNIQUE_AXIS + 1
+            and 1 < df[node.attrs[attr_types["N"][1]].name].nunique() < MAX_UNIQUE_AXIS + 1
+            and df[node.attrs[attr_types["Q"][0]].name].nunique() > 3
+        ):
+            node.encodings = [
                 Heatmap(
                     x=node.attrs[attr_types["N"][0]],
                     y=node.attrs[attr_types["N"][1]],
