@@ -15,6 +15,7 @@ from .space.DataTransforms import (
 )
 from .space.Node import VISNode
 from .space.Encodings import encode_node
+from .oracle import ColumbusOracle
 
 
 agg_types: list[AggregationType] = ["max", "min", "mean", "sum"]
@@ -32,6 +33,8 @@ class Columbus:
         ]
         self.queue: list["VISNode"] = []
         self.nodes: list["VISNode"] = []
+        self.oracle = ColumbusOracle()
+
         # get {(n + 2) (n + 1) n / 6} combinations of attributes
         for i in range(1, MAX_TARGET_ATTRIBUTES + 1):
             for comb in combinations(self.attrs, i):
@@ -88,11 +91,11 @@ class Columbus:
                             new_node = apply_filtering(node, attr.name, value, "eq")
                             self.queue.append(new_node)
 
-    def get_muiltiview(self, n_vis: int, col: int) -> alt.VConcatChart:
-        sample_nodes: list["VISNode"] = sample(self.nodes, n_vis * 2)
+    def get_muiltiview(self, vis_nodes: list["VISNode"], col: int) -> alt.VConcatChart:
         altairs: list[alt.Chart] = []
+        n_vis = len(vis_nodes)
         while len(altairs) is not n_vis:
-            charts = sample_nodes.pop().get_altair()
+            charts = vis_nodes.pop().get_altair()
             if len(charts) == 0:
                 continue
             altairs.append(charts[0].properties(width=200, height=200))
@@ -102,3 +105,13 @@ class Columbus:
             for i in range(0, n_vis, col)
         ]
         return alt.vconcat(*rows)
+
+    def get_vis_nodes(self, n_vis: int) -> list["VISNode"]:
+        candidate_vis_nodes = [sample(self.nodes, n_vis) for _ in range(1000)]
+        scores_vis_nodes = [
+            self.oracle.get_score(vis_nodes, self.df, set())
+            for vis_nodes in candidate_vis_nodes
+        ]
+        print(max(scores_vis_nodes), min(scores_vis_nodes))
+
+        return candidate_vis_nodes[scores_vis_nodes.index(max(scores_vis_nodes))]

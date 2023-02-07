@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import altair as alt
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Set
 
 from .DataTransformsModel import Aggregation, Filter, Sort, Binning, TransformType
 from .EncodingsModel import EncodingType
@@ -28,6 +28,9 @@ class VISNode:
         self.encodings = []
         self.raw_df = df[[attr.name for attr in attrs]]
         self.df = self.raw_df
+
+    def __str__(self) -> str:
+        return f"dim: {self.dim} attrs: {self.attrs} transforms: {self.transforms} encodings: {self.encodings}"
 
     def is_transformable(self) -> bool:
         # check if there is any immutable attribute
@@ -106,13 +109,29 @@ class VISNode:
             return []
         return [encoding.get_altair(df) for encoding in self.encodings]
 
-    def print(self):
-        print(
-            f"dim: {self.dim} attrs: {self.attrs} transforms: {self.transforms} encodings: {self.encodings}"
-        )
+    def get_bov(self) -> Set[str]:
+        bov: Set[str] = set()
+        bov.update(*[attr.name for attr in self.attrs])
+        bov.update(*[transform.name for transform in self.transforms])
+        bov.update(self.encodings[0].mark)
 
-    def __str__(self) -> str:
-        return f"dim: {self.dim} attrs: {self.attrs} transforms: {self.transforms} encodings: {self.encodings}"
+        return bov
+
+    def get_coverage(self) -> dict[str, float]:
+        coverage = {key: 1.0 for key in self.raw_df.columns.tolist()}
+        for transform in self.transforms:
+            if isinstance(transform, Aggregation):
+                coverage = {key: value * 0.5 for key, value in coverage.items()}
+            elif isinstance(transform, Filter):
+                ratio = self.raw_df[transform.by].value_counts(normalize=True)[
+                    transform.value
+                ]
+                coverage[transform.by] *= ratio
+            elif isinstance(transform, Sort):
+                pass
+            elif isinstance(transform, Binning):
+                coverage = {key: value * 0.25 for key, value in coverage.items()}
+        return coverage
 
 
 class Visualizations:
