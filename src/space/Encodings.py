@@ -118,7 +118,8 @@ def encode_node(node: "VISNode") -> "VISNode":
         if (
             len(attr_types["Q"]) == 2
             and len(attr_types["N"]) == 1
-            and 1 < df[node.attrs[attr_types["N"][0]].name].nunique()
+            and 1
+            < df[node.attrs[attr_types["N"][0]].name].nunique()
             < MAX_UNIQUE_CATEGORY + 1
         ):
             node.encodings = [
@@ -133,20 +134,23 @@ def encode_node(node: "VISNode") -> "VISNode":
         elif (
             len(attr_types["Q"]) == 1
             and len(attr_types["N"]) == 2
-            and 1 < df[node.attrs[attr_types["N"][0]].name].nunique()
+            and 1
+            < df[node.attrs[attr_types["N"][0]].name].nunique()
             < MAX_UNIQUE_CATEGORY + 1
-            and 1 < df[node.attrs[attr_types["N"][1]].name].nunique() < MAX_UNIQUE_AXIS + 1
+            and 1
+            < df[node.attrs[attr_types["N"][1]].name].nunique()
+            < MAX_UNIQUE_AXIS + 1
         ):
             node.encodings = [
-                GroupedBar(
-                    group=node.attrs[attr_types["N"][0]],
-                    x=node.attrs[attr_types["N"][1]],
-                    y=node.attrs[attr_types["Q"][0]],
-                ),
                 StackedBar(
                     x=node.attrs[attr_types["N"][1]],
                     y=node.attrs[attr_types["Q"][0]],
                     color=node.attrs[attr_types["N"][0]],
+                ),
+                GroupedBar(
+                    group=node.attrs[attr_types["N"][0]],
+                    x=node.attrs[attr_types["N"][1]],
+                    y=node.attrs[attr_types["Q"][0]],
                 ),
             ]
 
@@ -159,23 +163,27 @@ def encode_node(node: "VISNode") -> "VISNode":
             and df[node.attrs[attr_types["N"][0]].name].nunique() < MAX_UNIQUE_AXIS + 1
         ):
             node.encodings = [
-                GroupedBar(
-                    group=node.attrs[attr_types["N"][1]],
-                    x=node.attrs[attr_types["N"][0]],
-                    y=node.attrs[attr_types["Q"][0]],
-                ),
                 StackedBar(
                     x=node.attrs[attr_types["N"][0]],
                     y=node.attrs[attr_types["Q"][0]],
                     color=node.attrs[attr_types["N"][1]],
+                ),
+                GroupedBar(
+                    group=node.attrs[attr_types["N"][1]],
+                    x=node.attrs[attr_types["N"][0]],
+                    y=node.attrs[attr_types["Q"][0]],
                 ),
             ]
 
         elif (
             len(attr_types["Q"]) == 1
             and len(attr_types["N"]) == 2
-            and 1 < df[node.attrs[attr_types["N"][0]].name].nunique() < MAX_UNIQUE_AXIS + 1
-            and 1 < df[node.attrs[attr_types["N"][1]].name].nunique() < MAX_UNIQUE_AXIS + 1
+            and 1
+            < df[node.attrs[attr_types["N"][0]].name].nunique()
+            < MAX_UNIQUE_AXIS + 1
+            and 1
+            < df[node.attrs[attr_types["N"][1]].name].nunique()
+            < MAX_UNIQUE_AXIS + 1
             and df[node.attrs[attr_types["Q"][0]].name].nunique() > 3
         ):
             node.encodings = [

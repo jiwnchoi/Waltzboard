@@ -1,18 +1,20 @@
 import pandas as pd
 from itertools import combinations
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Union
 from config import MAX_TARGET_ATTRIBUTES, AggregationType, FILTER_VALUE_THRESHOLD
+from random import sample
+import altair as alt
 
 
-from .DataModel import Attribute
-from .DataTransforms import (
+from .space.DataModel import Attribute
+from .space.DataTransforms import (
     apply_aggregation,
     apply_binning,
     apply_filtering,
     apply_sorting,
 )
-from .Node import VISNode
-from .Encodings import encode_node
+from .space.Node import VISNode
+from .space.Encodings import encode_node
 
 
 agg_types: list[AggregationType] = ["max", "min", "mean", "sum"]
@@ -86,8 +88,17 @@ class Columbus:
                             new_node = apply_filtering(node, attr.name, value, "eq")
                             self.queue.append(new_node)
 
-    def get_nodes(self) -> list["VISNode"]:
-        return self.nodes
+    def get_muiltiview(self, n_vis: int, col: int) -> alt.VConcatChart:
+        sample_nodes: list["VISNode"] = sample(self.nodes, n_vis * 2)
+        altairs: list[alt.Chart] = []
+        while len(altairs) is not n_vis:
+            charts = sample_nodes.pop().get_altair()
+            if len(charts) == 0:
+                continue
+            altairs.append(charts[0].properties(width=200, height=200))
 
-    def get_visualizations(self) -> list["VISNode"]:
-        return [node for node in self.nodes if len(node.encodings) > 0]
+        rows: list[alt.HConcatChart] = [
+            alt.hconcat(*altairs[i : i + col]).resolve_scale(color="independent")
+            for i in range(0, n_vis, col)
+        ]
+        return alt.vconcat(*rows)

@@ -101,11 +101,9 @@ class VISNode:
         return df
 
     def get_altair(self) -> list[alt.Chart]:
-        altair_list: list[alt.Chart] = []
         df = self.get_df()
         if df is None:
             return []
-        df = df.dropna()
         return [encoding.get_altair(df) for encoding in self.encodings]
 
     def print(self):
