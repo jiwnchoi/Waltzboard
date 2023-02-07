@@ -28,6 +28,6 @@ class ColumbusOracle:
             self.coverage * coverage
             + self.uniqueness * uniqueness
             + self.interestingness * interestingness
-            + self.specificity * specificity
+            + self.specificity * specificity * len(nodes)
         )
     

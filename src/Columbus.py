@@ -106,10 +106,10 @@ class Columbus:
         ]
         return alt.vconcat(*rows)
 
-    def get_vis_nodes(self, n_vis: int) -> list["VISNode"]:
+    def get_vis_nodes(self, n_vis: int, wildcard: list[str]) -> list["VISNode"]:
         candidate_vis_nodes = [sample(self.nodes, n_vis) for _ in range(1000)]
         scores_vis_nodes = [
-            self.oracle.get_score(vis_nodes, self.df, set())
+            self.oracle.get_score(vis_nodes, self.df, set(wildcard))
             for vis_nodes in candidate_vis_nodes
         ]
         print(max(scores_vis_nodes), min(scores_vis_nodes))

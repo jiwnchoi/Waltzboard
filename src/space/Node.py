@@ -111,10 +111,9 @@ class VISNode:
 
     def get_bov(self) -> Set[str]:
         bov: Set[str] = set()
-        bov.update(*[attr.name for attr in self.attrs])
-        bov.update(*[transform.name for transform in self.transforms])
-        bov.update(self.encodings[0].mark)
-
+        bov.update([attr.name for attr in self.attrs])
+        bov.update([transform.name for transform in self.transforms])
+        bov.add(self.encodings[0].mark)
         return bov
 
     def get_coverage(self) -> dict[str, float]:
