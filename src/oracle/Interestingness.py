@@ -15,15 +15,14 @@ if TYPE_CHECKING:
 def get_outlierness_n(series: pd.Series, thresold: float = 1.5) -> float:
     counts = series.value_counts(normalize=True).to_numpy()
     entropy_vals = -np.sum(counts * np.log(counts), axis=1)
-    return np.sum(entropy_vals < thresold) / len(entropy_vals)
+    return np.count_nonzero(entropy_vals < thresold) / len(entropy_vals)
 
 
 # Q
 def get_outlierness_q(series: pd.Series) -> float:
     lof = LocalOutlierFactor()
     pred = lof.fit_predict(series.to_numpy().reshape(-1, 1))
-    outliers = np.count_nonzero(pred == -1)
-    return outliers / len(pred)
+    return np.count_nonzero(pred == -1) / len(pred)
 
 
 def get_skewness_q(series: pd.Series) -> float:
@@ -55,8 +54,10 @@ def get_correlation_nn(series1: pd.Series, series2: pd.Series) -> float:
 def get_outlierness_nn(series1: pd.Series, series2: pd.Series) -> float:
     # Point-wise Mutual Information
     crosstab = pd.crosstab(series1, series2)
-    crosstab = crosstab.apply(lambda x: x / x.sum(), axis=1)
-    return max(np.log(crosstab) - np.log(crosstab.sum(axis=0)), 0)
+    sumtab = crosstab.apply(lambda x: x / x.sum(), axis=1)
+    pmi = np.log(sumtab) - np.log(sumtab.sum(axis=0))
+    outliers = crosstab * np.where(np.abs(pmi) > 2, 1, 0)
+    return np.sum(np.sum(outliers.to_numpy().flatten())) / len(series1)
 
 
 # QQ
