@@ -15,7 +15,7 @@ from .space.DataTransforms import (
 )
 from .space.Node import VISNode
 from .space.Encodings import encode_node
-from .oracle import ColumbusOracle
+from .oracle import ColumbusOracle, OracleWeight
 
 
 agg_types: list[AggregationType] = ["max", "min", "mean", "sum"]
@@ -33,7 +33,7 @@ class Columbus:
         ]
         self.queue: list["VISNode"] = []
         self.nodes: list["VISNode"] = []
-        self.oracle = ColumbusOracle()
+        self.oracle = ColumbusOracle(OracleWeight())
 
         # get {(n + 2) (n + 1) n / 6} combinations of attributes
         for i in range(1, MAX_TARGET_ATTRIBUTES + 1):
