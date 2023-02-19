@@ -12,7 +12,7 @@ class Aggregation:
 @dataclass
 class Filter:
     by: str
-    value: Union[str, int]
+    value: Union[str, int, float]
     type: Literal["eq", "neq"]
     name = "filter"
 
