@@ -1,4 +1,5 @@
-from .ResultModel import OracleResult, OracleWeight
+from .OracleWeight import OracleWeight
+from .OracleResult import OracleResult
 from .Coverage import get_coverage_from_nodes
 from .Interestingness import get_interestingness_from_nodes
 from .Specificity import get_specificity_from_nodes

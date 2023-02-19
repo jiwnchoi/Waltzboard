@@ -5,7 +5,7 @@ from src.oracle import (
     get_interestingness_from_nodes,
     get_specificity_from_nodes,
 )
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 import pandas as pd
 
 if TYPE_CHECKING:
@@ -13,8 +13,8 @@ if TYPE_CHECKING:
 
 
 class ColumbusOracle:
-    def __init__(self, weight: OracleWeight) -> None:
-        self.weight = weight
+    def __init__(self, weight: Optional[OracleWeight]) -> None:
+        self.weight = OracleWeight() if weight is None else weight
 
     def get_score(
         self, nodes: list["VISNode"], df: pd.DataFrame, wildcard: set[str]

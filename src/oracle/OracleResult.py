@@ -1,12 +1,5 @@
 from dataclasses import dataclass, field
-
-
-@dataclass
-class OracleWeight:
-    coverage: float = 1.0
-    uniqueness: float = 1.0
-    specificity: float = 1.0
-    interestingness: float = 1.0
+from src.oracle import OracleWeight
 
 
 @dataclass
