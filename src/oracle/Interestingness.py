@@ -8,7 +8,7 @@ from scipy.stats import chi2_contingency
 from sklearn.linear_model import LogisticRegression
 
 if TYPE_CHECKING:
-    from ..space.Node import VISNode
+    from ..space.Node import VisualizationNode
 
 
 # N
@@ -91,5 +91,7 @@ def get_outlierness_qn(q_series: pd.Series, n_series: pd.Series) -> float:
     return np.count_nonzero(scores == -1) / len(scores)
 
 
-def get_interestingness_from_nodes(nodes: list["VISNode"], df: pd.DataFrame) -> float:
+def get_interestingness_from_nodes(
+    nodes: list["VisualizationNode"], df: pd.DataFrame
+) -> float:
     return 1.0

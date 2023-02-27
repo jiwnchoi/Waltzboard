@@ -2,143 +2,324 @@ import pandas as pd
 import numpy as np
 import altair as alt
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Set
+from typing import TYPE_CHECKING, Literal, Set, Optional
 
 from .DataTransformsModel import Aggregation, Filter, Sort, Binning, TransformType
-from .EncodingsModel import EncodingType
 
 from config import MAX_BINS, MIN_ROWS
 from typing import Union
+
+from dataclasses import dataclass
 
 if TYPE_CHECKING:
     from .DataModel import Attribute
 
 
-class VISNode:
-    dim = 0
-    attrs: list["Attribute"]
-    transforms: list["TransformType"]
-    encodings: list["EncodingType"]
-    raw_df: pd.DataFrame
+chart_type = Literal["bar", "line", "circle", "area", "arc", "rect"]
 
-    def __init__(self, attrs: list["Attribute"], df: pd.DataFrame):
-        self.dim = len(attrs)
-        self.attrs = attrs
-        self.transforms = []
-        self.encodings = []
-        self.raw_df = df[[attr.name for attr in attrs]]
-        self.df = self.raw_df
 
-    def __str__(self) -> str:
-        return f"dim: {self.dim} attrs: {self.attrs} transforms: {self.transforms} encodings: {self.encodings}"
+@dataclass
+class Encodings:
+    chart_type: str
+    x: Union[alt.X, alt.Color]
+    y: Union[alt.Y, alt.Theta]
+    z: Union[alt.Color, alt.Column, alt.Y, None] = None
 
-    def is_transformable(self) -> bool:
-        # check if there is any immutable attribute
-        return any([not attr.immutable for attr in self.attrs])
 
-    def get_number_of_types(self) -> dict[Literal["Q", "N", "T", "O"], list[int]]:
-        types: dict[Literal["Q", "N", "T", "O"], list[int]] = {
+@dataclass
+class VisualizationNode:
+    sub_df: pd.DataFrame
+    attrs: tuple["Attribute"]
+
+    filters: Optional[tuple[tuple[str, str, str]]]
+    binnings: Optional[list["Binning"]]
+    aggregation: Optional["Aggregation"]
+
+    encoding: Optional["Encodings"]
+
+    chart: Optional[alt.Chart]
+
+    def get_children(self) -> list["VisualizationNode"]:
+        filtered_attrs = [
+            attr for attr in self.attrs if self.sub_df[attr.name].nunique() != 1
+        ]
+        dim = len(filtered_attrs)
+
+        children: list["VisualizationNode"] = []
+        types = self.get_number_of_types()
+
+        if dim == 1 and filtered_attrs[0].type == "N":
+            for encoding in ["bar", "arc"]:
+                child = deepcopy(self)
+                child.aggregation = Aggregation(by=[types["N"][0].name], type="count")
+                child.encoding = Encodings(
+                    encoding,
+                    alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
+                    alt.Y(field=types["N"][0].name, aggregate="count", type="nominal"),  # type: ignore
+                )
+                children.append(child)
+
+        elif dim == 1 and filtered_attrs[0].type == "Q":
+            for agg in ["count", "sum", "mean"]:
+                child = deepcopy(self)
+                child.binnings = [Binning(by=types["Q"][0].name)]
+                child.aggregation = Aggregation(by=[types["Q"][0].name], type=agg)
+                child.encoding = Encodings(
+                    "bar",
+                    alt.X(field=types["Q"][0].name, type="quantitative"),  # type: ignore
+                    alt.Y(field=types["Q"][0].name, aggregate=agg, type="quantitative"),  # type: ignore
+                )
+                children.append(child)
+
+        # QQ
+        elif dim == 2 and len(types["Q"]) == 2:
+            # Scatterplot
+            child = deepcopy(self)
+            child.encoding = Encodings(
+                "circle",
+                alt.X(field=types["Q"][0].name, type="quantitative"),  # type: ignore
+                alt.Y(field=types["Q"][1].name, type="quantitative"),  # type: ignore
+            )
+            children.append(child)
+
+            # Heatmap
+            child = deepcopy(self)
+            child.binnings = [
+                Binning(by=types["Q"][0].name),
+                Binning(by=types["Q"][1].name),
+            ]
+            child.aggregation = Aggregation(
+                by=[types["Q"][0].name, types["Q"][1].name], type="count"
+            )
+            child.encoding = Encodings(
+                "rect",
+                alt.X(field=types["Q"][0].name, type="quantitative", bin=True),  # type: ignore
+                alt.Y(field=types["Q"][1].name, type="quantitative", bin=True),  # type: ignore
+                alt.Color(aggregate="count", type="quantitative"),  # type: ignore
+            )
+            children.append(child)
+
+        # QN
+        elif dim == 2 and len(types["Q"]) == 1 and len(types["N"]) == 1:
+            # Bar
+            for agg in ["sum", "mean", "max", "min"]:
+                child = deepcopy(self)
+                child.aggregation = Aggregation(by=[types["N"][0].name], type=agg)
+                child.encoding = Encodings(
+                    "bar",
+                    alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
+                    alt.Y(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
+                )
+                children.append(child)
+
+            # Pie
+            # for agg in ["sum", "mean", "max", "min"]:
+            #     child = deepcopy(self)
+            #     child.aggregation = Aggregation(by=[types["N"][0].name], type=agg)
+            #     child.encoding = Encodings(
+            #         "arc",
+            #         alt.Color(field=types["N"][0].name, type="nominal"),  # type: ignore
+            #         alt.Theta(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
+            #     )
+            #     children.append(child)
+
+        # NN
+        elif dim == 2 and len(types["N"]) == 2:
+            # Heatmap
+            child = deepcopy(self)
+            child.aggregation = Aggregation(
+                by=[types["N"][0].name, types["N"][1].name], type="count"
+            )
+            child.encoding = Encodings(
+                "rect",
+                alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
+                alt.Y(field=types["N"][1].name, type="nominal"),  # type: ignore
+                alt.Color(aggregate="count", type="quantitative"),  # type: ignore
+            )
+            children.append(child)
+
+        # QQQ
+        elif dim == 3 and len(types["Q"]) == 3:
+            # Colored Scatterplot
+            for i in range(3):
+                child = deepcopy(self)
+                child.binnings = [Binning(by=types["Q"][i].name)]
+                child.encoding = Encodings(
+                    "circle",
+                    alt.X(field=types["Q"][i].name, type="quantitative"),  # type: ignore
+                    alt.Y(field=types["Q"][(i + 1) % 3].name, type="quantitative"),  # type: ignore
+                    alt.Color(field=types["Q"][(i + 2) % 3].name, type="quantitative", bin=True),  # type: ignore
+                )
+                children.append(child)
+
+            # Heatmap
+            for i in range(3):
+                for agg in ["mean", "max"]:
+                    child = deepcopy(self)
+                    child.binnings = [
+                        Binning(by=types["Q"][i].name),
+                        Binning(by=types["Q"][(i + 1) % 3].name),
+                    ]
+                    child.encoding = Encodings(
+                        "rect",
+                        alt.X(field=types["Q"][i].name, type="quantitative", bin=True),  # type: ignore
+                        alt.Y(field=types["Q"][(i + 1) % 3].name, type="quantitative", bin=True),  # type: ignore
+                        alt.Color(field=types["Q"][(i + 2) % 3].name, type="quantitative", aggregate=agg),  # type: ignore
+                    )
+                    children.append(child)
+
+        # QQN
+        elif dim == 3 and len(types["Q"]) == 2 and len(types["N"]) == 1:
+            # Colored Scatterplot
+            child = deepcopy(self)
+            child.encoding = Encodings(
+                "circle",
+                alt.X(field=types["Q"][0].name, type="quantitative"),  # type: ignore
+                alt.Y(field=types["Q"][1].name, type="quantitative"),  # type: ignore
+                alt.Color(field=types["N"][0].name, type="nominal"),  # type: ignore
+            )
+            children.append(child)
+
+            # Heatmap
+            for i in range(2):
+                for agg in ["mean", "max"]:
+                    child = deepcopy(self)
+                    child.binnings = [Binning(by=types["Q"][i].name)]
+                    child.encoding = Encodings(
+                        "rect",
+                        alt.X(field=types["Q"][i].name, type="quantitative", bin=True),  # type: ignore
+                        alt.Y(field=types["N"][0].name, type="nominal"),  # type: ignore
+                        alt.Color(field=types["Q"][1 - i].name, type="quantitative", aggregate=agg),  # type: ignore
+                    )
+                    children.append(child)
+
+        # QNN
+        elif dim == 3 and len(types["Q"]) == 1 and len(types["N"]) == 2:
+            # Stacked Bar
+            for i in range(2):
+                for agg in ["count", "sum", "mean", "max", "min"]:
+                    child = deepcopy(self)
+                    child.aggregation = Aggregation(
+                        by=[types["N"][0].name, types["N"][1].name], type=agg
+                    )
+                    child.encoding = Encodings(
+                        "stacked_bar",
+                        alt.X(field=types["N"][i].name, type="nominal"),  # type: ignore
+                        alt.Y(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
+                        alt.Color(field=types["N"][1 - i].name, type="nominal"),  # type: ignore
+                    )
+                    children.append(child)
+
+            # Grouped Bar
+            for i in range(2):
+                for agg in ["count", "sum", "mean", "max", "min"]:
+                    child = deepcopy(self)
+                    child.aggregation = Aggregation(
+                        by=[types["N"][0].name, types["N"][1].name], type=agg
+                    )
+                    child.encoding = Encodings(
+                        "grouped_bar",
+                        alt.X(field=types["N"][i].name, type="nominal"),  # type: ignore
+                        alt.Y(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
+                        alt.Column(field=types["N"][1 - i].name, type="nominal"),  # type: ignore
+                    )
+                    children.append(child)
+
+            # Heatmap
+            for agg in ["mean", "max"]:
+                child = deepcopy(self)
+                child.encoding = Encodings(
+                    "rect",
+                    alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
+                    alt.Y(field=types["N"][1].name, type="nominal"),  # type: ignore
+                    alt.Color(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
+                )
+                children.append(child)
+
+        return children
+
+    def get_chart(self) -> alt.Chart:
+        chart = alt.Chart(self.sub_df)  # type: ignore
+
+        if self.encoding is None:
+            return chart
+
+        chart: alt.Chart = chart.encode(x=self.encoding.x, y=self.encoding.y)
+
+        if self.encoding.chart_type == "circle":
+            chart = chart.mark_circle()
+            if self.encoding.z:
+                chart = chart.encode(color=self.encoding.z)
+        elif self.encoding.chart_type == "bar":
+            chart = chart.mark_bar()
+        elif self.encoding.chart_type == "grouped_bar":
+            chart = chart.mark_bar().encode(column=self.encoding.z)
+        elif self.encoding.chart_type == "stacked_bar":
+            chart = chart.mark_bar().encode(color=self.encoding.z)
+        elif self.encoding.chart_type == "rect":
+            chart = chart.mark_rect().encode(color=self.encoding.z)
+        elif self.encoding.chart_type == "line":
+            chart = chart.mark_line()
+        elif self.encoding.chart_type == "area":
+            chart = chart.mark_area()
+        elif self.encoding.chart_type == "arc":
+            chart = alt.Chart(self.sub_df)  # type: ignore
+            chart = chart.mark_arc()
+            chart = chart.encode(
+                color=self.encoding.x,
+                theta=self.encoding.y,
+            )
+        return chart
+
+    def get_number_of_types(
+        self,
+    ) -> dict[Literal["Q", "N", "T", "O"], list["Attribute"]]:
+        types: dict[Literal["Q", "N", "T", "O"], list["Attribute"]] = {
             "Q": [],
             "N": [],
             "O": [],
             "T": [],
         }
-        for i in range(len(self.attrs)):
-            types[self.attrs[i].type].append(i)
+        for attr in self.attrs:
+            if self.sub_df[attr.name].nunique() != 1:
+                types[attr.type].append(attr)
         return types
-
-    def get_copy(self) -> "VISNode":
-        return deepcopy(self)
-
-    def get_df(self) -> Union[pd.DataFrame, None]:
-        df = self.raw_df.copy()
-        # print(df)
-        for transform in self.transforms:
-            if len(df.dropna()) < MIN_ROWS:
-                return None
-
-            # print(transform)
-            if isinstance(transform, Aggregation):
-                if transform.type == "count":
-                    df = df.groupby(transform.by).size().reset_index(name=f"count")
-
-                df = df.groupby(transform.by).agg(transform.type).reset_index()
-            elif isinstance(transform, Filter):
-                df = df[df[transform.by] == transform.value]
-                df = df.drop(columns=transform.by)
-            elif isinstance(transform, Sort):
-                df = df.sort_values(
-                    by=transform.by,
-                    ascending=True if transform.type == "asc" else False,
-                )
-            elif isinstance(transform, Binning):
-                N = df[transform.by].count()
-                MAX_BINS = 10
-                num_bins = min(MAX_BINS, N)
-                unique_values = df[transform.by].sort_values().unique()
-
-                step = (
-                    int(len(unique_values) / num_bins)
-                    if len(unique_values) > num_bins
-                    else 1
-                )
-                bin_edges = unique_values[::step]
-
-                labels = [
-                    [bin_edges[i], bin_edges[i + 1]] for i in range(len(bin_edges) - 1)
-                ]
-                labels[0][0] = min(unique_values)
-                labels[-1][1] = max(unique_values)
-                labels = [f"{label[0]}-{label[1]}" for label in labels]
-
-                df[transform.by] = pd.cut(
-                    df[transform.by],
-                    bins=bin_edges.tolist(),
-                    right=True,
-                    labels=labels,
-                    duplicates="raise",
-                    include_lowest=True,
-                    precision=0,
-                )  # type: ignore
-            self.df = df
-        return df
-
-    def get_altair(self) -> list[alt.Chart]:
-        df = self.get_df()
-        if df is None:
-            return []
-        return [encoding.get_altair(df) for encoding in self.encodings]
 
     def get_bov(self) -> Set[str]:
         bov: Set[str] = set()
-        bov.update([attr.name for attr in self.attrs])
-        bov.update([transform.name for transform in self.transforms])
-        bov.add(self.encodings[0].mark)
+        bov.update([f"attr_{attr.name}" for attr in self.attrs])
+        if self.filters:
+            bov.update([f"filter_to_{filter[0]}" for filter in self.filters])
+            bov.update([f"filter_by_{filter[2]}" for filter in self.filters])
+        if self.binnings:
+            bov.update([f"bin_by_{binning.by}" for binning in self.binnings])
+        if self.aggregation:
+            bov.add(f"agg_by_{self.aggregation.by}")
+            bov.add(f"agg_type_{self.aggregation.type}")
+        if self.encoding:
+            bov.add(self.encoding.chart_type)
         return bov
 
-    def get_coverage(self) -> dict[str, float]:
-        coverage = {key: 1.0 for key in self.raw_df.columns.tolist()}
-        for transform in self.transforms:
-            if isinstance(transform, Aggregation):
-                coverage = {key: value * 0.5 for key, value in coverage.items()}
-            elif isinstance(transform, Filter):
-                ratio = self.raw_df[transform.by].value_counts(normalize=True)[
-                    transform.value
-                ]
-                coverage[transform.by] *= ratio
-            elif isinstance(transform, Sort):
-                pass
-            elif isinstance(transform, Binning):
-                coverage = {key: value * 0.25 for key, value in coverage.items()}
+    def get_coverage(self, raw_df: pd.DataFrame) -> dict[str, float]:
+        row_ratio = len(self.sub_df) / len(raw_df)
+        coverage = {attr.name: 1.0 * row_ratio for attr in self.attrs}
+        if self.binnings:
+            for binning in self.binnings:
+                coverage[binning.by] *= 0.75
+        if self.aggregation:
+            for attr in self.aggregation.by:
+                coverage[attr] *= 0.5
         return coverage
 
-
-class Visualizations:
-    def __init__(self, node: "VISNode", encoding: EncodingType) -> None:
-        self.attrs = node.attrs
-        self.transforms = node.transforms
-        self.encoding = encoding
-        self.raw_df = node.raw_df
-
-    def __str__(self) -> str:
-        return f"encoding: {self.encoding} attrs: {self.attrs} transforms: {self.transforms}"
+    def get_info(self) -> str:
+        info = ""
+        info += f"Attributes: {[attr.name for attr in self.attrs]}\n"
+        if self.filters:
+            info += f"Filters: {[[f[0], f[1]]  for f in self.filters]}\n"
+        if self.binnings:
+            info += f"Binnings: {[binning.by for binning in self.binnings]}\n"
+        if self.aggregation:
+            info += f"Aggregation: {self.aggregation.type}({self.aggregation.by})\n"
+        if self.encoding:
+            info += f"Encodings: {self.encoding}\n"
+        return info
