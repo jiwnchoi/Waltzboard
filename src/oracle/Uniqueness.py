@@ -3,7 +3,7 @@ import numpy as np
 
 
 if TYPE_CHECKING:
-    from ..space.Node import VISNode
+    from ..space.Node import VisualizationNode
 
 
 def jcd_index(sets: list[set]) -> float:
@@ -27,7 +27,7 @@ def jcd_index(sets: list[set]) -> float:
     return jaccard_matrix[np.triu_indices(n, 1)].sum() - n
 
 
-def get_uniqueness_from_nodes(nodes: list["VISNode"]) -> float:
+def get_uniqueness_from_nodes(nodes: list["VisualizationNode"]) -> float:
     bovs = [node.get_bov() for node in nodes]
     n = len(bovs)
     return jcd_index(bovs) / (n * (n - 1) / 2)
