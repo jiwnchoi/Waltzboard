@@ -22,6 +22,7 @@ from .space.Node import VisualizationNode
 
 from .oracle.OracleResult import OracleResult
 from .oracle.OracleWeight import OracleWeight
+from .oracle.Interestingness import get_statistic_feature_hashmap
 
 agg_types: list[AggregationType] = ["max", "min", "mean", "sum"]
 
@@ -112,10 +113,13 @@ class Columbus:
     def __init__(self, df: pd.DataFrame) -> None:
         self.df = df
         self.columns: dict[str, Attribute] = {
-            col: Attribute(col, ("N" if df[col].dtype == "object" else "Q"), False)
+            col: Attribute(col, ("N" if df[col].dtype == "object" else "Q"))
             for col in [str(col) for col in df.columns]
         }
         self.sub_dfs = get_sub_dfs(df, self.columns)
+
+        self.statistical_features = get_statistic_feature_hashmap(self.sub_dfs)
+
         self.oracle = ColumbusOracle(OracleWeight())
         self.nodes = [
             VisualizationNode(
@@ -129,14 +133,19 @@ class Columbus:
             )
             for sub_df in self.sub_dfs
         ]
-        self.visualizations = []
+        self.visualizations: list[VisualizationNode] = []
         for node in self.nodes:
             self.visualizations.extend(node.get_children())
 
+    def __len__(self) -> int:
+        return len(self.visualizations)
+
     def sample(self, num_views: int, wildcards: list[str]) -> "Multiview":
-        samples = [sample(self.visualizations, num_views) for _ in range(1000)]
+        samples = [sample(self.visualizations, num_views) for _ in range(10)]
         multiview_oracle_result = [
-            self.oracle.get_result(multiview, self.df, set(wildcards))
+            self.oracle.get_result(
+                multiview, self.df, set(wildcards), self.statistical_features
+            )
             for multiview in samples
         ]
         multiview_scores = [result.get_score() for result in multiview_oracle_result]

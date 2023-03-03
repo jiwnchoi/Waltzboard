@@ -4,6 +4,7 @@ from src.oracle import (
     get_uniqueness_from_nodes,
     get_interestingness_from_nodes,
     get_specificity_from_nodes,
+    HashMap,
 )
 from typing import TYPE_CHECKING, Optional
 import pandas as pd
@@ -17,12 +18,16 @@ class ColumbusOracle:
         self.weight = OracleWeight() if weight is None else weight
 
     def get_result(
-        self, nodes: list["VisualizationNode"], df: pd.DataFrame, wildcard: set[str]
+        self,
+        nodes: list["VisualizationNode"],
+        df: pd.DataFrame,
+        wildcard: set[str],
+        hashmap: HashMap,
     ) -> OracleResult:
         return OracleResult(
             weight=self.weight,
             coverage=get_coverage_from_nodes(nodes, df),
             uniqueness=get_uniqueness_from_nodes(nodes),
-            interestingness=get_interestingness_from_nodes(nodes, df),
+            interestingness=get_interestingness_from_nodes(nodes, hashmap),
             specificity=get_specificity_from_nodes(nodes, wildcard),
         )
