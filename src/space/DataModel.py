@@ -6,18 +6,13 @@ import pandas as pd
 @dataclass
 class Attribute:
     name: str
-    type: Literal["Q", "N", "T", "O"]
+    type: Literal["Q", "C", "T", "O", "N", "N"]
 
     def __str__(self):
         return self.name
 
-    def get_long_type(self) -> str:
-        return {
-            "Q": "quantitative",
-            "N": "nominal",
-            "T": "temporal",
-            "O": "ordinal",
-        }[self.type]
+    def to_dict(self):
+        return {"name": self.name, "type": self.type}
 
 
 @dataclass

@@ -1,28 +1,26 @@
-import pandas as pd
-import numpy as np
-import altair as alt
+# type: ignore
+
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Set, Optional
-
-from .DataTransformsModel import Aggregation, Filter, Sort, Binning, TransformType
-
-from config import MAX_BINS, MIN_ROWS
-from typing import Union
-
 from dataclasses import dataclass
+from typing import TYPE_CHECKING, Literal, Optional, Set, Union
+
+import altair as alt
+import pandas as pd
+
+from .DataTransformsModel import Aggregation, Binning
 
 if TYPE_CHECKING:
     from .DataModel import Attribute
 
 
-chart_type = Literal["bar", "line", "circle", "area", "arc", "rect"]
+chart_type = Literal["bar", "line", "point", "area", "arc", "rect"]
 
 
 @dataclass
 class Encodings:
     chart_type: str
     x: Union[alt.X, alt.Color]
-    y: Union[alt.Y, alt.Theta]
+    y: Union[alt.Y, alt.Theta, None] = None
     z: Union[alt.Color, alt.Column, alt.Y, None] = None
 
 
@@ -48,37 +46,44 @@ class VisualizationNode:
         children: list["VisualizationNode"] = []
         types = self.get_number_of_types()
 
-        if dim == 1 and filtered_attrs[0].type == "N":
+        if dim == 1 and filtered_attrs[0].type == "C":
             for encoding in ["bar", "arc"]:
                 child = deepcopy(self)
-                child.aggregation = Aggregation(by=[types["N"][0].name], type="count")
+                child.aggregation = Aggregation(by=[types["C"][0].name], type="count")
                 child.encoding = Encodings(
                     encoding,
-                    alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
-                    alt.Y(field=types["N"][0].name, aggregate="count", type="nominal"),  # type: ignore
+                    alt.X(field=types["C"][0].name, type="nominal"),
+                    alt.Y(field=types["C"][0].name, aggregate="count", type="nominal"),
                 )
                 children.append(child)
 
         elif dim == 1 and filtered_attrs[0].type == "Q":
-            for agg in ["count", "sum", "mean"]:
-                child = deepcopy(self)
-                child.binnings = [Binning(by=types["Q"][0].name)]
-                child.aggregation = Aggregation(by=[types["Q"][0].name], type=agg)
-                child.encoding = Encodings(
-                    "bar",
-                    alt.X(field=types["Q"][0].name, type="quantitative"),  # type: ignore
-                    alt.Y(field=types["Q"][0].name, aggregate=agg, type="quantitative"),  # type: ignore
-                )
-                children.append(child)
+            # Stripplot
+            child = deepcopy(self)
+            child.encoding = Encodings(
+                "tick", x=alt.X(field=types["Q"][0].name, type="quantitative")
+            )
+            children.append(child)
+
+            # Histogram
+            child = deepcopy(self)
+            child.binnings = [Binning(by=types["Q"][0].name)]
+            child.aggregation = Aggregation(by=[types["Q"][0].name], type="count")
+            child.encoding = Encodings(
+                "bar",
+                alt.X(field=types["Q"][0].name, type="quantitative"),
+                alt.Y(field=types["Q"][0].name, aggregate="count", type="quantitative"),
+            )
+            children.append(child)
 
         # QQ
         elif dim == 2 and len(types["Q"]) == 2:
             # Scatterplot
             child = deepcopy(self)
             child.encoding = Encodings(
-                "circle",
-                alt.X(field=types["Q"][0].name, type="quantitative"),  # type: ignore
-                alt.Y(field=types["Q"][1].name, type="quantitative"),  # type: ignore
+                "point",
+                alt.X(field=types["Q"][0].name, type="quantitative"),
+                alt.Y(field=types["Q"][1].name, type="quantitative"),
             )
             children.append(child)
 
@@ -93,48 +98,80 @@ class VisualizationNode:
             )
             child.encoding = Encodings(
                 "rect",
-                alt.X(field=types["Q"][0].name, type="quantitative", bin=True),  # type: ignore
-                alt.Y(field=types["Q"][1].name, type="quantitative", bin=True),  # type: ignore
-                alt.Color(aggregate="count", type="quantitative"),  # type: ignore
+                alt.X(field=types["Q"][0].name, type="quantitative", bin=True),
+                alt.Y(field=types["Q"][1].name, type="quantitative", bin=True),
+                alt.Color(aggregate="count", type="quantitative"),
             )
             children.append(child)
 
         # QN
-        elif dim == 2 and len(types["Q"]) == 1 and len(types["N"]) == 1:
+        elif dim == 2 and len(types["Q"]) == 1 and len(types["C"]) == 1:
             # Bar
             for agg in ["sum", "mean", "max", "min"]:
                 child = deepcopy(self)
-                child.aggregation = Aggregation(by=[types["N"][0].name], type=agg)
+                child.aggregation = Aggregation(by=[types["C"][0].name], type=agg)
                 child.encoding = Encodings(
                     "bar",
-                    alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
-                    alt.Y(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
+                    alt.X(field=types["C"][0].name, type="nominal"),
+                    alt.Y(field=types["Q"][0].name, type="quantitative", aggregate=agg),
                 )
                 children.append(child)
 
             # Pie
-            # for agg in ["sum", "mean", "max", "min"]:
-            #     child = deepcopy(self)
-            #     child.aggregation = Aggregation(by=[types["N"][0].name], type=agg)
-            #     child.encoding = Encodings(
-            #         "arc",
-            #         alt.Color(field=types["N"][0].name, type="nominal"),  # type: ignore
-            #         alt.Theta(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
-            #     )
-            #     children.append(child)
+            for agg in ["sum", "mean", "max", "min"]:
+                child = deepcopy(self)
+                child.aggregation = Aggregation(by=[types["C"][0].name], type=agg)
+                child.encoding = Encodings(
+                    "arc",
+                    alt.Color(field=types["C"][0].name, type="nominal"),
+                    alt.Theta(
+                        field=types["Q"][0].name, type="quantitative", aggregate=agg
+                    ),
+                )
+                children.append(child)
+
+            # Stripplot
+            child = deepcopy(self)
+            child.encoding = Encodings(
+                "tick",
+                alt.X(field=types["Q"][0].name, type="quantitative"),
+                alt.Y(field=types["C"][0].name, type="nominal"),
+            )
+            children.append(child)
+
+            # Boxplot
+            child = deepcopy(self)
+            child.encoding = Encodings(
+                "boxplot",
+                alt.X(field=types["C"][0].name, type="nominal"),
+                alt.Y(field=types["Q"][0].name, type="quantitative"),
+            )
+            children.append(child)
+
+            # Layered Histogram
+            child = deepcopy(self)
+            child.binnings = [Binning(by=types["Q"][0].name)]
+            child.aggregation = Aggregation(by=[types["Q"][0].name], type="count")
+            child.encoding = Encodings(
+                "bar",
+                alt.X(field=types["Q"][0].name, type="quantitative", bin=True),
+                alt.Y(field=types["Q"][0].name, aggregate=agg, type="quantitative"),
+                alt.Color(field=types["C"][0].name, type="nominal"),
+            )
+            children.append(child)
 
         # NN
-        elif dim == 2 and len(types["N"]) == 2:
+        elif dim == 2 and len(types["C"]) == 2:
             # Heatmap
             child = deepcopy(self)
             child.aggregation = Aggregation(
-                by=[types["N"][0].name, types["N"][1].name], type="count"
+                by=[types["C"][0].name, types["C"][1].name], type="count"
             )
             child.encoding = Encodings(
                 "rect",
-                alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
-                alt.Y(field=types["N"][1].name, type="nominal"),  # type: ignore
-                alt.Color(aggregate="count", type="quantitative"),  # type: ignore
+                alt.X(field=types["C"][0].name, type="nominal"),
+                alt.Y(field=types["C"][1].name, type="nominal"),
+                alt.Color(aggregate="count", type="quantitative"),
             )
             children.append(child)
 
@@ -145,10 +182,14 @@ class VisualizationNode:
                 child = deepcopy(self)
                 child.binnings = [Binning(by=types["Q"][i].name)]
                 child.encoding = Encodings(
-                    "circle",
-                    alt.X(field=types["Q"][i].name, type="quantitative"),  # type: ignore
-                    alt.Y(field=types["Q"][(i + 1) % 3].name, type="quantitative"),  # type: ignore
-                    alt.Color(field=types["Q"][(i + 2) % 3].name, type="quantitative", bin=True),  # type: ignore
+                    "point",
+                    alt.X(field=types["Q"][i].name, type="quantitative"),
+                    alt.Y(field=types["Q"][(i + 1) % 3].name, type="quantitative"),
+                    alt.Color(
+                        field=types["Q"][(i + 2) % 3].name,
+                        type="quantitative",
+                        bin=True,
+                    ),
                 )
                 children.append(child)
 
@@ -162,21 +203,29 @@ class VisualizationNode:
                     ]
                     child.encoding = Encodings(
                         "rect",
-                        alt.X(field=types["Q"][i].name, type="quantitative", bin=True),  # type: ignore
-                        alt.Y(field=types["Q"][(i + 1) % 3].name, type="quantitative", bin=True),  # type: ignore
-                        alt.Color(field=types["Q"][(i + 2) % 3].name, type="quantitative", aggregate=agg),  # type: ignore
+                        alt.X(field=types["Q"][i].name, type="quantitative", bin=True),
+                        alt.Y(
+                            field=types["Q"][(i + 1) % 3].name,
+                            type="quantitative",
+                            bin=True,
+                        ),
+                        alt.Color(
+                            field=types["Q"][(i + 2) % 3].name,
+                            type="quantitative",
+                            aggregate=agg,
+                        ),
                     )
                     children.append(child)
 
         # QQN
-        elif dim == 3 and len(types["Q"]) == 2 and len(types["N"]) == 1:
+        elif dim == 3 and len(types["Q"]) == 2 and len(types["C"]) == 1:
             # Colored Scatterplot
             child = deepcopy(self)
             child.encoding = Encodings(
-                "circle",
-                alt.X(field=types["Q"][0].name, type="quantitative"),  # type: ignore
-                alt.Y(field=types["Q"][1].name, type="quantitative"),  # type: ignore
-                alt.Color(field=types["N"][0].name, type="nominal"),  # type: ignore
+                "point",
+                alt.X(field=types["Q"][0].name, type="quantitative"),
+                alt.Y(field=types["Q"][1].name, type="quantitative"),
+                alt.Color(field=types["C"][0].name, type="nominal"),
             )
             children.append(child)
 
@@ -187,67 +236,83 @@ class VisualizationNode:
                     child.binnings = [Binning(by=types["Q"][i].name)]
                     child.encoding = Encodings(
                         "rect",
-                        alt.X(field=types["Q"][i].name, type="quantitative", bin=True),  # type: ignore
-                        alt.Y(field=types["N"][0].name, type="nominal"),  # type: ignore
-                        alt.Color(field=types["Q"][1 - i].name, type="quantitative", aggregate=agg),  # type: ignore
+                        alt.X(field=types["Q"][i].name, type="quantitative", bin=True),
+                        alt.Y(field=types["C"][0].name, type="nominal"),
+                        alt.Color(
+                            field=types["Q"][1 - i].name,
+                            type="quantitative",
+                            aggregate=agg,
+                        ),
                     )
                     children.append(child)
 
         # QNN
-        elif dim == 3 and len(types["Q"]) == 1 and len(types["N"]) == 2:
+        elif dim == 3 and len(types["Q"]) == 1 and len(types["C"]) == 2:
             # Stacked Bar
             for i in range(2):
                 for agg in ["count", "sum", "mean", "max", "min"]:
                     child = deepcopy(self)
                     child.aggregation = Aggregation(
-                        by=[types["N"][0].name, types["N"][1].name], type=agg
+                        by=[types["C"][0].name, types["C"][1].name], type=agg
                     )
                     child.encoding = Encodings(
                         "stacked_bar",
-                        alt.X(field=types["N"][i].name, type="nominal"),  # type: ignore
-                        alt.Y(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
-                        alt.Color(field=types["N"][1 - i].name, type="nominal"),  # type: ignore
+                        alt.X(field=types["C"][i].name, type="nominal"),
+                        alt.Y(
+                            field=types["Q"][0].name, type="quantitative", aggregate=agg
+                        ),
+                        alt.Color(field=types["C"][1 - i].name, type="nominal"),
                     )
                     children.append(child)
 
-            # Grouped Bar
-            for i in range(2):
-                for agg in ["count", "sum", "mean", "max", "min"]:
-                    child = deepcopy(self)
-                    child.aggregation = Aggregation(
-                        by=[types["N"][0].name, types["N"][1].name], type=agg
-                    )
-                    child.encoding = Encodings(
-                        "grouped_bar",
-                        alt.X(field=types["N"][i].name, type="nominal"),  # type: ignore
-                        alt.Y(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
-                        alt.Column(field=types["N"][1 - i].name, type="nominal"),  # type: ignore
-                    )
-                    children.append(child)
+            # # Grouped Bar
+            # for i in range(2):
+            #     for agg in ["count", "sum", "mean", "max", "min"]:
+            #         child = deepcopy(self)
+            #         child.aggregation = Aggregation(
+            #             by=[types["C"][0].name, types["C"][1].name], type=agg
+            #         )
+            #         child.encoding = Encodings(
+            #             "grouped_bar",
+            #             alt.X(field=types["C"][i].name, type="nominal"),
+            #             alt.Y(
+            #                 field=types["Q"][0].name, type="quantitative", aggregate=agg
+            #             ),
+            #             alt.Column(field=types["C"][1 - i].name, type="nominal"),
+            #         )
+            #         children.append(child)
 
             # Heatmap
             for agg in ["mean", "max"]:
                 child = deepcopy(self)
                 child.encoding = Encodings(
                     "rect",
-                    alt.X(field=types["N"][0].name, type="nominal"),  # type: ignore
-                    alt.Y(field=types["N"][1].name, type="nominal"),  # type: ignore
-                    alt.Color(field=types["Q"][0].name, type="quantitative", aggregate=agg),  # type: ignore
+                    alt.X(field=types["C"][0].name, type="nominal"),
+                    alt.Y(field=types["C"][1].name, type="nominal"),
+                    alt.Color(
+                        field=types["Q"][0].name, type="quantitative", aggregate=agg
+                    ),
                 )
                 children.append(child)
 
         return children
 
-    def get_chart(self) -> alt.Chart:
-        chart = alt.Chart(self.sub_df)  # type: ignore
+    def get_vegalite(self) -> alt.VegaLiteSchema:
+        chart = self.get_altair()
+        return chart.to_json()
+
+    def get_altair(self) -> alt.Chart:
+        chart = alt.Chart(self.sub_df)
 
         if self.encoding is None:
             return chart
 
-        chart: alt.Chart = chart.encode(x=self.encoding.x, y=self.encoding.y)
+        chart: alt.Chart = chart.encode(x=self.encoding.x)
+        if self.encoding.y:
+            chart = chart.encode(y=self.encoding.y)
 
-        if self.encoding.chart_type == "circle":
-            chart = chart.mark_circle()
+        if self.encoding.chart_type == "point":
+            chart = chart.mark_point()
             if self.encoding.z:
                 chart = chart.encode(color=self.encoding.z)
         elif self.encoding.chart_type == "bar":
@@ -256,6 +321,8 @@ class VisualizationNode:
             chart = chart.mark_bar().encode(column=self.encoding.z)
         elif self.encoding.chart_type == "stacked_bar":
             chart = chart.mark_bar().encode(color=self.encoding.z)
+        elif self.encoding.chart_type == "layered_bar":
+            chart = chart.mark_bar().encode(color=self.encoding.z)
         elif self.encoding.chart_type == "rect":
             chart = chart.mark_rect().encode(color=self.encoding.z)
         elif self.encoding.chart_type == "line":
@@ -263,22 +330,25 @@ class VisualizationNode:
         elif self.encoding.chart_type == "area":
             chart = chart.mark_area()
         elif self.encoding.chart_type == "arc":
-            chart = alt.Chart(self.sub_df)  # type: ignore
+            chart = alt.Chart(self.sub_df)
             chart = chart.mark_arc()
-            chart = chart.encode(
-                color=self.encoding.x,
-                theta=self.encoding.y,
-            )
+            chart = chart.encode(color=self.encoding.x, theta=self.encoding.y)
+        elif self.encoding.chart_type == "boxplot":
+            chart = chart.mark_boxplot(extent="min-max")
+        elif self.encoding.chart_type == "tick":
+            chart = chart.mark_tick()
+
         return chart
 
     def get_number_of_types(
         self,
-    ) -> dict[Literal["Q", "N", "T", "O"], list["Attribute"]]:
-        types: dict[Literal["Q", "N", "T", "O"], list["Attribute"]] = {
+    ) -> dict[Literal["Q", "C", "T", "O", "N"], list["Attribute"]]:
+        types: dict[Literal["Q", "C", "T", "O", "N"], list["Attribute"]] = {
             "Q": [],
-            "N": [],
+            "C": [],
             "O": [],
             "T": [],
+            "N": [],
         }
         for attr in self.attrs:
             if self.sub_df[attr.name].nunique() != 1:

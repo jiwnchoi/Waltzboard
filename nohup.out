@@ -1,0 +1,122 @@
+INFO:     Will watch for changes in these directories: ['/home/jasonchoi3/project/Columbus']
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO:     Started reloader process [1518410] using StatReload
+19
+INFO:     Started server process [1518413]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     172.19.0.2:50162 - "GET /5000 HTTP/1.1" 404 Not Found
+INFO:     172.19.0.2:59814 - "GET /5000/init HTTP/1.1" 404 Not Found
+INFO:     172.19.0.2:48964 - "GET /5000/init HTTP/1.1" 404 Not Found
+WARNING:  StatReload detected changes in 'api.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1518413]
+19
+INFO:     Started server process [1518926]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     172.19.0.2:57204 - "GET /5000/init HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 407, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/applications.py", line 271, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/applications.py", line 118, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/cors.py", line 84, in __call__
+    await self.app(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/routing.py", line 706, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/routing.py", line 66, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/routing.py", line 237, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/routing.py", line 163, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/project/Columbus/api.py", line 58, in init
+    result=columbus.sample(ColumbusOracle(), num_vis, 100, []).to_dict(),
+                           ^^^^^^^^^^^^^^^^
+TypeError: ColumbusOracle.__init__() missing 1 required positional argument: 'weight'
+INFO:     172.19.0.2:54348 - "GET /5000/init HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 407, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 78, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/applications.py", line 271, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/applications.py", line 118, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/errors.py", line 184, in __call__
+    raise exc
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/cors.py", line 84, in __call__
+    await self.app(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 79, in __call__
+    raise exc
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 68, in __call__
+    await self.app(scope, receive, sender)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 21, in __call__
+    raise e
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/routing.py", line 706, in __call__
+    await route.handle(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/starlette/routing.py", line 66, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/routing.py", line 237, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/.conda/envs/vistiller/lib/python3.11/site-packages/fastapi/routing.py", line 163, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jasonchoi3/project/Columbus/api.py", line 58, in init
+    result=columbus.sample(ColumbusOracle(), num_vis, 100, []).to_dict(),
+                           ^^^^^^^^^^^^^^^^
+TypeError: ColumbusOracle.__init__() missing 1 required positional argument: 'weight'
+WARNING:  StatReload detected changes in 'api.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1518926]
+19
+INFO:     Started server process [1519255]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     172.19.0.2:36862 - "GET /5000/init HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1519255]
+INFO:     Stopping reloader process [1518410]

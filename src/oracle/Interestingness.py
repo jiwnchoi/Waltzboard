@@ -70,9 +70,7 @@ def has_significance_qn(df: pd.DataFrame, attr_q: str, attr_n: str) -> bool:
 HashMap = dict[str, list[bool]]
 
 
-def get_statistic_feature_hashmap(
-    vis_dfs: list[VisualizableDataFrame],
-) -> HashMap:
+def get_statistic_feature_hashmap(vis_dfs: list[VisualizableDataFrame],) -> HashMap:
     hashmap: HashMap = {}
 
     for vis_df in vis_dfs:
@@ -81,9 +79,13 @@ def get_statistic_feature_hashmap(
             *list(combinations(vis_df.attrs, 2)),
         ]
         for comb in attr_combinations:
-            key = f"{((f[0], f[1] ) for f in vis_df.filter) if vis_df.filter is not None else ()}/"
+            key = ""
+            if vis_df.filter is not None:
+                for f in vis_df.filter:
+                    key += f"{str((f[0], f[1]))}/"
             target_attrs = [attr.name for attr in comb]
             key += f"{target_attrs}"
+
             df_notnull = vis_df.df[target_attrs].dropna()
             if key not in hashmap:
                 if len(comb) == 1 and comb[0].type == "Q":
@@ -92,13 +94,13 @@ def get_statistic_feature_hashmap(
                         has_skewness_q(df_notnull, comb[0].name),
                         has_kurosis(df_notnull, comb[0].name),
                     ]
-                elif len(comb) == 1 and comb[0].type == "N":
+                elif len(comb) == 1 and comb[0].type == "C":
                     hashmap[key] = [has_outliers_n(df_notnull, comb[0].name)]
-                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "N":
+                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "C":
                     hashmap[key] = [
                         has_significance_qn(df_notnull, comb[0].name, comb[1].name)
                     ]
-                elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "N":
+                elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "C":
                     hashmap[key] = [
                         has_significance_qn(df_notnull, comb[1].name, comb[0].name)
                     ]
@@ -107,7 +109,7 @@ def get_statistic_feature_hashmap(
                         has_correlation_qq(df_notnull, comb[0].name, comb[1].name),
                         has_outliers_qq(df_notnull, comb[0].name, comb[1].name),
                     ]
-                elif len(comb) == 2 and comb[0].type == "N" and comb[1].type == "N":
+                elif len(comb) == 2 and comb[0].type == "C" and comb[1].type == "C":
                     hashmap[key] = [
                         has_correlation_nn(df_notnull, comb[0].name, comb[1].name),
                         has_outliers_nn(df_notnull, comb[0].name, comb[1].name),
@@ -123,12 +125,16 @@ def get_statistic_features_from_node(
         *list(combinations(node.attrs, 1)),
         *list(combinations(node.attrs, 2)),
     ]
-    features = [
-        hashmap[
-            f"{((f[0], f[1] ) for f in node.filters) if node.filters is not None else ()}/{[attr.name for attr in comb]}"
-        ]
-        for comb in attr_combinations
-    ]
+
+    features = []
+    for comb in attr_combinations:
+        key = ""
+        if node.filters is not None:
+            for f in node.filters:
+                key += f"{str((f[0], f[1]))}/"
+        target_attrs = [attr.name for attr in comb]
+        key += f"{target_attrs}"
+        features.append(hashmap[key])
 
     return features
 
