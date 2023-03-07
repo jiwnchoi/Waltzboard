@@ -12,7 +12,7 @@ from pathos.multiprocessing import ProcessingPool as Pool
 from .oracle import ColumbusOracle, OracleResult, OracleWeight
 from .oracle.Interestingness import get_statistic_feature_hashmap
 from .space.DataModel import Attribute, VisualizableDataFrame
-from .space.Node import VisualizationNode
+from .space.Node import VisualizationNode, chart_type
 
 agg_types: list[str] = ["max", "min", "mean", "sum"]
 EncodingType = Literal["bar", "line", "area", "pie", "scatter", "box", "heatmap"]
@@ -193,8 +193,14 @@ class Columbus:
         num_views: int,
         num_samples: int,
         wildcards: list[str],
+        targetChartType: list[str],
     ) -> "Multiview":
-        samples = [sample(self.visualizations, num_views) for _ in range(num_samples)]
+        subspace = [
+            s
+            for s in self.visualizations
+            if s.encoding and s.encoding.chart_type in targetChartType
+        ]
+        samples = [sample(subspace, num_views) for _ in range(num_samples)]
 
         multiview_oracle_result = [
             oracle.get_result(

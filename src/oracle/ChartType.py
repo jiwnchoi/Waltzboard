@@ -22,14 +22,14 @@ class ChartType:
         return {"name": self.name, "mark": self.mark}
 
 
-chart_types: list[ChartType] = [
-    ChartType("Bar Chart", "bar"),
-    ChartType("Line Chart", "line"),
-    ChartType("Pie Chart", "pie"),
-    ChartType("Scatterplot", "point"),
-    ChartType("Area Chart", "area"),
-    ChartType("Heatmap", "rect"),
-    ChartType("Boxplot", "boxplot"),
-    ChartType("Strip Plot", "tick"),
-    ChartType("Histogram", "bar"),
-]
+
+chart_types: dict[str, ChartType] = {
+    "bar": ChartType("Bar Chart", "bar"),
+    "line": ChartType("Line Chart", "line"),
+    "pie": ChartType("Pie Chart", "arc"),
+    "scatter": ChartType("Scatterplot", "point"),
+    "area": ChartType("Area Chart", "area"),
+    "heatmap": ChartType("Heatmap", "rect"),
+    "boxplot": ChartType("Boxplot", "boxplot"),
+    "stripplot": ChartType("Strip Plot", "tick"),
+}

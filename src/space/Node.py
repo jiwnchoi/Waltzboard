@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from .DataModel import Attribute
 
 
-chart_type = Literal["bar", "line", "point", "area", "arc", "rect"]
+chart_type = Literal["bar", "line", "point", "area", "arc", "rect", "tick", "boxplot"]
 
 
 @dataclass
