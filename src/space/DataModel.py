@@ -18,5 +18,5 @@ class Attribute:
 @dataclass
 class VisualizableDataFrame:
     df: pd.DataFrame
-    attrs: tuple["Attribute", ...]
-    filter: Optional[tuple[tuple[str, Any, Any]]]
+    attrs: list["Attribute"]
+    filter: Optional[list[tuple[str, Any, Any]]]

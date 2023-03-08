@@ -81,7 +81,7 @@ def get_sub_dfs(
     ]
 
     filter_combinations = [
-        tuple(comb)
+        list(comb)
         for i in range(0, config.max_filters + 1)
         for comb in combinations(single_filters, i)
     ]
@@ -89,7 +89,7 @@ def get_sub_dfs(
     print(len(filter_combinations))
 
     colum_combinations = [
-        tuple(comb)
+        list(comb)
         for i in range(1, config.max_attributes + 1)
         for comb in combinations(columns.values(), i)
     ]
@@ -99,7 +99,7 @@ def get_sub_dfs(
     for filter_comb in filter_combinations:
         column_filter = {}
         if len(filter_comb) == 0:
-            filtered_dfs.append(VisualizableDataFrame(df, (), None))
+            filtered_dfs.append(VisualizableDataFrame(df, [], None))
             continue
 
         for condition in filter_comb:
@@ -113,7 +113,7 @@ def get_sub_dfs(
         tmp_df = df[combined_filter]
         tmp_df = df.dropna()
         if len(tmp_df) >= config.min_rows:
-            filtered_dfs.append(VisualizableDataFrame(tmp_df, (), filter_comb))
+            filtered_dfs.append(VisualizableDataFrame(tmp_df, [], filter_comb))
 
     return [
         [
@@ -192,6 +192,7 @@ class Columbus:
         oracle: ColumbusOracle,
         num_views: int,
         num_samples: int,
+        num_filters: int,
         wildcards: list[str],
         targetChartType: list[str],
     ) -> "Multiview":
@@ -199,7 +200,9 @@ class Columbus:
             s
             for s in self.visualizations
             if s.encoding and s.encoding.chart_type in targetChartType
+            if s.filters is None or (s.filters and len(s.filters) <= num_filters)
         ]
+        num_samples = min(num_samples, len(subspace))
         samples = [sample(subspace, num_views) for _ in range(num_samples)]
 
         multiview_oracle_result = [

@@ -54,17 +54,18 @@ config = ColumbusCofnig()
 columbus = Columbus(df, config)
 
 
-@app.get("/5001/init")
-async def init(num_vis: int = 12) -> InitItem:
+@app.post("/5001/init")
+async def init(body: CreateDashboardBody) -> InitItem:
     return InitItem(
         chartTypes=[c.to_dict() for c in chart_types.values()],
         taskTypes=[t.to_dict() for t in task_types.values()],
         attributes=columbus.get_attributes(),
         result=columbus.sample(
             ColumbusOracle(OracleWeight()),
-            num_vis,
-            100,
-            [],
+            body.numVis,
+            body.numSample,
+            body.numFilter,
+            body.wildcard,
             [c.mark for c in chart_types.values()],
         ).to_dict(),
     )
@@ -77,6 +78,7 @@ async def create_dashboard(body: CreateDashboardBody) -> Result:
             ColumbusOracle(body.weight),
             body.numVis,
             body.numSample,
+            body.numFilter,
             body.wildcard,
             body.chartTypes,
         ).to_dict()

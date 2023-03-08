@@ -27,9 +27,9 @@ class Encodings:
 @dataclass
 class VisualizationNode:
     sub_df: pd.DataFrame
-    attrs: tuple["Attribute"]
+    attrs: list["Attribute"]
 
-    filters: Optional[tuple[tuple[str, str, str]]]
+    filters: Optional[list[tuple[str, str, str]]]
     binnings: Optional[list["Binning"]]
     aggregation: Optional["Aggregation"]
 
@@ -71,7 +71,7 @@ class VisualizationNode:
             child.aggregation = Aggregation(by=[types["Q"][0].name], type="count")
             child.encoding = Encodings(
                 "bar",
-                alt.X(field=types["Q"][0].name, type="quantitative"),
+                alt.X(field=types["Q"][0].name, type="quantitative", bin=True),
                 alt.Y(field=types["Q"][0].name, aggregate="count", type="quantitative"),
             )
             children.append(child)
@@ -197,6 +197,9 @@ class VisualizationNode:
             for i in range(3):
                 for agg in ["mean", "max"]:
                     child = deepcopy(self)
+                    child.aggregation = Aggregation(
+                        by=[types["Q"][i].name, types["Q"][(i + 1) % 3].name], type=agg
+                    )
                     child.binnings = [
                         Binning(by=types["Q"][i].name),
                         Binning(by=types["Q"][(i + 1) % 3].name),
@@ -298,7 +301,9 @@ class VisualizationNode:
         return children
 
     def get_vegalite(self) -> alt.VegaLiteSchema:
+
         chart = self.get_altair()
+        chart.configure_legend(title=None)
         return chart.to_json()
 
     def get_altair(self) -> alt.Chart:
@@ -337,6 +342,43 @@ class VisualizationNode:
             chart = chart.mark_boxplot(extent="min-max")
         elif self.encoding.chart_type == "tick":
             chart = chart.mark_tick()
+
+        num_fields = (
+            3
+            if self.encoding.z
+            else 2
+            if self.encoding.y
+            else 1
+            if self.encoding.x
+            else None
+        )
+
+        value_field_name = (
+            self.encoding.z.field
+            if num_fields == 3
+            else self.encoding.y.field
+            if num_fields == 2
+            else self.encoding.x.field
+            if num_fields == 1
+            else None
+        )
+
+        desc = ""
+        if self.aggregation:
+            desc += f"{self.aggregation.type[0].upper()}{self.aggregation.type[1:]} of "
+        desc += f"{value_field_name} "
+        if num_fields == 3:
+            desc += f"by {self.encoding.x.field} and {self.encoding.y.field} "
+        elif num_fields == 2:
+            desc += f"by {self.encoding.x.field}"
+        if self.filters:
+            desc += ", when "
+            for i, f in enumerate(self.filters):
+                if i > 0:
+                    desc += " and "
+                desc += f"{f[0]} is {f[1]}"
+
+        chart = chart.properties(description=desc)
 
         return chart
 
@@ -393,3 +435,4 @@ class VisualizationNode:
         if self.encoding:
             info += f"Encodings: {self.encoding}\n"
         return info
+
