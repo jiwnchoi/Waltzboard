@@ -26,6 +26,7 @@ class Encodings:
 
 @dataclass
 class VisualizationNode:
+    index: Optional[int]
     sub_df: pd.DataFrame
     attrs: list["Attribute"]
 

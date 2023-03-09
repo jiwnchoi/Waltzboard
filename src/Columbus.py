@@ -4,7 +4,7 @@ from itertools import combinations
 from math import ceil
 from os import cpu_count
 from random import sample
-from typing import Literal
+from typing import Literal, Any
 import altair as alt
 import pandas as pd
 from pathos.multiprocessing import ProcessingPool as Pool
@@ -42,6 +42,7 @@ class Multiview:
     oracle_result: OracleResult
     oracle_weight: OracleWeight
     chart_sequence: list[VisualizationNode]
+    statistic_features: list[dict[str, list[str | None]]]
 
     def get_multiview(self, num_columns: int) -> alt.VConcatChart:
         altairs = [
@@ -59,7 +60,7 @@ class Multiview:
     def get_info(self) -> str:
         return f"Score\n\n{self.score}\n\nOracle Result\n\n{self.oracle_result}"
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "num_views": self.num_views,
             "wildcards": self.wildcards,
@@ -67,6 +68,8 @@ class Multiview:
             "oracle_result": self.oracle_result.to_dict(),
             "oracle_weight": self.oracle_weight.to_dict(),
             "vlspecs": [node.get_vegalite() for node in self.chart_sequence],
+            "indices": [node.index for node in self.chart_sequence],
+            "statistic_features": self.statistic_features,
         }
 
 
@@ -170,6 +173,7 @@ class Columbus:
 
         self.nodes = [
             VisualizationNode(
+                index=-1,
                 sub_df=sub_df.df,
                 attrs=sub_df.attrs,
                 filters=sub_df.filter,
@@ -184,26 +188,39 @@ class Columbus:
         for node in self.nodes:
             self.visualizations.extend(node.get_children())
 
+        for index, node in enumerate(self.visualizations):
+            node.index = index
+
     def __len__(self) -> int:
         return len(self.visualizations)
 
     def sample(
         self,
+        indices: list[int],
         oracle: ColumbusOracle,
         num_views: int,
         num_samples: int,
         num_filters: int,
         wildcards: list[str],
         targetChartType: list[str],
-    ) -> "Multiview":
+    ):
         subspace = [
             s
             for s in self.visualizations
             if s.encoding and s.encoding.chart_type in targetChartType
             if s.filters is None or (s.filters and len(s.filters) <= num_filters)
+            if s.index not in indices
         ]
+
+        current_chart = [self.visualizations[i] for i in indices]
+
         num_samples = min(num_samples, len(subspace))
-        samples = [sample(subspace, num_views) for _ in range(num_samples)]
+        num_additional_charts = num_views - len(indices)
+
+        samples = [
+            current_chart + list(sample(subspace, num_additional_charts))
+            for _ in range(num_samples)
+        ]
 
         multiview_oracle_result = [
             oracle.get_result(
@@ -217,6 +234,11 @@ class Columbus:
         result = multiview_oracle_result[idx]
         sample_sequence = samples[idx]
 
+        sample_sequence_statistic_features = [
+            oracle.get_statistic_features(node, self.statistical_features)
+            for node in sample_sequence
+        ]
+
         return Multiview(
             num_views=num_views,
             wildcards=wildcards,
@@ -224,6 +246,7 @@ class Columbus:
             oracle_result=result,
             oracle_weight=oracle.weight,
             chart_sequence=sample_sequence,
+            statistic_features=sample_sequence_statistic_features,
         )
 
     def get_attributes(self) -> list[dict[str, str]]:

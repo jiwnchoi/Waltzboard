@@ -29,13 +29,18 @@ class Result(BaseModel):
     result: dict
 
 
-class CreateDashboardBody(BaseModel):
+class SampleBody(BaseModel):
     numVis: int
     numSample: int
     numFilter: int
     weight: OracleWeight
     chartTypes: list[str]
     wildcard: list[str]
+    indices: list[int]
+
+
+class AddChartBody(BaseModel):
+    indices: list[int]
 
 
 app = FastAPI()
@@ -55,12 +60,13 @@ columbus = Columbus(df, config)
 
 
 @app.post("/5001/init")
-async def init(body: CreateDashboardBody) -> InitItem:
+async def init(body: SampleBody) -> InitItem:
     return InitItem(
         chartTypes=[c.to_dict() for c in chart_types.values()],
         taskTypes=[t.to_dict() for t in task_types.values()],
         attributes=columbus.get_attributes(),
         result=columbus.sample(
+            [],
             ColumbusOracle(OracleWeight()),
             body.numVis,
             body.numSample,
@@ -71,10 +77,11 @@ async def init(body: CreateDashboardBody) -> InitItem:
     )
 
 
-@app.post("/5001/create_dashboard")
-async def create_dashboard(body: CreateDashboardBody) -> Result:
+@app.post("/5001/sample")
+async def sample(body: SampleBody) -> Result:
     return Result(
         result=columbus.sample(
+            body.indices,
             ColumbusOracle(body.weight),
             body.numVis,
             body.numSample,
