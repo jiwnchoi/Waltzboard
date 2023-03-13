@@ -19,8 +19,26 @@ EncodingType = Literal["bar", "line", "area", "pie", "scatter", "box", "heatmap"
 
 
 @dataclass
+class SequenceScores:
+    score: list[float]
+    coverage: list[float]
+    uniqueness: list[float]
+    interestingness: list[float]
+    specificity: list[float]
+
+    def to_dict(self):
+        return {
+            "score": self.score,
+            "coverage": self.coverage,
+            "uniqueness": self.uniqueness,
+            "interestingness": self.interestingness,
+            "specificity": self.specificity,
+        }
+
+
+@dataclass
 class ColumbusCofnig:
-    max_attributes: int = 4
+    max_attributes: int = 3
     max_categories: int = 10
     max_filters: int = 1
     min_rows: int = 4
@@ -36,40 +54,43 @@ class ColumbusCofnig:
 
 @dataclass
 class Multiview:
-    num_views: int
-    wildcards: list[str]
-    score: float
-    oracle_result: OracleResult
     oracle_weight: OracleWeight
-    chart_sequence: list[VisualizationNode]
+
+    sampled_results: list[OracleResult]
+    sampled_sequences: list[list[VisualizationNode]]
+
+    max_sequence_idx: int
     statistic_features: list[dict[str, list[str | None]]]
+
+    def get_max_sequence(self) -> list[VisualizationNode]:
+        return self.sampled_sequences[self.max_sequence_idx]
+
+    def get_max_result(self) -> OracleResult:
+        return self.sampled_results[self.max_sequence_idx]
 
     def get_multiview(self, num_columns: int) -> alt.VConcatChart:
         altairs = [
             node.get_altair().properties(width=100, height=100)
-            for node in self.chart_sequence
+            for node in self.get_max_sequence()
         ]
         rows: list[alt.HConcatChart] = [
             alt.hconcat(*altairs[i : i + num_columns]).resolve_scale(
                 color="independent"
             )
-            for i in range(0, self.num_views, num_columns)
+            for i in range(0, len(self.get_max_sequence()), num_columns)
         ]
         return alt.vconcat(*rows)
 
     def get_info(self) -> str:
-        return f"Score\n\n{self.score}\n\nOracle Result\n\n{self.oracle_result}"
+        return f"Score\n\n{self.get_max_result().get_score()}\n\nOracle Result\n\n{self.get_max_result()}"
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "num_views": self.num_views,
-            "wildcards": self.wildcards,
-            "score": self.score,
-            "oracle_result": self.oracle_result.to_dict(),
-            "oracle_weight": self.oracle_weight.to_dict(),
-            "vlspecs": [node.get_vegalite() for node in self.chart_sequence],
-            "indices": [node.index for node in self.chart_sequence],
+            "indices": [node.index for node in self.get_max_sequence()],
+            "vlspecs": [node.get_vegalite() for node in self.get_max_sequence()],
             "statistic_features": self.statistic_features,
+            "sampled_results": [result.to_dict() for result in self.sampled_results],
+            "result": self.get_max_result().to_dict(),
         }
 
 
@@ -217,36 +238,41 @@ class Columbus:
         num_samples = min(num_samples, len(subspace))
         num_additional_charts = num_views - len(indices)
 
-        samples = [
+        sampled_sequences = [
             current_chart + list(sample(subspace, num_additional_charts))
             for _ in range(num_samples)
         ]
 
-        multiview_oracle_result = [
+        sampled_results = [
             oracle.get_result(
                 multiview, self.df, set(wildcards), self.statistical_features
             )
-            for multiview in samples
+            for multiview in sampled_sequences
         ]
-        multiview_scores = [result.get_score() for result in multiview_oracle_result]
-        score = max(multiview_scores)
-        idx = multiview_scores.index(max(multiview_scores))
-        result = multiview_oracle_result[idx]
-        sample_sequence = samples[idx]
 
-        sample_sequence_statistic_features = [
+        sampled_scores = SequenceScores(
+            score=[result.get_score() for result in sampled_results],
+            coverage=[result.coverage for result in sampled_results],
+            uniqueness=[result.uniqueness for result in sampled_results],
+            specificity=[result.specificity for result in sampled_results],
+            interestingness=[result.interestingness for result in sampled_results],
+        )
+        max_score = max(sampled_scores.score)
+        idx = sampled_scores.score.index(max_score)
+
+        result = sampled_results[idx]
+        sequence = sampled_sequences[idx]
+        statistic_features = [
             oracle.get_statistic_features(node, self.statistical_features)
-            for node in sample_sequence
+            for node in sequence
         ]
 
         return Multiview(
-            num_views=num_views,
-            wildcards=wildcards,
-            score=score,
-            oracle_result=result,
-            oracle_weight=oracle.weight,
-            chart_sequence=sample_sequence,
-            statistic_features=sample_sequence_statistic_features,
+            oracle_weight=result.weight,
+            sampled_results=sampled_results,
+            sampled_sequences=sampled_sequences,
+            max_sequence_idx=idx,
+            statistic_features=statistic_features,
         )
 
     def get_attributes(self) -> list[dict[str, str]]:

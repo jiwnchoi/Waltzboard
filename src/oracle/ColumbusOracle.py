@@ -9,7 +9,7 @@ from src.oracle import (
     get_interestingness_from_nodes,
     get_specificity_from_nodes,
     get_uniqueness_from_nodes,
-    get_statistic_features_from_node
+    get_statistic_features_from_node,
 )
 
 if TYPE_CHECKING:
@@ -50,6 +50,7 @@ class OracleResult:
 
     def __str__(self) -> str:
         return f"""
+Score: {self.get_score()}
 Coverage: {self.coverage}
 Uniqueness: {self.uniqueness}
 Specificity: {self.specificity}
@@ -58,6 +59,7 @@ Interestingness: {self.interestingness}
 
     def to_dict(self) -> dict[str, float]:
         return {
+            "score": self.get_score(),
             "coverage": self.coverage,
             "uniqueness": self.uniqueness,
             "specificity": self.specificity,
@@ -83,8 +85,6 @@ class ColumbusOracle:
             interestingness=get_interestingness_from_nodes(nodes, hashmap),
             specificity=get_specificity_from_nodes(nodes, wildcard),
         )
-        
-    def get_statistic_features(
-        self, node: "VisualizationNode", hashmap: HashMap
-    ):
+
+    def get_statistic_features(self, node: "VisualizationNode", hashmap: HashMap):
         return get_statistic_features_from_node(node, hashmap)
