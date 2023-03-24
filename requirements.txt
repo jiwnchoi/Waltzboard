@@ -2,3 +2,6 @@ pandas
 numpy
 altair
 scikit-learn
+pathos
+umap-learn
+vega-datasets

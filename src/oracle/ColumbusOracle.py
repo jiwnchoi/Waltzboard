@@ -9,11 +9,13 @@ from src.oracle import (
     get_interestingness_from_nodes,
     get_specificity_from_nodes,
     get_uniqueness_from_nodes,
-    get_statistic_features_from_node,
+    get_interestingness_v2,
+    get_statistic_features_from_hashmap,
 )
 
 if TYPE_CHECKING:
     from ..space.Node import VisualizationNode
+    from ..space.ProbabilisticNode import ProbabilisticNode
 
 
 @dataclass
@@ -87,4 +89,20 @@ class ColumbusOracle:
         )
 
     def get_statistic_features(self, node: "VisualizationNode", hashmap: HashMap):
-        return get_statistic_features_from_node(node, hashmap)
+        return get_statistic_features_from_hashmap(node, hashmap)
+
+
+@dataclass
+class ColumbusProbOracle:
+    weight: OracleWeight
+
+    def get_result(
+        self, nodes: list["ProbabilisticNode"], df: pd.DataFrame, wildcard: set[str]
+    ) -> OracleResult:
+        return OracleResult(
+            weight=self.weight,
+            coverage=get_coverage_from_nodes(nodes, df),
+            uniqueness=get_uniqueness_from_nodes(nodes),
+            interestingness=get_interestingness_v2(nodes),
+            specificity=get_specificity_from_nodes(nodes, wildcard),
+        )

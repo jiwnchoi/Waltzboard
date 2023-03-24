@@ -36,8 +36,6 @@ class VisualizationNode:
 
     encoding: Optional["Encodings"]
 
-    chart: Optional[alt.Chart]
-
     def get_children(self) -> list["VisualizationNode"]:
         filtered_attrs = [
             attr for attr in self.attrs if self.sub_df[attr.name].nunique() != 1
@@ -181,7 +179,7 @@ class VisualizationNode:
             # Colored Scatterplot
             for i in range(3):
                 child = deepcopy(self)
-                child.binnings = [Binning(by=types["Q"][i].name)]
+                child.binnings = [Binning(by=types["Q"][(i + 2) % 3].name)]
                 child.encoding = Encodings(
                     "point",
                     alt.X(field=types["Q"][i].name, type="quantitative"),

@@ -163,6 +163,7 @@ def get_type(series: pd.Series):
     else:
         return "Q"
 
+        
 
 class Columbus:
     def __init__(self, df: pd.DataFrame, config: ColumbusCofnig) -> None:
@@ -201,7 +202,6 @@ class Columbus:
                 binnings=None,
                 aggregation=None,
                 encoding=None,
-                chart=None,
             )
             for sub_df in self.sub_dfs
         ]
@@ -214,6 +214,11 @@ class Columbus:
 
     def __len__(self) -> int:
         return len(self.visualizations)
+
+    def infer(self, oracle: ColumbusOracle, indices: list[int]) -> float:
+        target = [self.visualizations[i] for i in indices]
+        result = oracle.get_result(target, self.df, set(), self.statistical_features)
+        return float(result.get_score())
 
     def sample(
         self,

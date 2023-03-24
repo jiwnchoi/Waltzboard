@@ -14,9 +14,19 @@ class Attribute:
     def to_dict(self):
         return {"name": self.name, "type": self.type}
 
+    def long_type(self):
+        return {
+            "Q": "quantitative",
+            "C": "nominal",
+            "T": "temporal",
+            "O": "ordinal",
+            "N": "name",
+        }[self.type]
+
 
 @dataclass
 class VisualizableDataFrame:
     df: pd.DataFrame
     attrs: list["Attribute"]
     filter: Optional[list[tuple[str, Any, Any]]]
+
