@@ -36,7 +36,7 @@ class ColumbusConfig:
         }
 
 
-chart_type = ["bar", "line", "point", "area", "arc", "rect", "tick", "boxplot"]
+chart_type = ["bar", "point", "arc", "rect", "tick", "boxplot"]
 agg_type = [None, "mean", "max", "sum", "min", "count"]
 
 
