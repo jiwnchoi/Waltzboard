@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 def get_coverage_from_nodes(
-    nodes: list["VisualizationNode | ProbabilisticNode"], df: pd.DataFrame
+    nodes: list["VisualizationNode"] | list["ProbabilisticNode"], df: pd.DataFrame
 ) -> float:
     coverages = [node.get_coverage(df) for node in nodes]
     full_coverage = {key: 0.0 for key in list(df.columns)}

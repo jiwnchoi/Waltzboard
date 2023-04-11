@@ -5,3 +5,6 @@ scikit-learn
 pathos
 umap-learn
 vega-datasets
+scikit-optimize
+fastapi
+uvicorn

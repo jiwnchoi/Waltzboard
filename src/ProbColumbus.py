@@ -16,7 +16,7 @@ from .oracle.Interestingness import get_statistic_feature_hashmap
 from .space.DataModel import Attribute, VisualizableDataFrame
 from .space.Node import VisualizationNode
 from .space.ProbabilisticNode import ProbabilisticNode
-from .ExpressivenessMap import expressive_map
+from .ChartMap import chart_map
 import altair as alt
 
 
@@ -92,11 +92,16 @@ class ProbColumbus:
                 for col in df.columns
             ]
         )
+        self.dic = {
+            col: Attribute(col, "C" if df[col].dtype == "object" else "Q")
+            for col in df.columns
+        }
+        self.dic[None] = None
 
     def attr_filtered_weight(
         self, current: list["Attribute"], weight: np.ndarray
     ) -> np.ndarray:
-        valid_map = [e for e in expressive_map if is_valid_map(current, e)]
+        valid_map = [e for e in chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map if e is not None])
         weight_mask = np.array(
             [True] + [e.type in valid_type and e not in current for e in self.attrs[1:]]
@@ -104,13 +109,13 @@ class ProbColumbus:
         return weight * weight_mask
 
     def ct_filtered_weight(self, current: list, weight: np.ndarray) -> np.ndarray:
-        valid_map = [e for e in expressive_map if is_valid_map(current, e)]
+        valid_map = [e for e in chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
         weight_mask = np.array([e in valid_type for e in chart_type])
         return weight * weight_mask
 
     def at_filtered_weight(self, current: list, weight: np.ndarray) -> np.ndarray:
-        valid_map = [e for e in expressive_map if is_valid_map(current, e)]
+        valid_map = [e for e in chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
         weight_mask = np.array([e in valid_type for e in agg_type])
         return weight * weight_mask
@@ -138,6 +143,30 @@ class ProbColumbus:
         current.append(at)
         return current
 
+    # not using choice, select the max weight one
+    def _sample_max(self, weight: SamplingWeight):
+        current = []
+        x = self.attrs[1:][np.argmax(weight.x)]
+        current.append(x)
+        weight_y = self.attr_filtered_weight(current, weight.y)
+        y = self.attrs[np.argmax(weight_y)]
+        current.append(y)
+
+        if y:
+            weight_z = self.attr_filtered_weight(current, weight.z)
+            z = self.attrs[np.argmax(weight_z)]
+            current.append(z)
+        else:
+            z = None
+            current.append(z)
+        weight_ct = self.ct_filtered_weight(current, weight.ct)
+        ct = chart_type[np.argmax(weight_ct)]
+        current.append(ct)
+        weight_at = self.at_filtered_weight(current, weight.at)
+        at = agg_type[np.argmax(weight_at)]
+        current.append(at)
+        return current
+
     def sample_one(self, weight: SamplingWeight):
         sample = []
         while len(sample) == 0:
@@ -145,8 +174,21 @@ class ProbColumbus:
 
         return ProbabilisticNode(sample[0], self.df)
 
+    def sample_max_one(self, weight: SamplingWeight):
+        sample = []
+        while len(sample) == 0:
+            sample.append(self._sample_max(weight))
+        return ProbabilisticNode(sample[0], self.df)
+
     def sample_n(self, n: int, weight) -> list[ProbabilisticNode]:
         return [self.sample_one(weight) for _ in range(n)]
+
+    def sample_max_n(self, n: int, weight) -> list[ProbabilisticNode]:
+        return [self.sample_max_one(weight) for _ in range(n)]
+
+    def get_node(self, sample: list) -> ProbabilisticNode:
+        new_sample = [self.dic[key] for key in sample[:3]] + sample[3:]
+        return ProbabilisticNode(new_sample, self.df)
 
     def infer(
         self,
@@ -156,4 +198,3 @@ class ProbColumbus:
     ):
         result = oracle.get_result(nodes, self.df, set(wildcard))
         return float(result.get_score())
-

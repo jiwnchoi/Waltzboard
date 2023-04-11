@@ -85,7 +85,9 @@ HashMap = dict[str, list[str | None]]
 hashmap: HashMap = {}
 
 
-def get_statistic_feature_hashmap(vis_dfs: list[VisualizableDataFrame],) -> HashMap:
+def get_statistic_feature_hashmap(
+    vis_dfs: list[VisualizableDataFrame],
+) -> HashMap:
     for vis_df in vis_dfs:
         attr_combinations: list[tuple[Attribute, ...]] = [
             *list(combinations(vis_df.attrs, 1)),
@@ -172,7 +174,7 @@ def get_interestingness_from_nodes(
 
 
 def get_statistic_features_v2(
-    node: "VisualizationNode | ProbabilisticNode"
+    node: "VisualizationNode | ProbabilisticNode",
 ) -> list[list[str | None]]:
     attr_combinations: list[tuple[Attribute, ...]] = [
         *list(combinations(node.attrs, 1)),
@@ -188,38 +190,44 @@ def get_statistic_features_v2(
         key += f"{target_attrs}"
 
         df_notnull = node.sub_df.dropna()
-        if key not in hashmap:
-            if len(comb) == 1 and comb[0].type == "Q":
-                hashmap[key] = [
-                    has_outliers_q(df_notnull, comb[0].name),
-                    has_skewness_q(df_notnull, comb[0].name),
-                    has_kurtosis(df_notnull, comb[0].name),
-                ]
-            elif len(comb) == 1 and comb[0].type == "C":
-                hashmap[key] = [has_outliers_n(df_notnull, comb[0].name)]
-            elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "C":
-                hashmap[key] = [
-                    has_significance_qn(df_notnull, comb[0].name, comb[1].name)
-                ]
-            elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "C":
-                hashmap[key] = [
-                    has_significance_qn(df_notnull, comb[1].name, comb[0].name)
-                ]
-            elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "Q":
-                hashmap[key] = [
-                    has_correlation_qq(df_notnull, comb[0].name, comb[1].name),
-                    has_outliers_qq(df_notnull, comb[0].name, comb[1].name),
-                ]
-            elif len(comb) == 2 and comb[0].type == "C" and comb[1].type == "C":
-                hashmap[key] = [
-                    has_correlation_nn(df_notnull, comb[0].name, comb[1].name),
-                    has_outliers_nn(df_notnull, comb[0].name, comb[1].name),
-                ]
-        features.append(hashmap[key])
+        try:
+            if key not in hashmap:
+                if len(comb) == 1 and comb[0].type == "Q":
+                    hashmap[key] = [
+                        has_outliers_q(df_notnull, comb[0].name),
+                        has_skewness_q(df_notnull, comb[0].name),
+                        has_kurtosis(df_notnull, comb[0].name),
+                    ]
+                elif len(comb) == 1 and comb[0].type == "C":
+                    hashmap[key] = [has_outliers_n(df_notnull, comb[0].name)]
+                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "C":
+                    hashmap[key] = [
+                        has_significance_qn(df_notnull, comb[0].name, comb[1].name)
+                    ]
+                elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "C":
+                    hashmap[key] = [
+                        has_significance_qn(df_notnull, comb[1].name, comb[0].name)
+                    ]
+                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "Q":
+                    hashmap[key] = [
+                        has_correlation_qq(df_notnull, comb[0].name, comb[1].name),
+                        has_outliers_qq(df_notnull, comb[0].name, comb[1].name),
+                    ]
+                elif len(comb) == 2 and comb[0].type == "C" and comb[1].type == "C":
+                    hashmap[key] = [
+                        has_correlation_nn(df_notnull, comb[0].name, comb[1].name),
+                        has_outliers_nn(df_notnull, comb[0].name, comb[1].name),
+                    ]
+            features.append(hashmap[key])
+        except Exception as e:
+            print(f"Error in {key} with {comb} and {node.filters}")
+            raise e
+
     return features
 
 
-def get_interestingness_v2(nodes: list["VisualizationNode"]) -> float:
+def get_interestingness_v2(
+    nodes: list["VisualizationNode"] | list["ProbabilisticNode"],
+) -> float:
     node_features = [get_statistic_features_v2(node) for node in nodes]
     return mean([get_interestingness(feature) for feature in node_features])
-

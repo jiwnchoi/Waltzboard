@@ -4,7 +4,7 @@ import altair as alt
 
 # Q C T
 
-expressive_map = [
+chart_map = [
     ["Q", None, None, "bar", "count"],
     ["Q", None, None, "tick", None],
     ["C", None, None, "bar", "count"],
@@ -49,3 +49,14 @@ expressive_map = [
     ["C", "C", "Q", "rect", "mean"],
     ["C", "C", "Q", "rect", "max"],
 ]
+
+# V1: probability of chooseing each attribute as the first attribute
+# V2: is_there_second_variable yes or no
+# V3: probability of chooseing each attribute as the second attribute
+# V4: is_there_third_variable yes or no
+# V5: probability of chooseing each attribute as the third attribute
+
+
+# ...
+
+# V3: prob each T

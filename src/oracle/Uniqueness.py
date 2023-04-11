@@ -29,7 +29,7 @@ def jcd_index(sets: list[set]) -> float:
 
 
 def get_uniqueness_from_nodes(
-    nodes: list["VisualizationNode | ProbabilisticNode"]
+    nodes: list["VisualizationNode"] | list["ProbabilisticNode"],
 ) -> float:
     bovs = [node.get_bov() for node in nodes]
     n = len(bovs)
