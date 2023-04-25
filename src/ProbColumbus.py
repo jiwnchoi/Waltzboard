@@ -143,30 +143,6 @@ class ProbColumbus:
         current.append(at)
         return current
 
-    # not using choice, select the max weight one
-    def _sample_max(self, weight: SamplingWeight):
-        current = []
-        x = self.attrs[1:][np.argmax(weight.x)]
-        current.append(x)
-        weight_y = self.attr_filtered_weight(current, weight.y)
-        y = self.attrs[np.argmax(weight_y)]
-        current.append(y)
-
-        if y:
-            weight_z = self.attr_filtered_weight(current, weight.z)
-            z = self.attrs[np.argmax(weight_z)]
-            current.append(z)
-        else:
-            z = None
-            current.append(z)
-        weight_ct = self.ct_filtered_weight(current, weight.ct)
-        ct = chart_type[np.argmax(weight_ct)]
-        current.append(ct)
-        weight_at = self.at_filtered_weight(current, weight.at)
-        at = agg_type[np.argmax(weight_at)]
-        current.append(at)
-        return current
-
     def sample_one(self, weight: SamplingWeight):
         sample = []
         while len(sample) == 0:
@@ -174,21 +150,25 @@ class ProbColumbus:
 
         return ProbabilisticNode(sample[0], self.df)
 
-    def sample_max_one(self, weight: SamplingWeight):
-        sample = []
-        while len(sample) == 0:
-            sample.append(self._sample_max(weight))
-        return ProbabilisticNode(sample[0], self.df)
+    def _sample_n(self, n: int, weight) -> list[str]:
+        return [self._sample_one(weight) for _ in range(n)]
 
     def sample_n(self, n: int, weight) -> list[ProbabilisticNode]:
         return [self.sample_one(weight) for _ in range(n)]
 
-    def sample_max_n(self, n: int, weight) -> list[ProbabilisticNode]:
-        return [self.sample_max_one(weight) for _ in range(n)]
-
     def get_node(self, sample: list) -> ProbabilisticNode:
         new_sample = [self.dic[key] for key in sample[:3]] + sample[3:]
         return ProbabilisticNode(new_sample, self.df)
+
+    def _infer(
+        self,
+        samples: list[str],
+        oracle: ColumbusProbOracle,
+        wildcard: list[str],
+    ):
+        nodes = [ProbabilisticNode(sample, self.df) for sample in samples]
+        result = oracle.get_result(nodes, self.df, set(wildcard))
+        return float(result.get_score())
 
     def infer(
         self,
