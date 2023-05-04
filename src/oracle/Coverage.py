@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 if TYPE_CHECKING:
-    from ..space.Node import VisualizationNode
+    from ..model.Node import VisualizationNode
 
 
 def get_coverage_from_nodes(

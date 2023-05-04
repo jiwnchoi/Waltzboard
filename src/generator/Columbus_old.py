@@ -9,10 +9,10 @@ import altair as alt
 import pandas as pd
 from pathos.multiprocessing import ProcessingPool as Pool
 
-from .oracle import ColumbusOracle, OracleResult, OracleWeight
-from .oracle.Interestingness import get_statistic_feature_hashmap
-from .space.DataModel import Attribute, VisualizableDataFrame
-from .space.Node import VisualizationNode, chart_type
+from ..oracle import ColumbusOracle, OracleResult, OracleWeight
+from ..oracle.Interestingness import get_statistic_feature_hashmap
+from ..model.DataModel import Attribute, VisualizableDataFrame
+from ..model.Node import VisualizationNode, chart_type
 
 agg_types: list[str] = ["max", "min", "mean", "sum"]
 EncodingType = Literal["bar", "line", "area", "pie", "scatter", "box", "heatmap"]

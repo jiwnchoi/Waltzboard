@@ -8,10 +8,10 @@ import pandas as pd
 from numpy.random import dirichlet, choice
 
 
-from .ChartMap import chart_map
-from .space.DataModel import Attribute
-from .space.Node import VisualizationNode
-from .ChartMap import chart_type, agg_type
+from ..ChartMap import chart_map
+from ..model.DataModel import Attribute
+from ..model.Node import VisualizationNode
+from ..ChartMap import chart_type, agg_type
 
 
 @dataclass

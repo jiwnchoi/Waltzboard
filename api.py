@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from src import Columbus_old, ColumbusOracle, ColumbusCofnig, OracleWeight
+from src import ColumbusOracle, ColumbusCofnig, OracleWeight
+from src.generator import Columbus_old
 from src.oracle import chart_types, task_types, ChartType, TaskType
 from vega_datasets import data
 
