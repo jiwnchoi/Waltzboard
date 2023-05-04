@@ -29,10 +29,10 @@ chart_map = [
     # cc heatmap
     ["C", "C", None, "rect", "count"],
     # tq
-    ["T", "Q", None, "line", "max"],
-    ["T", "Q", None, "line", "mean"],
-    ["T", "Q", None, "line", "sum"],
-    ["T", "Q", None, "line", "min"],
+    # ["T", "Q", None, "line", "max"],
+    # ["T", "Q", None, "line", "mean"],
+    # ["T", "Q", None, "line", "sum"],
+    # ["T", "Q", None, "line", "min"],
     # colored scatter qqq
     ["Q", "Q", "Q", "point", None],
     # heatmap agg to xy
@@ -50,13 +50,10 @@ chart_map = [
     ["C", "C", "Q", "rect", "max"],
 ]
 
-# V1: probability of chooseing each attribute as the first attribute
-# V2: is_there_second_variable yes or no
-# V3: probability of chooseing each attribute as the second attribute
-# V4: is_there_third_variable yes or no
-# V5: probability of chooseing each attribute as the third attribute
+for c in chart_map:
+    mark = c.pop(3)
+    c.insert(0, mark)
 
 
-# ...
-
-# V3: prob each T
+chart_type = list(set([m[0] for m in chart_map]))
+agg_type = list(set([m[-1] for m in chart_map]))

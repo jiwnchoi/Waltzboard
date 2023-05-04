@@ -4,11 +4,10 @@ import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
 from scipy.stats import chi2_contingency, f_oneway, entropy
 from itertools import combinations
-from src.space.DataModel import Attribute, VisualizableDataFrame
+from src.space.DataModel import Attribute
 
 if TYPE_CHECKING:
     from ..space.Node import VisualizationNode
-    from ..space.ProbabilisticNode import ProbabilisticNode
 
 
 # N
@@ -85,76 +84,8 @@ HashMap = dict[str, list[str | None]]
 hashmap: HashMap = {}
 
 
-def get_statistic_feature_hashmap(
-    vis_dfs: list[VisualizableDataFrame],
-) -> HashMap:
-    for vis_df in vis_dfs:
-        attr_combinations: list[tuple[Attribute, ...]] = [
-            *list(combinations(vis_df.attrs, 1)),
-            *list(combinations(vis_df.attrs, 2)),
-        ]
-        for comb in attr_combinations:
-            key = ""
-            if vis_df.filter is not None:
-                for f in vis_df.filter:
-                    key += f"{str((f[0], f[1]))}/"
-            target_attrs = [attr.name for attr in comb]
-            key += f"{target_attrs}"
-
-            df_notnull = vis_df.df[target_attrs].dropna()
-            if key not in hashmap:
-                if len(comb) == 1 and comb[0].type == "Q":
-                    hashmap[key] = [
-                        has_outliers_q(df_notnull, comb[0].name),
-                        has_skewness_q(df_notnull, comb[0].name),
-                        has_kurtosis(df_notnull, comb[0].name),
-                    ]
-                elif len(comb) == 1 and comb[0].type == "C":
-                    hashmap[key] = [has_outliers_n(df_notnull, comb[0].name)]
-                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "C":
-                    hashmap[key] = [
-                        has_significance_qn(df_notnull, comb[0].name, comb[1].name)
-                    ]
-                elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "C":
-                    hashmap[key] = [
-                        has_significance_qn(df_notnull, comb[1].name, comb[0].name)
-                    ]
-                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "Q":
-                    hashmap[key] = [
-                        has_correlation_qq(df_notnull, comb[0].name, comb[1].name),
-                        has_outliers_qq(df_notnull, comb[0].name, comb[1].name),
-                    ]
-                elif len(comb) == 2 and comb[0].type == "C" and comb[1].type == "C":
-                    hashmap[key] = [
-                        has_correlation_nn(df_notnull, comb[0].name, comb[1].name),
-                        has_outliers_nn(df_notnull, comb[0].name, comb[1].name),
-                    ]
-
-    return hashmap
-
-
-def get_statistic_features_from_hashmap(
-    node: "VisualizationNode", hashmap: HashMap
-) -> dict[str, list[str | None]]:
-    attr_combinations: list[tuple[Attribute, ...]] = [
-        *list(combinations(node.attrs, 1)),
-        *list(combinations(node.attrs, 2)),
-    ]
-
-    features: dict[str, list[str | None]] = {}
-    for comb in attr_combinations:
-        key = ""
-        if node.filters is not None:
-            for f in node.filters:
-                key += f"{str((f[0], f[1]))}/"
-        target_attrs = [attr.name for attr in comb]
-        key += f"{target_attrs}"
-        features[str(target_attrs)] = [f for f in hashmap[key]]
-
-    return features
-
-
-mean = lambda x: sum(x) / len(x)
+def mean(l):
+    return sum(l) / len(l)
 
 
 def get_interestingness(features: list[list[str | None]]) -> float:
@@ -162,20 +93,7 @@ def get_interestingness(features: list[list[str | None]]) -> float:
     return mean(values)
 
 
-def get_interestingness_from_nodes(
-    nodes: list["VisualizationNode"], hashmap: HashMap
-) -> float:
-    node_features = [
-        get_statistic_features_from_hashmap(node, hashmap) for node in nodes
-    ]
-    return mean(
-        [get_interestingness(list(feature.values())) for feature in node_features]
-    )
-
-
-def get_statistic_features_v2(
-    node: "VisualizationNode | ProbabilisticNode",
-) -> list[list[str | None]]:
+def get_statistic_features_v2(node: "VisualizationNode") -> list[list[str | None]]:
     attr_combinations: list[tuple[Attribute, ...]] = [
         *list(combinations(node.attrs, 1)),
         *list(combinations(node.attrs, 2)),
@@ -227,7 +145,7 @@ def get_statistic_features_v2(
 
 
 def get_interestingness_v2(
-    nodes: list["VisualizationNode"] | list["ProbabilisticNode"],
+    nodes: list["VisualizationNode"],
 ) -> float:
     node_features = [get_statistic_features_v2(node) for node in nodes]
     return mean([get_interestingness(feature) for feature in node_features])

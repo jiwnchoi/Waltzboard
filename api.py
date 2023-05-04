@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from src import Columbus, ColumbusOracle, ColumbusCofnig, OracleWeight
+from src import Columbus_old, ColumbusOracle, ColumbusCofnig, OracleWeight
 from src.oracle import chart_types, task_types, ChartType, TaskType
 from vega_datasets import data
 
@@ -56,7 +56,7 @@ app.add_middleware(
 
 config = ColumbusCofnig()
 
-columbus = Columbus(df, config)
+columbus = Columbus_old(df, config)
 
 
 @app.post("/5001/init")

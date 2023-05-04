@@ -4,7 +4,7 @@ import numpy as np
 
 if TYPE_CHECKING:
     from ..space.Node import VisualizationNode
-    from ..space.ProbabilisticNode import ProbabilisticNode
+    from ..space.Node import VisualizationNode
 
 
 def jcd_index(sets: list[set]) -> float:
@@ -28,8 +28,8 @@ def jcd_index(sets: list[set]) -> float:
     return jaccard_matrix[np.triu_indices(n, 1)].sum() - n
 
 
-def get_uniqueness_from_nodes(
-    nodes: list["VisualizationNode"] | list["ProbabilisticNode"],
+def get_diversity_from_nodes(
+    nodes: list["VisualizationNode"],
 ) -> float:
     bovs = [node.get_bov() for node in nodes]
     n = len(bovs)
