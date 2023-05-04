@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..space.Node import VisualizationNode
+    from ..model.Node import VisualizationNode
 
 
 def includeness(bovs: set, wildcard: set) -> float:
@@ -13,7 +13,7 @@ def get_specificity_from_nodes(
 ) -> float:
     if len(wildcard) == 0:
         return 0.0
-    
+
     bovs = [node.get_bov() for node in nodes]
     specificities = [includeness(bov, wildcard) for bov in bovs]
     return sum(specificities) / len(specificities)

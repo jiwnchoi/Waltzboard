@@ -4,10 +4,10 @@ import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
 from scipy.stats import chi2_contingency, f_oneway, entropy
 from itertools import combinations
-from src.space.DataModel import Attribute
+from src.model.DataModel import Attribute
 
 if TYPE_CHECKING:
-    from ..space.Node import VisualizationNode
+    from ..model.Node import VisualizationNode
 
 
 # N

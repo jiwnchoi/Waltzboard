@@ -11,7 +11,7 @@ from src.oracle import (
 )
 
 if TYPE_CHECKING:
-    from ..space.Node import VisualizationNode
+    from ..model.Node import VisualizationNode
 
 
 @dataclass
