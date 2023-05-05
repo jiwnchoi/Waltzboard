@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from collections import Counter
 import pandas as pd
 import numpy as np
-from . import ExplorerConfig
+from . import ExplorerConfig, TrainResult
 from src.generator import Generator
 from src.oracle import Oracle, OracleResult
 from src.model import VisualizationNode
@@ -37,17 +37,6 @@ class Counters:
         self.y[y] += 1
         self.z[z] += 1
         self.at[at] += 1
-
-
-@dataclass
-class TrainResult:
-    scores: np.ndarray
-    specificity: np.ndarray
-    interestingness: np.ndarray
-    coverage: np.ndarray
-    diversity: np.ndarray
-    conciseness: np.ndarray
-    n_charts: np.ndarray
 
 
 class Explorer:
@@ -107,7 +96,7 @@ class Explorer:
         )
 
         halved_results = sorted_result_n_scores[
-            : self.config.n_candidates // self.config.halving_ratio
+            0 : int(self.config.n_candidates * self.config.halving_ratio)
         ]
         halved_n_charts = np.array([len(r[0].dashboard) for r in halved_results])
 
@@ -119,8 +108,8 @@ class Explorer:
         gen.prior.x.update(counters.x.get_posteriors(gen.attr_names))
         gen.prior.y.update(counters.y.get_posteriors(gen.attr_names))
         gen.prior.z.update(counters.z.get_posteriors(gen.attr_names))
-        gen.prior.ct.update(counters.ct.get_posteriors(gen.attr_names))
-        gen.prior.at.update(counters.at.get_posteriors(gen.attr_names))
+        gen.prior.ct.update(counters.ct.get_posteriors(chart_type))
+        gen.prior.at.update(counters.at.get_posteriors(agg_type))
         gen.prior.n_charts.update(
             len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std()
         )

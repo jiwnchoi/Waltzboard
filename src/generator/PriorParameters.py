@@ -16,7 +16,7 @@ class DirichletPrior:
     def parameters(self):
         return self.count / np.sum(self.count)
 
-    def update(self, x):
+    def update(self, x: np.ndarray):
         self.count += x
         self.history.append(np.copy(self.count))
 

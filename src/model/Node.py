@@ -25,14 +25,16 @@ class VisualizationNode:
     encoding: Optional["Encodings"] = None
 
     def __init__(self, result: list, df: pd.DataFrame) -> None:
-        self.sample = result
         chart_type, x, y, z, agg_type = result
         self.attrs = [x, y, z] if z else [x, y] if y else [x]
+        self.sample = result
+        for i in range(len(self.attrs)):
+            self.sample[i + 1] = self.attrs[i].name
+
         self.sub_df = df[
             [x.name, y.name, z.name] if z else [x.name, y.name] if y else [x.name]
         ]
         self.chart_type = chart_type
-        self.index = 1
 
         dim = len(self.attrs)
 
