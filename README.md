@@ -1,1 +1,1 @@
-# Columbus: Intent-adaptive Exploratory Visual Anlytics System
+# Multi-Criteria Optimization for Automatic Dashboard Design
