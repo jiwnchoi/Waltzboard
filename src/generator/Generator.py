@@ -1,27 +1,10 @@
-# type: ignore
-from dataclasses import dataclass
-from typing import TypeVar
-
-import altair as alt
 import numpy as np
 import pandas as pd
 from numpy.random import dirichlet, choice
 
-
-from ..ChartMap import chart_map
-from ..model.DataModel import Attribute
-from ..model.Node import VisualizationNode
-from ..ChartMap import chart_type, agg_type
-
-
-@dataclass
-class SamplingWeight:
-    x: np.ndarray
-    y: np.ndarray
-    z: np.ndarray
-    ct: np.ndarray
-    at: np.ndarray
-    n_chart: float
+from . import PriorParameters
+from src.model import Attribute, VisualizationNode
+from ..ChartMap import chart_type, agg_type, chart_map
 
 
 def is_valid_map(current: list, map: list) -> bool:
@@ -33,10 +16,10 @@ def is_valid_map(current: list, map: list) -> bool:
     )
 
 
-class Explorer:
+class Generator:
     def __init__(self, df: pd.DataFrame) -> None:
         self.df = df
-        self.attrs: list[None | Attribute] = [None] + [
+        self.attrs: list[Attribute | None] = [None] + [
             Attribute(col, "C" if df[col].dtype == "object" else "Q")
             for col in df.columns
         ]
@@ -69,23 +52,21 @@ class Explorer:
         weight_mask = np.array([e in valid_type for e in agg_type])
         return weight_mask
 
-    def sample_one(self, weight: SamplingWeight) -> VisualizationNode:
+    def sample_one(self, weight: PriorParameters) -> VisualizationNode:
         current: list = []
-
-        mask_ct = self.ct_mask(current)
-        current.append(choice(chart_type, p=p(dirichlet(weight.ct) * mask_ct)))
+        current.append(choice(chart_type, p=p(weight.ct.sample())))
 
         mask_x = self.attr_mask(current)
-        current.append(choice(self.attrs, p=p(dirichlet(weight.x) * mask_x)))
+        current.append(choice(self.attrs, p=p(weight.x.sample() * mask_x)))  # type: ignore
 
         mask_y = self.attr_mask(current)
-        current.append(choice(self.attrs, p=p(dirichlet(weight.y) * mask_y)))
+        current.append(choice(self.attrs, p=p(weight.y.sample() * mask_y)))  # type: ignore
 
         mask_z = self.attr_mask(current)
-        current.append(choice(self.attrs, p=p(dirichlet(weight.z) * mask_z)))
+        current.append(choice(self.attrs, p=p(weight.z.sample() * mask_z)))  # type: ignore
 
         mask_at = self.at_mask(current)
-        current.append(choice(agg_type, p=p(dirichlet(weight.at) * mask_at)))
+        current.append(choice(agg_type, p=p(weight.at.sample() * mask_at)))
 
         return VisualizationNode(current, self.df)
 

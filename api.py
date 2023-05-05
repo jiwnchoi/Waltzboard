@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from src import ColumbusOracle, ColumbusCofnig, OracleWeight
+from src import Oracle, ColumbusCofnig, OracleWeight
 from src.generator import Columbus_old
 from src.oracle import chart_types, task_types, ChartType, TaskType
 from vega_datasets import data
@@ -68,7 +68,7 @@ async def init(body: SampleBody) -> InitItem:
         attributes=columbus.get_attributes(),
         result=columbus.sample(
             [],
-            ColumbusOracle(OracleWeight()),
+            Oracle(OracleWeight()),
             body.numVis,
             body.numSample,
             body.numFilter,
@@ -83,7 +83,7 @@ async def sample(body: SampleBody) -> Result:
     return Result(
         result=columbus.sample(
             body.indices,
-            ColumbusOracle(body.weight),
+            Oracle(body.weight),
             body.numVis,
             body.numSample,
             body.numFilter,

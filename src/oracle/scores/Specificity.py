@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..model.Node import VisualizationNode
+    from src.model.Node import VisualizationNode
 
 
 def includeness(bovs: set, wildcard: set) -> float:

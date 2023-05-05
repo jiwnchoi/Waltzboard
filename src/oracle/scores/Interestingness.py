@@ -4,10 +4,10 @@ import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
 from scipy.stats import chi2_contingency, f_oneway, entropy
 from itertools import combinations
-from src.model.DataModel import Attribute
+from src.model import Attribute
 
 if TYPE_CHECKING:
-    from ..model.Node import VisualizationNode
+    from src.model.Node import VisualizationNode
 
 
 # N
@@ -88,12 +88,7 @@ def mean(l):
     return sum(l) / len(l)
 
 
-def get_interestingness(features: list[list[str | None]]) -> float:
-    values = [bool(value) for feature in features for value in feature]
-    return mean(values)
-
-
-def get_statistic_features_v2(node: "VisualizationNode") -> list[list[str | None]]:
+def get_statistic_features(node: "VisualizationNode") -> list[list[str | None]]:
     attr_combinations: list[tuple[Attribute, ...]] = [
         *list(combinations(node.attrs, 1)),
         *list(combinations(node.attrs, 2)),
@@ -144,8 +139,14 @@ def get_statistic_features_v2(node: "VisualizationNode") -> list[list[str | None
     return features
 
 
-def get_interestingness_v2(
+def feature_to_interestingness(features: list[list[str | None]]) -> float:
+    values = [bool(value) for feature in features for value in feature]
+    return mean(values)
+
+
+def get_interestingness(
     nodes: list["VisualizationNode"],
 ) -> float:
-    node_features = [get_statistic_features_v2(node) for node in nodes]
-    return mean([get_interestingness(feature) for feature in node_features])
+    node_features = [get_statistic_features(node) for node in nodes]
+
+    return mean([feature_to_interestingness(feature) for feature in node_features])

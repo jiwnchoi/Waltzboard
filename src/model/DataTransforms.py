@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal, Union
-from .DataModel import Attribute
+from .Attribute import Attribute
 
 
 @dataclass
@@ -33,4 +33,4 @@ class Binning:
     name = "bin"
 
 
-TransformType = Union[Aggregation, Filter, Sort, Binning]
+TransformType = Aggregation | Filter | Sort | Binning

@@ -3,8 +3,7 @@ import numpy as np
 
 
 if TYPE_CHECKING:
-    from ..model.Node import VisualizationNode
-    from ..model.Node import VisualizationNode
+    from src.model.Node import VisualizationNode
 
 
 def jcd_index(sets: list[set]) -> float:

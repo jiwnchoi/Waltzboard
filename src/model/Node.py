@@ -1,27 +1,15 @@
 # type: ignore
 
-from copy import deepcopy
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, Optional, Set, Union
-
+from typing import Literal, Optional, Set, Union
 import altair as alt
 import pandas as pd
-import json
-from .DataTransformsModel import Aggregation, Binning
 
-if TYPE_CHECKING:
-    from .DataModel import Attribute
-
-
-chart_type = Literal["bar", "line", "point", "area", "arc", "rect", "tick", "boxplot"]
-
-
-@dataclass
-class Encodings:
-    chart_type: str
-    x: Union[alt.X, alt.Color]
-    y: Union[alt.Y, alt.Theta, None] = None
-    z: Union[alt.Color, alt.Column, alt.Y, None] = None
+from . import (
+    Aggregation,
+    Binning,
+    Encodings,
+    Attribute,
+)
 
 
 class VisualizationNode:

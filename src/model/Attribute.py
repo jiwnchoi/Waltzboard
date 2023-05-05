@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal, Optional, Any
-import pandas as pd
+from typing import Literal
 
 
 @dataclass
@@ -22,11 +21,3 @@ class Attribute:
             "O": "ordinal",
             "N": "name",
         }[self.type]
-
-
-@dataclass
-class VisualizableDataFrame:
-    df: pd.DataFrame
-    attrs: list["Attribute"]
-    filter: Optional[list[tuple[str, Any, Any]]]
-
