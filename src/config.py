@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 @dataclass
 class ColumbusConfig:
     max_attributes: int = 3

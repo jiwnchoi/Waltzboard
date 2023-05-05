@@ -30,4 +30,5 @@ class Oracle:
             interestingness=get_interestingness(nodes),
             specificity=get_specificity_from_nodes(nodes, wildcard),
             conciseness=len(self.df.columns) / len(nodes),
+            dashboard=nodes,
         )
