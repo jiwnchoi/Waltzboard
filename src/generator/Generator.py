@@ -3,8 +3,8 @@ import pandas as pd
 from numpy.random import choice
 
 from . import PriorParameters
-from src.model import Attribute, VisualizationNode
-from src.ChartMap import chart_type, agg_type, chart_map
+from src.model import Attribute, GleanerChart, GleanerDashboard
+from src.config import chart_type, agg_type, chart_map
 
 
 def p(x: np.ndarray) -> np.ndarray:
@@ -60,7 +60,7 @@ class Generator:
         weight_mask = np.array([e in valid_type for e in agg_type])
         return weight_mask
 
-    def sample_one(self) -> VisualizationNode:
+    def sample_one(self) -> GleanerChart:
         current: list = []
         current.append(choice(chart_type, p=p(self.prior.ct.sample())))
 
@@ -76,7 +76,7 @@ class Generator:
         mask_at = self.at_mask(current)
         current.append(choice(agg_type, p=p(self.prior.at.sample() * mask_at)))
 
-        return VisualizationNode(current, self.df)
+        return GleanerChart(current, self.df)
 
-    def sample_n(self, n: int) -> list[VisualizationNode]:
-        return [self.sample_one() for _ in range(n)]
+    def sample_dashboard(self, n: int) -> GleanerDashboard:
+        return GleanerDashboard([self.sample_one() for _ in range(n)])

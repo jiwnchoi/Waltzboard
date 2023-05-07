@@ -12,7 +12,7 @@ from . import (
 )
 
 
-class VisualizationNode:
+class GleanerChart:
     sample: list[Union["Attribute", str, None]]
     index: Optional[int]
     sub_df: pd.DataFrame
@@ -212,11 +212,11 @@ class VisualizationNode:
             )
 
     def get_vegalite(self) -> alt.VegaLiteSchema:
-        chart = self.get_altair()
+        chart = self.display()
         chart.configure_legend(title=None)
         return chart.to_json()
 
-    def get_altair(self) -> alt.Chart:
+    def display(self) -> alt.Chart:
         chart = alt.Chart(self.sub_df)
         if self.encoding is None:
             return chart

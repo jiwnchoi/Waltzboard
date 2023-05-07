@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from src.oracle.OracleWeight import OracleWeight
+from src.oracle.oracle_weight import OracleWeight
 from src.model import ChartType, chart_types
 
 

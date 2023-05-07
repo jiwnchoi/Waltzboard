@@ -2,12 +2,10 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 if TYPE_CHECKING:
-    from src.model.Node import VisualizationNode
+    from src.model.gleaner_chart import GleanerChart
 
 
-def get_coverage_from_nodes(
-    nodes: list["VisualizationNode"], df: pd.DataFrame
-) -> float:
+def get_coverage_from_nodes(nodes: list["GleanerChart"], df: pd.DataFrame) -> float:
     n = len(nodes)
     coverages = [node.get_coverage(df) for node in nodes]
     full_coverage = {key: 0.0 for key in list(df.columns)}

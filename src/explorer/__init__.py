@@ -1,3 +1,3 @@
-from .ExplorerResult import TrainResult
-from .ExplorerConfig import ExplorerConfig
-from .Explorer import Explorer, TrainResult
+from .explorer_result import TrainResult
+from .explorer_config import ExplorerConfig
+from .explorer import Explorer, TrainResult

@@ -1,3 +1,3 @@
-from .OracleWeight import OracleWeight
-from .OracleResult import OracleResult
-from .Oracle import Oracle
+from .oracle_weight import OracleWeight
+from .oracle_result import OracleResult
+from .oracle import Oracle

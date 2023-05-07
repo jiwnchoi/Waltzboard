@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal, Union
-from .Attribute import Attribute
+from .attribute import Attribute
 
 
 @dataclass

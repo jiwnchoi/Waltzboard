@@ -1,2 +1,2 @@
-from .PriorParameters import PriorParameters
-from .Generator import Generator
+from .generator_parameters import PriorParameters
+from .generator import Generator

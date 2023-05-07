@@ -1,6 +1,6 @@
 import pandas as pd
 from dataclasses import dataclass
-from src.ChartMap import chart_type, agg_type
+from src.config import chart_type, agg_type
 import numpy as np
 from IPython.display import display
 

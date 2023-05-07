@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.model.Node import VisualizationNode
+    from src.model.gleaner_chart import GleanerChart
 
 
 def includeness(bovs: set, wildcard: set) -> float:
@@ -9,7 +9,7 @@ def includeness(bovs: set, wildcard: set) -> float:
 
 
 def get_specificity_from_nodes(
-    nodes: list["VisualizationNode"], wildcard: set[str]
+    nodes: list["GleanerChart"], wildcard: set[str]
 ) -> float:
     if len(wildcard) == 0:
         return 0.0

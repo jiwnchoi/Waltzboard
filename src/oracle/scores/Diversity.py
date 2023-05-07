@@ -3,7 +3,7 @@ import numpy as np
 
 
 if TYPE_CHECKING:
-    from src.model.Node import VisualizationNode
+    from src.model.gleaner_chart import GleanerChart
 
 
 def jcd_index(sets: list[set]) -> float:
@@ -28,7 +28,7 @@ def jcd_index(sets: list[set]) -> float:
 
 
 def get_diversity_from_nodes(
-    nodes: list["VisualizationNode"],
+    nodes: list["GleanerChart"],
 ) -> float:
     bovs = [node.get_bov() for node in nodes]
     n = len(bovs)

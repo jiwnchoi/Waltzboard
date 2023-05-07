@@ -1,8 +1,8 @@
-from .Coverage import get_coverage_from_nodes
-from .Interestingness import (
+from .coverage import get_coverage_from_nodes
+from .interestingness import (
     HashMap,
     hashmap,
     get_interestingness,
 )
-from .Specificity import get_specificity_from_nodes
-from .Diversity import get_diversity_from_nodes
+from .specificity import get_specificity_from_nodes
+from .diversity import get_diversity_from_nodes

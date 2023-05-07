@@ -7,7 +7,7 @@ from itertools import combinations
 from src.model import Attribute
 
 if TYPE_CHECKING:
-    from src.model.Node import VisualizationNode
+    from src.model.gleaner_chart import GleanerChart
 
 
 # N
@@ -88,7 +88,7 @@ def mean(l):
     return sum(l) / len(l)
 
 
-def get_statistic_features(node: "VisualizationNode") -> list[list[str | None]]:
+def get_statistic_features(node: "GleanerChart") -> list[list[str | None]]:
     attr_combinations: list[tuple[Attribute, ...]] = [
         *list(combinations(node.attrs, 1)),
         *list(combinations(node.attrs, 2)),
@@ -145,7 +145,7 @@ def feature_to_interestingness(features: list[list[str | None]]) -> float:
 
 
 def get_interestingness(
-    nodes: list["VisualizationNode"],
+    nodes: list["GleanerChart"],
 ) -> float:
     node_features = [get_statistic_features(node) for node in nodes]
 

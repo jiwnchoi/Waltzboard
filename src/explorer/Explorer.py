@@ -5,8 +5,8 @@ import numpy as np
 from . import ExplorerConfig, TrainResult
 from src.generator import Generator
 from src.oracle import Oracle, OracleResult
-from src.model import VisualizationNode
-from src.ChartMap import chart_type, agg_type
+from src.model import GleanerChart, GleanerDashboard
+from src.config import chart_type, agg_type
 
 
 def mean(l):
@@ -30,7 +30,7 @@ class Counters:
         self.ct = PosteriorCounter(attr_names)
         self.at = PosteriorCounter(attr_names)
 
-    def update(self, node: VisualizationNode):
+    def update(self, node: GleanerChart):
         ct, x, y, z, at = node.sample
         self.ct[ct] += 1
         self.x[x] += 1
@@ -42,6 +42,7 @@ class Counters:
 class Explorer:
     config: ExplorerConfig
     df: pd.DataFrame
+    dashboard: GleanerDashboard | None = None
     result: OracleResult | None = None
 
     def __init__(self, df: pd.DataFrame, config: ExplorerConfig) -> None:
@@ -52,32 +53,21 @@ class Explorer:
         n_charts: list[float] = [
             gen.prior.n_charts.sample() for _ in range(self.config.n_candidates)
         ]
-        candidates: list[list[VisualizationNode]] = [
-            gen.sample_n(round(n_chart)) for n_chart in n_charts
+        candidates: list[GleanerDashboard] = [
+            gen.sample_dashboard(round(n_chart)) for n_chart in n_charts
         ]
         results: list[OracleResult] = [
             oracle.get_result(dashboard, set(wildcard)) for dashboard in candidates
         ]
 
-        specificity = np.array([])
-        interestingness = np.array([])
-        coverage = np.array([])
-        diversity = np.array([])
-        conciseness = np.array([])
+        specificity = np.array([r.specificity for r in results])
+        interestingness = np.array([r.interestingness for r in results])
+        coverage = np.array([r.coverage for r in results])
+        diversity = np.array([r.diversity for r in results])
+        conciseness = np.array([r.conciseness for r in results])
 
-        for r in results:
-            specificity = np.append(specificity, r.specificity)
-            interestingness = np.append(interestingness, r.interestingness)
-            coverage = np.append(coverage, r.coverage)
-            diversity = np.append(diversity, r.diversity)
-            conciseness = np.append(conciseness, r.conciseness)
-
-        raw_scores = specificity + interestingness + coverage + diversity + conciseness
-
-        self.result = (
-            results[np.argmax(raw_scores)]
-            if self.result is None or max(raw_scores) > self.result.get_score()
-            else self.result
+        raw_scores: np.ndarray = (
+            specificity + interestingness + coverage + diversity + conciseness
         )
 
         normalized_scores = (
@@ -88,21 +78,21 @@ class Explorer:
             + (conciseness - conciseness.mean()) / conciseness.std()
         )
 
-        result_n_scores: list[tuple[OracleResult, float, float]] = [
-            (r, raw_scores[i], normalized_scores[i]) for i, r in enumerate(results)
+        result_n_scores: list[tuple[OracleResult, GleanerDashboard, float, float]] = [
+            (result, candidates[i], raw_scores[i], normalized_scores[i])
+            for i, result in enumerate(results)
         ]
-        sorted_result_n_scores = sorted(
-            result_n_scores, key=lambda x: x[-1], reverse=True
-        )
+        result_n_scores = sorted(result_n_scores, key=lambda x: x[-1], reverse=True)
 
-        halved_results = sorted_result_n_scores[
+        halved_results = result_n_scores[
             0 : int(self.config.n_candidates * self.config.halving_ratio)
         ]
-        halved_n_charts = np.array([len(r[0].dashboard) for r in halved_results])
+        halved_n_charts = np.array([len(r[1]) for r in halved_results])
 
         counters = Counters(gen.attr_names)
         for candidate in halved_results:
-            for chart in candidate[0].dashboard:
+            charts = candidate[1].charts
+            for chart in charts:
                 counters.update(chart)
 
         gen.prior.x.update(counters.x.get_posteriors(gen.attr_names))
@@ -112,6 +102,14 @@ class Explorer:
         gen.prior.at.update(counters.at.get_posteriors(agg_type))
         gen.prior.n_charts.update(
             len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std()
+        )
+
+        expl_idx = np.argmax(normalized_scores)
+        self.dashboard = candidates[expl_idx]
+        self.result = (
+            results[expl_idx]
+            if self.result is None or raw_scores[expl_idx] > self.result.get_score()
+            else self.result
         )
 
         return TrainResult(
