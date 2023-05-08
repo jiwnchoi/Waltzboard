@@ -1,7 +1,4 @@
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from src.model.gleaner_chart import GleanerChart
+from src.model import GleanerChart
 
 
 def includeness(bovs: set, wildcard: set) -> float:

@@ -1,9 +1,5 @@
-from typing import TYPE_CHECKING
 import numpy as np
-
-
-if TYPE_CHECKING:
-    from src.model.gleaner_chart import GleanerChart
+from src.model import GleanerChart
 
 
 def jcd_index(sets: list[set]) -> float:

@@ -1,13 +1,10 @@
-from typing import TYPE_CHECKING
 import pandas as pd
 import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
 from scipy.stats import chi2_contingency, f_oneway, entropy
 from itertools import combinations
-from src.model import Attribute
 
-if TYPE_CHECKING:
-    from src.model.gleaner_chart import GleanerChart
+from src.model import GleanerChart, Attribute
 
 
 # N

@@ -1,8 +1,5 @@
-from typing import TYPE_CHECKING
 import pandas as pd
-
-if TYPE_CHECKING:
-    from src.model.gleaner_chart import GleanerChart
+from src.model import GleanerChart
 
 
 def get_coverage_from_nodes(nodes: list["GleanerChart"], df: pd.DataFrame) -> float:

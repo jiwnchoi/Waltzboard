@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from collections import Counter
 import pandas as pd
 import numpy as np
-from . import ExplorerConfig, TrainResult
+from src.explorer import ExplorerConfig, TrainResult
 from src.generator import Generator
 from src.oracle import Oracle, OracleResult
 from src.model import GleanerChart, GleanerDashboard
