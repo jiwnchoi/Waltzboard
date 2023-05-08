@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from numpy.random import choice
 
-from . import PriorParameters
+from src.generator import PriorParameters
 from src.model import Attribute, GleanerChart, GleanerDashboard
 from src.config import chart_type, agg_type, chart_map
 

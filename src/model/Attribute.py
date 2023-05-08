@@ -5,7 +5,7 @@ from typing import Literal
 @dataclass
 class Attribute:
     name: str
-    type: Literal["Q", "C", "T", "O", "N", "N"]
+    type: Literal["Q", "C", "T", "O", "N"]
 
     def __str__(self):
         return self.name

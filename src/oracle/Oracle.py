@@ -2,15 +2,14 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from src.oracle import OracleWeight, OracleResult
+from src.model import GleanerDashboard
+from src.oracle import OracleResult, OracleWeight
 from src.oracle.scores import (
     get_coverage_from_nodes,
     get_diversity_from_nodes,
     get_interestingness,
     get_specificity_from_nodes,
 )
-
-from src.model import GleanerChart, GleanerDashboard
 
 
 @dataclass
