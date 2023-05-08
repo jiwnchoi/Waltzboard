@@ -6,3 +6,4 @@ from .interestingness import (
 )
 from .specificity import get_specificity_from_nodes
 from .diversity import get_diversity_from_nodes
+from .conciseness import get_conciseness_from_nodes
