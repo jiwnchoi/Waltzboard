@@ -41,6 +41,7 @@ class GleanerChart:
 
         if dim == 1 and x.type == "Q" and agg_type:
             self.binnings = [Binning(x.name, x.type)]
+            self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
                 x=alt.X(x.name, type=x.long_type(), bin=True),
