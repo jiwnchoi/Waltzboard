@@ -7,7 +7,7 @@ import altair as alt
 chart_map = [
     ["Q", None, None, "bar", "count"],
     ["Q", None, None, "tick", None],
-    ["Q", None, None, "tick", "boxplot"],
+    ["Q", None, None, "boxplot", None],
     ["C", None, None, "bar", "count"],
     ["C", None, None, "arc", "count"],
     ["T", None, None, "bar", "count"],
