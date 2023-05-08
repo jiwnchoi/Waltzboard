@@ -3,6 +3,7 @@
 from typing import Literal, Optional, Set, Union
 import altair as alt
 import pandas as pd
+import json
 
 from . import (
     Aggregation,
@@ -217,7 +218,34 @@ class GleanerChart:
         return chart.to_json()
 
     def display(self) -> alt.Chart:
-        chart = alt.Chart(self.sub_df)
+        num_fields = len(self.attrs)
+        axis_names = [attr.name for attr in self.attrs]
+        value_field_name = axis_names[-1]
+
+        filter_tokens = (
+            [
+                ["and" if i > 0 else "", f[0], "is", f[1]]
+                for i, f in enumerate(self.filters)
+            ]
+            if self.filters
+            else [],
+        )
+
+        tokens: list[str] = [
+            [f"{self.aggregation.type[0].upper()}{self.aggregation.type[1:]}", "of"]
+            if self.aggregation
+            else [],
+            [value_field_name],
+            ["of"] if self.aggregation else [],
+            ["by", axis_names[0], "and", axis_names[1]] if num_fields == 3 else [],
+            ["by", axis_names[0]] if num_fields == 2 else [],
+            [",", "when", *filter_tokens] if self.filters else [],
+        ]
+        tokens = [t for token in tokens for t in token]
+
+        chart = alt.Chart(self.sub_df, title=" ".join(tokens)).properties(
+            description=json.dumps(tokens)
+        )
         if self.encoding is None:
             return chart
         chart: alt.Chart = chart.encode(x=self.encoding.x)
@@ -251,96 +279,35 @@ class GleanerChart:
         elif self.encoding.chart_type == "tick":
             chart = chart.mark_tick()
 
-        # num_fields = (
-        #     3
-        #     if self.encoding.z
-        #     else 2
-        #     if self.encoding.y
-        #     else 1
-        #     if self.encoding.x
-        #     else None
-        # )
+        # Swap x and y axis for better readability
+        if (
+            num_fields > 2
+            and self.encoding.x.type == "nominal"
+            and self.encoding.y.type == "nominal"
+        ):
+            x_max_char = max(
+                [len(x) for x in self.sub_df[axis_names[0]].dropna().unique().tolist()]
+            )
+            y_max_char = max(
+                [len(y) for y in self.sub_df[axis_names[1]].dropna().unique().tolist()]
+            )
+            if x_max_char > y_max_char:
+                chart = chart.encode(y=self.encoding.x, x=self.encoding.y)
 
-        # value_field_name = (
-        #     self.encoding.z.field
-        #     if num_fields == 3 and str(self.encoding.z.field) != "Undefined"
-        #     else "Values"
-        #     if num_fields == 3
-        #     else self.encoding.y.field
-        #     if num_fields == 2
-        #     else self.encoding.x.field
-        #     if num_fields == 1
-        #     else None
-        # )
-        # if (
-        #     num_fields > 2
-        #     and self.encoding.x.type == "nominal"
-        #     and self.encoding.y.type == "nominal"
-        # ):
-        #     x_max_char = max(
-        #         [
-        #             len(x)
-        #             for x in self.sub_df[self.encoding.x.field]
-        #             .dropna()
-        #             .unique()
-        #             .tolist()
-        #         ]
-        #     )
-        #     y_max_char = max(
-        #         [
-        #             len(y)
-        #             for y in self.sub_df[self.encoding.y.field]
-        #             .dropna()
-        #             .unique()
-        #             .tolist()
-        #         ]
-        #     )
-        #     if x_max_char > y_max_char:
-        #         chart = chart.encode(y=self.encoding.x, x=self.encoding.y)
-        #         value_field_name = self.encoding.y.field
+        elif (
+            num_fields > 1
+            and self.encoding.x.type == "nominal"
+            and self.encoding.chart_type != "arc"
+        ):
+            chart = chart.encode(x=self.encoding.y, y=self.encoding.x)
 
-        # elif (
-        #     num_fields > 1
-        #     and self.encoding.x.type == "nominal"
-        #     and self.encoding.chart_type != "arc"
-        # ):
-        #     chart = chart.encode(x=self.encoding.y, y=self.encoding.x)
-        #     value_field_name = self.encoding.y.field
-        # elif (
-        #     num_fields == 1
-        #     and self.encoding.x.type == "nominal"
-        #     and self.encoding.chart_type != "arc"
-        # ):
-        #     chart = chart.encode(x=None, y=self.encoding.x)
-        #     value_field_name = self.encoding.x.field
+        elif (
+            num_fields == 1
+            and self.encoding.x.type == "nominal"
+            and self.encoding.chart_type != "arc"
+        ):
+            chart = chart.encode(x=None, y=self.encoding.x)
 
-        # tokens = []
-
-        # if self.aggregation:
-        #     tokens.append(
-        #         f"{self.aggregation.type[0].upper()}{self.aggregation.type[1:]}"
-        #     )
-        # tokens.append(value_field_name)
-        # if num_fields == 3:
-        #     tokens.extend(["by", self.encoding.x.field, "and", self.encoding.y.field])
-        # elif num_fields == 2:
-        #     tokens.extend(["by", self.encoding.x.field])
-        # if self.filters:
-        #     tokens.extend([",", "when"])
-        #     for i, f in enumerate(self.filters):
-        #         if i > 0:
-        #             tokens.append("and")
-        #         tokens.extend([f[0], "is", f[1]])
-        # try:
-        #     chart = chart.properties(description=json.dumps(tokens))
-        # except:
-        #     print(self.encoding)
-        #     if self.encoding.z:
-        #         print(self.encoding.z.field)
-        #         print(type(self.encoding.z.field))
-        #     print(num_fields)
-        #     print(tokens)
-        #     pass
         return chart
 
     def get_number_of_types(

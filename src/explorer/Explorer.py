@@ -103,14 +103,10 @@ class Explorer:
         gen.prior.n_charts.update(
             len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std()
         )
-
         expl_idx = np.argmax(normalized_scores)
-        self.dashboard = candidates[expl_idx]
-        self.result = (
-            results[expl_idx]
-            if self.result is None or raw_scores[expl_idx] > self.result.get_score()
-            else self.result
-        )
+        if self.result is None or raw_scores[expl_idx] > self.result.get_score():
+            self.dashboard = candidates[expl_idx]
+            self.result = results[expl_idx]
 
         return TrainResult(
             raw_scores,

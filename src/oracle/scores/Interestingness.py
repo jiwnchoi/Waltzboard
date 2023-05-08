@@ -6,6 +6,8 @@ from itertools import combinations
 
 from src.model import GleanerChart, Attribute
 
+lof = LocalOutlierFactor()
+
 
 # N
 def has_outliers_n(df: pd.DataFrame, attr: str) -> str | None:
@@ -16,7 +18,6 @@ def has_outliers_n(df: pd.DataFrame, attr: str) -> str | None:
 
 # Q
 def has_outliers_q(df: pd.DataFrame, attr: str) -> str | None:
-    lof = LocalOutlierFactor()
     pred = lof.fit_predict(df[attr].to_numpy().reshape(-1, 1))
     return "has_outliers" if np.count_nonzero(pred == -1) > 0 else None
 
@@ -64,7 +65,6 @@ def has_correlation_qq(df: pd.DataFrame, attr1: str, attr2: str) -> str | None:
 
 def has_outliers_qq(df: pd.DataFrame, attr1: str, attr2: str) -> str | None:
     # use lof
-    lof = LocalOutlierFactor()
     scores = lof.fit_predict(df[[attr1, attr2]])
     return "has_outliers" if np.count_nonzero(scores == -1) > 0 else None
 
