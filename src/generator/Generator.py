@@ -32,9 +32,6 @@ class Generator:
         ]
         self.prior = PriorParameters(self.attr_names)
 
-    def initialize(self):
-        self.prior = PriorParameters(self.attr_names)
-
     def attr_mask(self, current: list["Attribute"]):
         valid_map = [e for e in chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])

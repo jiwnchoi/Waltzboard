@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
 
-# attribute.py
-
 
 @dataclass
 class Attribute:
