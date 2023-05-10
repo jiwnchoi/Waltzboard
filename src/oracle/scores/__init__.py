@@ -1,6 +1,5 @@
 from .coverage import get_coverage_from_nodes
 from .interestingness import (
-    HashMap,
     hashmap,
     get_interestingness,
 )

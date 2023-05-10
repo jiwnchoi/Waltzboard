@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 from numpy.random import choice
 
-from src.generator import PriorParameters
-from src.model import Attribute, GleanerChart, GleanerDashboard
-from src.config import chart_type, agg_type, chart_map
+from src.generator import PriorParameters, GeneratorConfig
+from src.model import Attribute, GleanerChart, GleanerDashboard, get_gleaner_chart
+from src.config import GleanerConfig
 
 
 def p(x: np.ndarray) -> np.ndarray:
@@ -21,19 +21,14 @@ def is_valid_map(current: list, map: list) -> bool:
 
 
 class Generator:
-    def __init__(self, df: pd.DataFrame) -> None:
+    def __init__(self, df: pd.DataFrame, config: GleanerConfig) -> None:
         self.df = df
-        self.attrs: list[Attribute | None] = [None] + [
-            Attribute(col, "C" if df[col].dtype == "object" else "Q")
-            for col in df.columns
-        ]
-        self.attr_names = [
-            e.name if isinstance(e, Attribute) else e for e in self.attrs
-        ]
-        self.prior = PriorParameters(self.attr_names)
+        self.attrs = [None] + config.attrs
+        self.config = config
+        self.prior = PriorParameters(self.config)
 
     def attr_mask(self, current: list["Attribute"]):
-        valid_map = [e for e in chart_map if is_valid_map(current, e)]
+        valid_map = [e for e in self.config.chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
         weight_mask = np.array(
             [
@@ -49,20 +44,20 @@ class Generator:
         return weight_mask
 
     def ct_mask(self, current: list):
-        valid_map = [e for e in chart_map if is_valid_map(current, e)]
+        valid_map = [e for e in self.config.chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
-        weight_mask = np.array([e in valid_type for e in chart_type])
+        weight_mask = np.array([e in valid_type for e in self.config.chart_type])
         return weight_mask
 
     def at_mask(self, current: list):
-        valid_map = [e for e in chart_map if is_valid_map(current, e)]
+        valid_map = [e for e in self.config.chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
-        weight_mask = np.array([e in valid_type for e in agg_type])
+        weight_mask = np.array([e in valid_type for e in self.config.agg_type])
         return weight_mask
 
     def sample_one(self) -> GleanerChart:
         current: list = []
-        current.append(choice(chart_type, p=p(self.prior.ct.sample())))
+        current.append(choice(self.config.chart_type, p=p(self.prior.ct.sample())))
 
         mask_x = self.attr_mask(current)
         current.append(choice(self.attrs, p=p(self.prior.x.sample() * mask_x)))  # type: ignore
@@ -74,9 +69,11 @@ class Generator:
         current.append(choice(self.attrs, p=p(self.prior.z.sample() * mask_z)))  # type: ignore
 
         mask_at = self.at_mask(current)
-        current.append(choice(agg_type, p=p(self.prior.at.sample() * mask_at)))
+        current.append(
+            choice(self.config.agg_type, p=p(self.prior.at.sample() * mask_at))
+        )
 
-        return GleanerChart(current, self.df)
+        return get_gleaner_chart(current, self.df)
 
     def sample_dashboard(self, n: int) -> GleanerDashboard:
         return GleanerDashboard([self.sample_one() for _ in range(n)])

@@ -1,16 +1,16 @@
 from src.model import GleanerChart
 
 
-def includeness(bovs: set, wildcard: set) -> float:
-    return len(bovs.intersection(wildcard)) / len(wildcard)
+def includeness(bovs: set, preferences: set) -> float:
+    return len(bovs.intersection(preferences)) / len(preferences)
 
 
 def get_specificity_from_nodes(
-    nodes: list["GleanerChart"], wildcard: set[str]
+    nodes: list["GleanerChart"], preferences: set[str]
 ) -> float:
-    if len(wildcard) == 0:
+    if len(preferences) == 0:
         return 0.0
 
     bovs = [node.get_bov() for node in nodes]
-    specificities = [includeness(bov, wildcard) for bov in bovs]
+    specificities = [includeness(bov, preferences) for bov in bovs]
     return sum(specificities) / len(specificities)

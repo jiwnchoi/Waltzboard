@@ -36,7 +36,7 @@ class SampleBody(BaseModel):
     numFilter: int
     weight: OracleWeight
     chartTypes: list[str]
-    wildcard: list[str]
+    preferences: list[str]
     indices: list[int]
 
 
@@ -72,7 +72,7 @@ async def init(body: SampleBody) -> InitItem:
             body.numVis,
             body.numSample,
             body.numFilter,
-            body.wildcard,
+            body.preferences,
             [c.mark for c in chart_types.values()],
         ).to_dict(),
     )
@@ -87,7 +87,7 @@ async def sample(body: SampleBody) -> Result:
             body.numVis,
             body.numSample,
             body.numFilter,
-            body.wildcard,
+            body.preferences,
             body.chartTypes,
         ).to_dict()
     )

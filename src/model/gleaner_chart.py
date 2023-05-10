@@ -1,16 +1,25 @@
 # type: ignore
-
 from typing import Literal, Optional, Set, Union
 import altair as alt
 import pandas as pd
 import json
 
-from . import (
+from src.model import (
     Aggregation,
     Binning,
     Encodings,
     Attribute,
 )
+
+
+chart_hash = {}
+
+
+def get_gleaner_chart(sample: list[Attribute | str | None], df):
+    chart = chart_hash.get(
+        tuple([s.name if isinstance(s, Attribute) else s for s in sample])
+    )
+    return chart if chart else GleanerChart(sample, df)
 
 
 class GleanerChart:
