@@ -244,9 +244,7 @@ class GleanerChart:
         ]
         tokens = [t for token in tokens for t in token]
 
-        chart = alt.Chart(self.sub_df, title=" ".join(tokens)).properties(
-            description=json.dumps(tokens)
-        )
+        chart = alt.Chart(self.sub_df, title=" ".join(tokens))
         if self.encoding is None:
             return chart
         chart: alt.Chart = chart.encode(x=self.encoding.x)
@@ -272,8 +270,7 @@ class GleanerChart:
         elif self.encoding.chart_type == "area":
             chart = chart.mark_area()
         elif self.encoding.chart_type == "arc":
-            chart = alt.Chart(self.sub_df)
-            chart = chart.mark_arc()
+            chart = alt.Chart(self.sub_df, title=" ".join(tokens)).mark_arc()
             chart = chart.encode(color=self.encoding.x, theta=self.encoding.y)
         elif self.encoding.chart_type == "boxplot":
             chart = chart.mark_boxplot(extent="min-max")
@@ -309,7 +306,7 @@ class GleanerChart:
         ):
             chart = chart.encode(x=None, y=self.encoding.x)
 
-        return chart
+        return chart.properties(description=json.dumps(tokens))
 
     def get_number_of_types(
         self,
