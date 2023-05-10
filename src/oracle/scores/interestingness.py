@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
-from scipy.stats import chi2_contingency, f_oneway, entropy
+from scipy.stats import chi2_contingency
+
+from .anova import f_oneway
 from itertools import combinations
 
 from src.model import GleanerChart, Attribute
@@ -71,14 +73,14 @@ def has_outliers_qq(df: pd.DataFrame, attr1: str, attr2: str) -> str | None:
 
 ## QN
 def has_significance_qn(df: pd.DataFrame, attr_q: str, attr_n: str) -> str | None:
-    grouped_data = [df[df[attr_n] == group][attr_q] for group in df[attr_n]]
-    f_statistic, p_value = f_oneway(*grouped_data)
-    return "has_significance" if p_value < 0.05 else None
+    n = df[attr_n].to_numpy()
+    q = df[attr_q].to_numpy()
+    f, p = f_oneway(n, q)
+    return "has_significance" if p < 0.05 else None
 
 
-HashMap = dict[str, list[str | None]]
-
-hashmap: HashMap = {}
+hashmap = {}
+df_hash_map = {}
 
 
 def mean(l):
@@ -99,9 +101,11 @@ def get_statistic_features(node: "GleanerChart") -> list[list[str | None]]:
         target_attrs = [attr.name for attr in comb]
         key += f"{target_attrs}"
 
-        df_notnull = node.sub_df.dropna()
         try:
             if key not in hashmap:
+                df_notnull = (
+                    df_hash_map[key] if key in df_hash_map else node.sub_df.dropna()
+                )
                 if len(comb) == 1 and comb[0].type == "Q":
                     hashmap[key] = [
                         has_outliers_q(df_notnull, comb[0].name),
