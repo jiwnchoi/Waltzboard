@@ -67,15 +67,25 @@ class Explorer:
         conciseness = np.array([r.conciseness for r in results])
 
         raw_scores: np.ndarray = (
-            specificity + interestingness + coverage + diversity + conciseness
+            specificity * oracle.weight.specificity
+            + interestingness * oracle.weight.interestingness
+            + coverage * oracle.weight.coverage
+            + diversity * oracle.weight.diversity
+            + conciseness * oracle.weight.conciseness
         )
 
         normalized_scores = (
-            (specificity - specificity.mean()) / specificity.std()
-            + (interestingness - interestingness.mean()) / interestingness.std()
-            + (coverage - coverage.mean()) / coverage.std()
-            + (diversity - diversity.mean()) / diversity.std()
-            + (conciseness - conciseness.mean()) / conciseness.std()
+            (specificity - specificity.mean())
+            / specificity.std()
+            * oracle.weight.specificity
+            + (interestingness - interestingness.mean())
+            / interestingness.std()
+            * oracle.weight.interestingness
+            + (coverage - coverage.mean()) / coverage.std() * oracle.weight.coverage
+            + (diversity - diversity.mean()) / diversity.std() * oracle.weight.diversity
+            + (conciseness - conciseness.mean())
+            / conciseness.std()
+            * oracle.weight.conciseness
         )
 
         result_n_scores: list[tuple[OracleResult, GleanerDashboard, float, float]] = [
@@ -104,7 +114,7 @@ class Explorer:
             len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std()
         )
         expl_idx = np.argmax(normalized_scores)
-        if self.result is None or raw_scores[expl_idx] > self.result.get_score():
+        if self.result is None or raw_scores[expl_idx] < self.result.get_score():
             self.dashboard = candidates[expl_idx]
             self.result = results[expl_idx]
 
