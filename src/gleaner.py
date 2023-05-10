@@ -25,7 +25,7 @@ class Gleaner:
         train_results: list[TrainResult] = []
         for epoch in range(self.config.n_epoch):
             train_result = self.explorer._train(
-                self.generator, self.oracle, ["IMDB_Votes", "tick"]
+                self.generator, self.oracle, preferences
             )
             train_results.append(train_result)
             display_function(epoch, train_results)
