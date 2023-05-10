@@ -36,11 +36,11 @@ class Oracle:
 
     def update(
         self,
-        specificity: float | None,
-        interestingness: float | None,
-        coverage: float | None,
-        diversity: float | None,
-        conciseness: float | None,
+        specificity: float | None = None,
+        interestingness: float | None = None,
+        coverage: float | None = None,
+        diversity: float | None = None,
+        conciseness: float | None = None,
     ) -> None:
         if specificity is not None:
             self.weight.specificity = specificity
