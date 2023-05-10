@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from collections import Counter
 import pandas as pd
 import numpy as np
-from src.explorer import TrainResult
+from gleaner.explorer import TrainResult
 
-from src.oracle import Oracle, OracleResult
-from src.model import GleanerChart, GleanerDashboard
-from src.config import GleanerConfig
+from gleaner.oracle import Oracle, OracleResult
+from gleaner.model import GleanerChart, GleanerDashboard
+from gleaner.config import GleanerConfig
 
-from src.generator import Generator
+from gleaner.generator import Generator
 
 
 def mean(l):
@@ -54,15 +54,9 @@ class Explorer:
         self.config = config
 
     def _infer(self, gen: Generator, oracle: Oracle, preferences: list[str]):
-        n_charts: list[float] = [
-            gen.prior.n_charts.sample() for _ in range(self.config.n_candidates)
-        ]
-        candidates: list[GleanerDashboard] = [
-            gen.sample_dashboard(round(n_chart)) for n_chart in n_charts
-        ]
-        results: list[OracleResult] = [
-            oracle.get_result(dashboard, set(preferences)) for dashboard in candidates
-        ]
+        n_charts: list[float] = [gen.prior.n_charts.sample() for _ in range(self.config.n_candidates)]
+        candidates: list[GleanerDashboard] = [gen.sample_dashboard(round(n_chart)) for n_chart in n_charts]
+        results: list[OracleResult] = [oracle.get_result(dashboard, set(preferences)) for dashboard in candidates]
 
         specificity = np.array([r.specificity for r in results])
         interestingness = np.array([r.interestingness for r in results])
@@ -79,22 +73,15 @@ class Explorer:
         )
 
         normalized_scores = (
-            (specificity - specificity.mean())
-            / specificity.std()
-            * oracle.weight.specificity
-            + (interestingness - interestingness.mean())
-            / interestingness.std()
-            * oracle.weight.interestingness
+            (specificity - specificity.mean()) / specificity.std() * oracle.weight.specificity
+            + (interestingness - interestingness.mean()) / interestingness.std() * oracle.weight.interestingness
             + (coverage - coverage.mean()) / coverage.std() * oracle.weight.coverage
             + (diversity - diversity.mean()) / diversity.std() * oracle.weight.diversity
-            + (conciseness - conciseness.mean())
-            / conciseness.std()
-            * oracle.weight.conciseness
+            + (conciseness - conciseness.mean()) / conciseness.std() * oracle.weight.conciseness
         )
 
         result_n_scores: list[tuple[OracleResult, GleanerDashboard, float, float]] = [
-            (result, candidates[i], raw_scores[i], normalized_scores[i])
-            for i, result in enumerate(results)
+            (result, candidates[i], raw_scores[i], normalized_scores[i]) for i, result in enumerate(results)
         ]
 
         return (
@@ -108,9 +95,7 @@ class Explorer:
             conciseness,
         )
 
-    def infer(
-        self, gen: Generator, oracle: Oracle, preferences: list[str]
-    ) -> GleanerDashboard:
+    def infer(self, gen: Generator, oracle: Oracle, preferences: list[str]) -> GleanerDashboard:
         (
             result_n_scores,
             raw_scores,
@@ -125,9 +110,7 @@ class Explorer:
         expl_idx = np.argmax(normalized_scores)
         return result_n_scores[expl_idx][1]
 
-    def _train(
-        self, gen: Generator, oracle: Oracle, preferences: list[str]
-    ) -> TrainResult:
+    def _train(self, gen: Generator, oracle: Oracle, preferences: list[str]) -> TrainResult:
         (
             result_n_scores,
             raw_scores,
@@ -146,9 +129,7 @@ class Explorer:
 
         result_n_scores = sorted(result_n_scores, key=lambda x: x[-1], reverse=True)
 
-        halved_results = result_n_scores[
-            0 : int(self.config.n_candidates * self.config.halving_ratio)
-        ]
+        halved_results = result_n_scores[0 : int(self.config.n_candidates * self.config.halving_ratio)]
         halved_n_charts = np.array([len(r[1]) for r in halved_results])
 
         none_attr_names: list[str | None] = [None, *self.config.attr_names]
@@ -163,9 +144,7 @@ class Explorer:
         gen.prior.z.update(counters.z.get_posteriors(none_attr_names))
         gen.prior.ct.update(counters.ct.get_posteriors(self.config.chart_type))
         gen.prior.at.update(counters.at.get_posteriors(self.config.agg_type))
-        gen.prior.n_charts.update(
-            len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std()
-        )
+        gen.prior.n_charts.update(len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std())
 
         return TrainResult(
             raw_scores,
@@ -177,9 +156,7 @@ class Explorer:
             np.array([len(d[1]) for d in result_n_scores]),
         )
 
-    def train(
-        self, gen: Generator, oracle: Oracle, preferences: list[str]
-    ) -> list[TrainResult]:
+    def train(self, gen: Generator, oracle: Oracle, preferences: list[str]) -> list[TrainResult]:
         results = []
         for _ in range(self.config.n_epoch):
             results.append(self._train(gen, oracle, preferences))

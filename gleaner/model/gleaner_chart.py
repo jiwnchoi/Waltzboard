@@ -4,7 +4,7 @@ import altair as alt
 import pandas as pd
 import json
 
-from src.model import (
+from gleaner.model import (
     Aggregation,
     Binning,
     Encodings,

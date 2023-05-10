@@ -34,7 +34,7 @@ Issues = "https://github.com/jason-choi/gleaner/issues"
 Source = "https://github.com/jason-choi/gleaner"
 
 [tool.hatch.version]
-path = "src/__about__.py"
+path = "gleaner/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -64,7 +64,7 @@ dependencies = [
   "ruff>=0.0.243",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/gleaner tests}"
+typing = "mypy --install-types --non-interactive {args:gleaner tests}"
 style = [
   "ruff {args:.}",
   "black --check --diff {args:.}",
@@ -144,11 +144,11 @@ source_pkgs = ["gleaner", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/__about__.py",
+  "gleaner/__about__.py",
 ]
 
 [tool.coverage.paths]
-gleaner = ["src", "*/gleaner/src"]
+gleaner = ["gleaner", "*/gleaner/gleaner"]
 tests = ["tests", "*/gleaner/tests"]
 
 [tool.coverage.report]
@@ -168,4 +168,4 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["gleaner"]

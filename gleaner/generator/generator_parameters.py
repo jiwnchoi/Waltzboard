@@ -1,5 +1,5 @@
 import pandas as pd
-from src.config import GleanerConfig
+from gleaner.config import GleanerConfig
 import numpy as np
 from IPython.display import display
 
@@ -33,9 +33,7 @@ class NormalPrior:
         self.history = [mean]
 
     def update(self, n, observed_mean, observed_var):
-        self.mean = (self.mean / self.var + observed_mean * n / observed_var) / (
-            1 / self.var + n / observed_var
-        )
+        self.mean = (self.mean / self.var + observed_mean * n / observed_var) / (1 / self.var + n / observed_var)
         # self.var = 1 / (1 / self.var + n / observed_var)
         self.history.append(self.mean)
 
@@ -62,12 +60,8 @@ class PriorParameters:
         self.x = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
         self.y = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
         self.z = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
-        self.ct = DirichletPrior(
-            np.ones(len(self.config.chart_type)) * self.config.robustness
-        )
-        self.at = DirichletPrior(
-            np.ones(len(self.config.agg_type)) * self.config.robustness
-        )
+        self.ct = DirichletPrior(np.ones(len(self.config.chart_type)) * self.config.robustness)
+        self.at = DirichletPrior(np.ones(len(self.config.agg_type)) * self.config.robustness)
         self.n_charts = NormalPrior(len(attrs) - 1)
 
     def display(self):

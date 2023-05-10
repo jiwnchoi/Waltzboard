@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 from numpy.random import choice
 
-from src.config import GleanerConfig
-from src.generator import GeneratorConfig, PriorParameters
-from src.model import Attribute, GleanerChart, GleanerDashboard, get_gleaner_chart
+from gleaner.config import GleanerConfig
+from gleaner.generator import GeneratorConfig, PriorParameters
+from gleaner.model import Attribute, GleanerChart, GleanerDashboard, get_gleaner_chart
 
 
 def p(x: np.ndarray) -> np.ndarray:

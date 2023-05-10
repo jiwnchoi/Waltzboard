@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from src.oracle import OracleResult, OracleWeight
-from src.oracle.scores import (
+from gleaner.oracle import OracleResult, OracleWeight
+from gleaner.oracle.scores import (
     get_coverage_from_nodes,
     get_diversity_from_nodes,
     get_interestingness,
@@ -13,7 +13,7 @@ from src.oracle.scores import (
 )
 
 if TYPE_CHECKING:
-    from src.model import GleanerDashboard
+    from gleaner.model import GleanerDashboard
 
 
 class Oracle:

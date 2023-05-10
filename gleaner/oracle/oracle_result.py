@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import pandas as pd
-from src.oracle import OracleWeight
+from gleaner.oracle import OracleWeight
 
 
 @dataclass

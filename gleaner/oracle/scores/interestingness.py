@@ -6,7 +6,7 @@ from scipy.stats import chi2_contingency
 from .anova import f_oneway
 from itertools import combinations
 
-from src.model import GleanerChart, Attribute
+from gleaner.model import GleanerChart, Attribute
 
 lof = LocalOutlierFactor()
 
@@ -25,19 +25,11 @@ def has_outliers_q(df: pd.DataFrame, attr: str) -> str | None:
 
 
 def has_skewness_q(df: pd.DataFrame, attr: str) -> str | None:
-    return (
-        "has_skewness"
-        if abs(pd.to_numeric(df[attr].skew(skipna=True), errors="coerce")) > 2
-        else None
-    )
+    return "has_skewness" if abs(pd.to_numeric(df[attr].skew(skipna=True), errors="coerce")) > 2 else None
 
 
 def has_kurtosis(df: pd.DataFrame, attr: str) -> str | None:
-    return (
-        "has_kurtosis"
-        if abs(pd.to_numeric(df[attr].kurtosis(skipna=True), errors="coerce")) > 7
-        else None
-    )
+    return "has_kurtosis" if abs(pd.to_numeric(df[attr].kurtosis(skipna=True), errors="coerce")) > 7 else None
 
 
 ## NN
@@ -51,12 +43,7 @@ def has_outliers_nn(df: pd.DataFrame, attr1: str, attr2: str) -> str | None:
     contingency_table = pd.crosstab(df[attr1], df[attr2])
     chi2, p_value, _, expected = chi2_contingency(contingency_table)
     return (
-        "has_outliers"
-        if (
-            p_value < 0.05
-            and np.count_nonzero(np.abs(contingency_table - expected) > 2) > 0
-        )
-        else None
+        "has_outliers" if (p_value < 0.05 and np.count_nonzero(np.abs(contingency_table - expected) > 2) > 0) else None
     )
 
 
@@ -103,9 +90,7 @@ def get_statistic_features(node: "GleanerChart") -> list[list[str | None]]:
 
         try:
             if key not in hashmap:
-                df_notnull = (
-                    df_hash_map[key] if key in df_hash_map else node.sub_df.dropna()
-                )
+                df_notnull = df_hash_map[key] if key in df_hash_map else node.sub_df.dropna()
                 if len(comb) == 1 and comb[0].type == "Q":
                     hashmap[key] = [
                         has_outliers_q(df_notnull, comb[0].name),
@@ -115,13 +100,9 @@ def get_statistic_features(node: "GleanerChart") -> list[list[str | None]]:
                 elif len(comb) == 1 and comb[0].type == "C":
                     hashmap[key] = [has_outliers_n(df_notnull, comb[0].name)]
                 elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "C":
-                    hashmap[key] = [
-                        has_significance_qn(df_notnull, comb[0].name, comb[1].name)
-                    ]
+                    hashmap[key] = [has_significance_qn(df_notnull, comb[0].name, comb[1].name)]
                 elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "C":
-                    hashmap[key] = [
-                        has_significance_qn(df_notnull, comb[1].name, comb[0].name)
-                    ]
+                    hashmap[key] = [has_significance_qn(df_notnull, comb[1].name, comb[0].name)]
                 elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "Q":
                     hashmap[key] = [
                         has_correlation_qq(df_notnull, comb[0].name, comb[1].name),

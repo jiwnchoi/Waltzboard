@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 import pandas as pd
 
-from src.explorer import Explorer, TrainResult
-from src.generator import Generator
-from src.model import GleanerDashboard
-from src.config import GleanerConfig
-from src.oracle import Oracle
-from src.utill import display_function
+from gleaner.explorer import Explorer, TrainResult
+from gleaner.generator import Generator
+from gleaner.model import GleanerDashboard
+from gleaner.config import GleanerConfig
+from gleaner.oracle import Oracle
+from gleaner.utill import display_function
 
 
 class Gleaner:
