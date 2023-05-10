@@ -26,6 +26,7 @@ dependencies = [
     "numpy",
     "altair",
     "scikit-learn",
+    "ipython",
 ]
 
 [project.urls]
