@@ -16,9 +16,7 @@ chart_hash = {}
 
 
 def get_gleaner_chart(sample: list[Attribute | str | None], df):
-    chart = chart_hash.get(
-        tuple([s.name if isinstance(s, Attribute) else s for s in sample])
-    )
+    chart = chart_hash.get(tuple([s.name if isinstance(s, Attribute) else s for s in sample]))
     return chart if chart else GleanerChart(sample, df)
 
 
@@ -41,9 +39,7 @@ class GleanerChart:
         for i in range(len(self.attrs)):
             self.sample[i + 1] = self.attrs[i].name
 
-        self.sub_df = df[
-            [x.name, y.name, z.name] if z else [x.name, y.name] if y else [x.name]
-        ]
+        self.sub_df = df[[x.name, y.name, z.name] if z else [x.name, y.name] if y else [x.name]]
         self.chart_type = chart_type
 
         dim = len(self.attrs)
@@ -58,9 +54,7 @@ class GleanerChart:
             )
 
         elif dim == 1 and x.type == "Q":
-            self.encoding = Encodings(
-                chart_type=chart_type, x=alt.X(x.name, type=x.long_type())
-            )
+            self.encoding = Encodings(chart_type=chart_type, x=alt.X(x.name, type=x.long_type()))
 
         elif dim == 1 and x.type == "C" and chart_type == "arc":
             self.aggregation = Aggregation([x.name], agg_type)
@@ -94,13 +88,7 @@ class GleanerChart:
                 y=alt.Y(y.name, type=y.long_type()),
             )
 
-        elif (
-            dim == 2
-            and x.type == "C"
-            and y.type == "Q"
-            and chart_type == "bar"
-            and agg_type == "count"
-        ):
+        elif dim == 2 and x.type == "C" and y.type == "Q" and chart_type == "bar" and agg_type == "count":
             self.binnings = [Binning(x.name)]
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
@@ -152,13 +140,7 @@ class GleanerChart:
                 z=alt.Color(aggregate=agg_type),
             )
 
-        elif (
-            dim == 3
-            and x.type == "Q"
-            and y.type == "Q"
-            and z.type == "Q"
-            and chart_type == "point"
-        ):
+        elif dim == 3 and x.type == "Q" and y.type == "Q" and z.type == "Q" and chart_type == "point":
             self.binnings = [Binning(z.name)]
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -167,13 +149,7 @@ class GleanerChart:
                 z=alt.Color(z.name, type=z.long_type(), bin=True),
             )
 
-        elif (
-            dim == 3
-            and x.type == "Q"
-            and y.type == "Q"
-            and z.type == "Q"
-            and chart_type == "rect"
-        ):
+        elif dim == 3 and x.type == "Q" and y.type == "Q" and z.type == "Q" and chart_type == "rect":
             self.binnings = [Binning(x.name), Binning(y.name)]
             self.aggregation = Aggregation([x.name, y.name], agg_type)
             self.encoding = Encodings(
@@ -233,18 +209,11 @@ class GleanerChart:
         value_field_name = axis_names[-1]
 
         filter_tokens = (
-            [
-                ["and" if i > 0 else "", f[0], "is", f[1]]
-                for i, f in enumerate(self.filters)
-            ]
-            if self.filters
-            else [],
+            [["and" if i > 0 else "", f[0], "is", f[1]] for i, f in enumerate(self.filters)] if self.filters else [],
         )
 
         tokens: list[str] = [
-            [f"{self.aggregation.type[0].upper()}{self.aggregation.type[1:]}", "of"]
-            if self.aggregation
-            else [],
+            [f"{self.aggregation.type[0].upper()}{self.aggregation.type[1:]}", "of"] if self.aggregation else [],
             [value_field_name],
             ["of"] if self.aggregation else [],
             ["by", axis_names[0], "and", axis_names[1]] if num_fields == 3 else [],
@@ -287,33 +256,17 @@ class GleanerChart:
             chart = chart.mark_tick()
 
         # Swap x and y axis for better readability
-        if (
-            num_fields > 2
-            and self.encoding.x.type == "nominal"
-            and self.encoding.y.type == "nominal"
-        ):
-            x_max_char = max(
-                [len(x) for x in self.sub_df[axis_names[0]].dropna().unique().tolist()]
-            )
-            y_max_char = max(
-                [len(y) for y in self.sub_df[axis_names[1]].dropna().unique().tolist()]
-            )
+        if num_fields > 2 and self.encoding.x.type == "nominal" and self.encoding.y.type == "nominal":
+            x_max_char = max([len(x) for x in self.sub_df[axis_names[0]].dropna().unique().tolist()])
+            y_max_char = max([len(y) for y in self.sub_df[axis_names[1]].dropna().unique().tolist()])
             if x_max_char > y_max_char:
                 chart = chart.encode(y=self.encoding.x, x=self.encoding.y)
 
-        elif (
-            num_fields > 1
-            and self.encoding.x.type == "nominal"
-            and self.encoding.chart_type != "arc"
-        ):
+        elif num_fields > 1 and self.encoding.x.type == "nominal" and self.encoding.chart_type != "arc":
             chart = chart.encode(x=self.encoding.y, y=self.encoding.x)
 
-        elif (
-            num_fields == 1
-            and self.encoding.x.type == "nominal"
-            and self.encoding.chart_type != "arc"
-        ):
-            chart = chart.encode(x=None, y=self.encoding.x)
+        # elif num_fields == 1 and self.encoding.x.type == "nominal" and self.encoding.chart_type != "arc":
+        #     chart = chart.encode(x=None, y=self.encoding.x)
 
         return chart.properties(description=json.dumps(tokens))
 

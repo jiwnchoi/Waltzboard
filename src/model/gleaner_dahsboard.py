@@ -14,9 +14,7 @@ class GleanerDashboard:
     def display(self, size: int = 150, num_cols: int = 4):
         if self.charts is None:
             return None
-        altairs = [
-            chart.display().properties(width=size, height=size) for chart in self.charts
-        ]
+        altairs = [chart.display().properties(width=size, height=size) for chart in self.charts]
         rows: list[alt.HConcatChart] = [
             alt.hconcat(*altairs[i : i + num_cols]).resolve_scale(color="independent")
             for i in range(0, len(altairs), num_cols)

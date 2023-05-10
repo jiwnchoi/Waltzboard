@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 from numpy.random import choice
 
-from src.generator import PriorParameters, GeneratorConfig
-from src.model import Attribute, GleanerChart, GleanerDashboard, get_gleaner_chart
 from src.config import GleanerConfig
+from src.generator import GeneratorConfig, PriorParameters
+from src.model import Attribute, GleanerChart, GleanerDashboard, get_gleaner_chart
 
 
 def p(x: np.ndarray) -> np.ndarray:
@@ -12,12 +12,7 @@ def p(x: np.ndarray) -> np.ndarray:
 
 
 def is_valid_map(current: list, map: list) -> bool:
-    return all(
-        [
-            map[i] == c.type if isinstance(c, Attribute) else map[i] == c
-            for i, c in enumerate(current)
-        ]
-    )
+    return all([map[i] == c.type if isinstance(c, Attribute) else map[i] == c for i, c in enumerate(current)])
 
 
 class Generator:
@@ -33,11 +28,7 @@ class Generator:
         weight_mask = np.array(
             [
                 (e is None and e in valid_type)
-                or (
-                    isinstance(e, Attribute)
-                    and e.type in valid_type
-                    and e not in current
-                )
+                or (isinstance(e, Attribute) and e.type in valid_type and e not in current)
                 for e in self.attrs
             ]
         )
@@ -69,11 +60,18 @@ class Generator:
         current.append(choice(self.attrs, p=p(self.prior.z.sample() * mask_z)))  # type: ignore
 
         mask_at = self.at_mask(current)
-        current.append(
-            choice(self.config.agg_type, p=p(self.prior.at.sample() * mask_at))
-        )
+        current.append(choice(self.config.agg_type, p=p(self.prior.at.sample() * mask_at)))
 
         return get_gleaner_chart(current, self.df)
 
     def sample_dashboard(self, n: int) -> GleanerDashboard:
-        return GleanerDashboard([self.sample_one() for _ in range(n)])
+        keys: set[str] = set()
+        charts: list[GleanerChart] = []
+
+        while len(charts) < n:
+            chart = self.sample_one()
+            if str(chart.sample) not in keys:
+                keys.add(str(chart.sample))
+                charts.append(chart)
+
+        return GleanerDashboard(charts)

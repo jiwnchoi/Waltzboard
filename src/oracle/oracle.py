@@ -1,8 +1,8 @@
+from typing import TYPE_CHECKING
 from dataclasses import dataclass
 
 import pandas as pd
 
-from src.model import GleanerDashboard
 from src.oracle import OracleResult, OracleWeight
 from src.oracle.scores import (
     get_coverage_from_nodes,
@@ -12,6 +12,9 @@ from src.oracle.scores import (
     get_conciseness_from_nodes,
 )
 
+if TYPE_CHECKING:
+    from src.model import GleanerDashboard
+
 
 class Oracle:
     df: pd.DataFrame
@@ -20,9 +23,7 @@ class Oracle:
         self.df = df
         self.weight = OracleWeight()
 
-    def get_result(
-        self, dashboard: GleanerDashboard, preferences: set[str]
-    ) -> OracleResult:
+    def get_result(self, dashboard: "GleanerDashboard", preferences: set[str]) -> OracleResult:
         nodes = dashboard.charts
         return OracleResult(
             weight=self.weight,

@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 import pandas as pd
 
-from src.config import GleanerConfig
 from src.explorer import Explorer, TrainResult
 from src.generator import Generator
 from src.model import GleanerDashboard
+from src.config import GleanerConfig
 from src.oracle import Oracle
 from src.utill import display_function
 
@@ -26,9 +26,7 @@ class Gleaner:
         self.preferences = preferences
         train_results: list[TrainResult] = []
         for epoch in range(self.config.n_epoch):
-            train_result = self.explorer._train(
-                self.generator, self.oracle, preferences
-            )
+            train_result = self.explorer._train(self.generator, self.oracle, preferences)
             train_results.append(train_result)
             display_function(epoch, train_results)
 
