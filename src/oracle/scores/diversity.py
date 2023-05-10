@@ -2,10 +2,10 @@ import numpy as np
 from src.model import GleanerChart
 
 
-def jcd_index(sets: list[set]) -> float:
+def jcd_index(sets: list[set], preferences: set[str]) -> float:
     n = len(sets)
     intersections = [
-        set1.intersection(set2)
+        set1.intersection(set2) - preferences
         for i, set1 in enumerate(sets)
         for j, set2 in enumerate(sets)
         if i < j
@@ -24,8 +24,8 @@ def jcd_index(sets: list[set]) -> float:
 
 
 def get_diversity_from_nodes(
-    nodes: list["GleanerChart"],
+    nodes: list["GleanerChart"], preferences: set[str]
 ) -> float:
     bovs = [node.get_bov() for node in nodes]
     n = len(bovs)
-    return jcd_index(bovs) / (n * (n - 1) / 2)
+    return jcd_index(bovs, preferences) / (n * (n - 1) / 2)

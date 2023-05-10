@@ -27,7 +27,7 @@ class Oracle:
         return OracleResult(
             weight=self.weight,
             coverage=get_coverage_from_nodes(nodes, self.df),
-            diversity=get_diversity_from_nodes(nodes),
+            diversity=get_diversity_from_nodes(nodes, preferences),
             interestingness=get_interestingness(nodes),
             specificity=get_specificity_from_nodes(nodes, preferences),
             conciseness=get_conciseness_from_nodes(nodes, self.df),
