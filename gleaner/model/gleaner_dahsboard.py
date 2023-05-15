@@ -11,6 +11,12 @@ class GleanerDashboard:
     def __len__(self):
         return len(self.charts)
 
+    def append(self, chart: GleanerChart):
+        self.charts.append(chart)
+
+    def extend(self, charts: list[GleanerChart]):
+        self.charts = charts + self.charts
+
     def display(self, width: int = 150, height: int = 150, num_cols: int = 4):
         if self.charts is None:
             return None

@@ -34,5 +34,5 @@ class Gleaner:
         self.preferences = preferences
         return self.explorer.train(self.generator, self.oracle, preferences)
 
-    def infer(self) -> GleanerDashboard:
-        return self.explorer.infer(self.generator, self.oracle, self.preferences)
+    def infer(self, n_chart: int | None = None, fixed_charts: list[list[str | None]] = []) -> GleanerDashboard:
+        return self.explorer.infer(self.generator, self.oracle, self.preferences, n_chart, fixed_charts)

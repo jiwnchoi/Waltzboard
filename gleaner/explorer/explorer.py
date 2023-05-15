@@ -53,9 +53,30 @@ class Explorer:
         self.df = df
         self.config = config
 
-    def _infer(self, gen: Generator, oracle: Oracle, preferences: list[str]):
-        n_charts: list[float] = [gen.prior.n_charts.sample() for _ in range(self.config.n_candidates)]
+    def _infer(
+        self,
+        gen: Generator,
+        oracle: Oracle,
+        preferences: list[str],
+        n_chart: int | None = None,
+        fixed_charts: list[GleanerChart] = [],
+    ):
+        if n_chart and n_chart < len(fixed_charts):
+            raise ValueError("Number of fixed_charts should be smaller than n_chart")
+
+        n_charts: list[float] = [
+            gen.prior.n_charts.sample() if n_chart is None else n_chart for _ in range(self.config.n_candidates)
+        ]
+
+        if len(fixed_charts):
+            n_charts = [max(1, n - len(fixed_charts)) for n in n_charts]
+
         candidates: list[GleanerDashboard] = [gen.sample_dashboard(round(n_chart)) for n_chart in n_charts]
+
+        if len(fixed_charts):
+            for candidate in candidates:
+                candidate.extend(fixed_charts)
+
         results: list[OracleResult] = [oracle.get_result(dashboard, set(preferences)) for dashboard in candidates]
 
         specificity = np.array([r.specificity for r in results])
@@ -95,7 +116,14 @@ class Explorer:
             conciseness,
         )
 
-    def infer(self, gen: Generator, oracle: Oracle, preferences: list[str]) -> GleanerDashboard:
+    def infer(
+        self,
+        gen: Generator,
+        oracle: Oracle,
+        preferences: list[str],
+        n_chart: int | None = None,
+        fixed_charts: list[list[str | None]] = [],
+    ) -> GleanerDashboard:
         (
             result_n_scores,
             raw_scores,
@@ -105,7 +133,7 @@ class Explorer:
             coverage,
             diversity,
             conciseness,
-        ) = self._infer(gen, oracle, preferences)
+        ) = self._infer(gen, oracle, preferences, n_chart, [GleanerChart(c, self.df) for c in fixed_charts])
 
         expl_idx = np.argmax(normalized_scores)
         return result_n_scores[expl_idx][1]
