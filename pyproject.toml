@@ -27,6 +27,8 @@ dependencies = [
     "altair",
     "scikit-learn",
     "ipython",
+    "fastapi",
+    "uvicorn"
 ]
 
 [project.urls]
