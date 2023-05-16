@@ -13,7 +13,7 @@ const Header = () => {
           Gleaner
         </Heading>
       </Flex>
-      <Link href="https://github.com/jason-choi/vis-tiller" isExternal>
+      <Link href="https://github.com/jason-choi/gleaner" isExternal>
         <Button variant={'layout'} leftIcon={<AiFillGithub />}>
           GitHub
         </Button>
@@ -41,7 +41,7 @@ const Footer = () => {
           Sungkyunkwan University
         </Text>
       </Link>
-      <Link href="https://cs.skku.edu" isExternal>
+      <Link href="https://sw.skku.edu" isExternal>
         <Text variant={'layout'} fontSize="sm">
           College of Computing and Informatics
         </Text>

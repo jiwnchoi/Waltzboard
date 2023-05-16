@@ -1,7 +1,8 @@
 export interface OracleResult {
     score: number;
     coverage: number;
-    uniqueness: number;
+    diversity: number;
     specificity: number;
     interestingness: number;
+    conciseness: number;
 }

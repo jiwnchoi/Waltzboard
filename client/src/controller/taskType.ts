@@ -9,7 +9,8 @@ const defaultTaskType: TaskType = {
         specificity: 1,
         interestingness: 1,
         coverage: 1,
-        uniqueness: 1,
+        diversity: 1,
+        conciseness: 1,
     },
     chartTypes: [],
 };

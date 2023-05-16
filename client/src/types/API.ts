@@ -1,36 +1,91 @@
 import type { AttributeFetched } from './Attribute';
 import type { ChartTypeFetched } from './ChartType';
 import { StatisticFeature } from './ChartView';
-import type { OracleResult } from "./OracleResult";
+import type { OracleResult } from './OracleResult';
 import { OracleWeight } from './OracleWeight';
 import { TaskTypeFetched } from './TaskType';
 
-
-interface Result {
-    indices: number[];
-    vlspecs: string[];
-    statistic_features: StatisticFeature[];
-    result: OracleResult;
-    sampled_results: OracleResult[];
+interface AttributeModel {
+    name: string;
+    type: string;
 }
 
+interface GleanerChartModel {
+    key: string;
+    title: string[];
+    spec: string;
+    statistics: StatisticFeature;
+}
 
+interface InferBody {
+    nCharts: number | null;
+    chartKeys: string[]
+}
 
-interface Init {
+interface TrainBody {
+    weight: OracleWeight;
+    preferences: string[];
+    constraints: string[];
+}
+
+interface RecommendBody {
+    chartKeys: string[]
+    nResults: number;
+}
+
+interface SetConfigBody {
+    nCandidates: number;
+    nFilters: number;
+    robustness: number;
+    halvingRatio: number;
+}
+
+interface InitResponse {
     chartTypes: ChartTypeFetched[];
     taskTypes: TaskTypeFetched[];
     attributes: AttributeFetched[];
-    result: Result;
 }
 
-interface SampleBody {
-    indices: number[]
-    numVis: number
-    numSample: number
-    numFilter: number
-    weight: OracleWeight
-    chartTypes: string[]
-    wildcard: string[]
+interface InferResponse {
+    charts: GleanerChartModel[];
+    result: OracleResult;
+    scores: number[];
+    specificity: number[];
+    interestingness: number[];
+    coverage: number[];
+    diversity: number[];
+    conciseness: number[];
 }
 
-export type { Result, Init, SampleBody };
+interface RecommendResponse {
+    charts: GleanerChartModel[];
+}
+
+interface TrainResponse {
+    success: boolean;
+    error?: string;
+}
+
+interface ScoreBody {
+    chartKeys: string[];
+}
+
+interface ScoreResponse {
+    result: OracleResult;
+}
+
+export type {
+    InitResponse,
+    InferResponse,
+    RecommendResponse,
+    TrainResponse,
+    InferBody,
+    TrainBody,
+    RecommendBody,
+    SetConfigBody,
+    GleanerChartModel,
+    AttributeModel,
+    ScoreBody,
+    ScoreResponse,
+
+};

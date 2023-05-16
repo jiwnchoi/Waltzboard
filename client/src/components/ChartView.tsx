@@ -3,8 +3,8 @@ import { RiDeleteBinLine, RiPushpinFill, RiPushpinLine } from 'react-icons/ri';
 import { TbExchange } from 'react-icons/tb';
 import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
-import { removeChart, togglePinChart } from '../controller/dashboard';
 import type { ChartView } from '../types/ChartView';
+import { removeChart, togglePinChart } from '../controller/dashboard';
 
 const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
   if (feature === null) return null;
@@ -34,7 +34,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           as={chart.isPinned ? RiPushpinFill : RiPushpinLine}
           boxSize={4}
           onClick={() => {
-            togglePinChart(chart.index);
+            togglePinChart(chart.key);
           }}
         />
         <Text w="full" fontSize={'xs'} textAlign="center">
@@ -55,7 +55,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           as={RiDeleteBinLine}
           boxSize={4}
           onClick={() => {
-            removeChart(chart.index);
+            removeChart(chart.key);
           }}
         />
       </Flex>
@@ -69,14 +69,14 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
         />
       </Center>
       <Divider />
-      {Object.keys(chart.statistic_feature).map((key) => {
-        if (chart.statistic_feature[key].filter((f) => f !== null).length === 0) return null;
+      {Object.keys(chart.statistics).map((key) => {
+        if (chart.statistics[key].filter((f) => f !== null).length === 0) return null;
         return (
           <Flex gap={1}>
             <Text fontSize={'xs'} textAlign="center" fontWeight={400} mr="auto">
               {key.replace("['", '').replace("']", '').replace("', '", ' & ')}
             </Text>
-            {chart.statistic_feature[key].map((feature) => (
+            {chart.statistics[key].map((feature) => (
               <StatisticFeatureBadge feature={feature} />
             ))}
           </Flex>

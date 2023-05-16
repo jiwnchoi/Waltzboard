@@ -1,4 +1,4 @@
-const URI = "http://localhost:3000/5001"
+const URI = "http://localhost:8000"
 
 
 export { URI }

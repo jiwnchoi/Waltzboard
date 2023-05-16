@@ -1,13 +1,15 @@
 import { Flex, Icon, Text } from '@chakra-ui/react';
 import {
   RiCalendar2Line,
+  RiCheckboxCircleFill,
+  RiCheckboxCircleLine,
   RiFontSize,
   RiHashtag,
   RiHeartAddFill,
   RiHeartAddLine,
   RiKey2Line,
 } from 'react-icons/ri';
-import { toggleAttributePrefer } from '../controller/attribute';
+import { toggleAttributeIgnore, toggleAttributePrefer } from '../controller/attribute';
 import type { Attribute } from '../types/Attribute';
 
 const Attribute = ({ attribute }: { attribute: Attribute }) => {
@@ -41,10 +43,18 @@ const Attribute = ({ attribute }: { attribute: Attribute }) => {
         {attribute.name}
       </Text>
       <Icon
+        as={attribute.ignore ? RiCheckboxCircleLine : RiCheckboxCircleFill}
+        boxSize={3.5}
+        color="blue.400"
+        ml={'auto'}
+        mr={1}
+        cursor="pointer"
+        onClick={() => toggleAttributeIgnore(attribute)}
+      />
+      <Icon
         as={attribute.prefer ? RiHeartAddFill : RiHeartAddLine}
         boxSize={3.5}
         color="pink.400"
-        ml={'auto'}
         cursor="pointer"
         onClick={() => toggleAttributePrefer(attribute)}
       />

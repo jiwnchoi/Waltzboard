@@ -1,4 +1,5 @@
-import { VisualizationSpec } from "react-vega";
+import type { TopLevelSpec } from "vega-lite";
+import { GleanerChartModel } from "../types/API";
 
 interface StatisticFeature {
     [key: string]: (string | null)[]
@@ -9,11 +10,12 @@ interface TitleToken {
     isPrefered: boolean;
 }
 
-interface ChartView {
-    index: number;
-    spec: VisualizationSpec | any;
+interface ChartView extends GleanerChartModel {
+    key: string;
+    spec: TopLevelSpec | any;
+    statistics: StatisticFeature;
+
     isPinned: boolean;
-    statistic_feature: StatisticFeature;
     title: TitleToken[];
 }
 

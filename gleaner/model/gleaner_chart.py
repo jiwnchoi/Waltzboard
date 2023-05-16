@@ -1,4 +1,5 @@
 # type: ignore
+from ast import literal_eval
 from typing import Literal, Optional, Set, Union
 import altair as alt
 import pandas as pd
@@ -12,16 +13,24 @@ from gleaner.model import (
 )
 
 
-chart_hash = {}
+chart_hash: dict[str, "GleanerChart"] = {}
+
+
+def get_gleaner_chart_from_key(key: str) -> "GleanerChart":
+    chart = chart_hash.get(key)
+    if not chart:
+        raise Exception("Chart not found")
+    return chart
 
 
 def get_gleaner_chart(sample: list[Attribute | str | None], df):
-    chart = chart_hash.get(tuple([s.name if isinstance(s, Attribute) else s for s in sample]))
+    chart = chart_hash.get(str([s.name if isinstance(s, Attribute) else s for s in sample]))
     return chart if chart else GleanerChart(sample, df)
 
 
 class GleanerChart:
     sample: list[Union["Attribute", str, None]]
+    key: str
     index: Optional[int]
     sub_df: pd.DataFrame
     attrs: list["Attribute"]
@@ -32,8 +41,19 @@ class GleanerChart:
     chart_type: str = None
     encoding: Optional["Encodings"] = None
 
+    title_tokens: list[str]
+
     def __init__(self, result: list, df: pd.DataFrame) -> None:
         chart_type, x, y, z, agg_type = result
+        self.key = str(
+            [
+                chart_type,
+                x.name if x else None,
+                y.name if y else None,
+                z.name if z else None,
+                agg_type,
+            ]
+        )
         self.attrs = [x, y, z] if z else [x, y] if y else [x]
         self.sample = result
         for i in range(len(self.attrs)):
@@ -198,7 +218,7 @@ class GleanerChart:
                 z=alt.Color(z.name, type=z.long_type(), aggregate=agg_type),
             )
 
-    def get_vegalite(self) -> alt.VegaLiteSchema:
+    def get_vegalite(self) -> str:
         chart = self.display()
         chart.configure_legend(title=None)
         return chart.to_json()
@@ -267,7 +287,7 @@ class GleanerChart:
 
         # elif num_fields == 1 and self.encoding.x.type == "nominal" and self.encoding.chart_type != "arc":
         #     chart = chart.encode(x=None, y=self.encoding.x)
-
+        self.title_tokens = tokens
         return chart.properties(description=json.dumps(tokens))
 
     def get_number_of_types(

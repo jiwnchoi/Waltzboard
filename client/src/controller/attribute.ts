@@ -13,16 +13,16 @@ const attributePreferedSignal = computed(() =>
         .map((attribute) => attribute.name)
 );
 
-
-const attributeWildcardsSignal = computed(() =>
-    attributePreferedSignal
+const attributeContrainedSignal = computed(() =>
+    attributesSignal
         .value
-        .map((attribute) => `attr_${attribute}`)
+        .filter((attribute) => attribute.ignore)
+        .map((attribute) => attribute.name)
 );
 
 
+
 const toggleAttributePrefer = (target: Attribute) => {
-    unSelectTaskType();
     attributesSignal.value = attributesSignal.peek().map((attribute) => {
         if (attribute.name === target.name) {
             return {
@@ -34,7 +34,18 @@ const toggleAttributePrefer = (target: Attribute) => {
     });
 };
 
+const toggleAttributeIgnore = (target: Attribute) => {
+    attributesSignal.value = attributesSignal.peek().map((attribute) => {
+        if (attribute.name === target.name) {
+            attribute.ignore = !attribute.ignore;
+            if (attribute.ignore) attribute.prefer = false;
+        }
+        return attribute;
+    });
+};
 
-export { attributesSignal, attributePreferedSignal, attributeWildcardsSignal, toggleAttributePrefer };
+
+
+export { attributesSignal, attributePreferedSignal, attributeContrainedSignal, toggleAttributePrefer, toggleAttributeIgnore };
 
 

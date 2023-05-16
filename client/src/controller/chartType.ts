@@ -8,11 +8,18 @@ const targetChartTypeSignal = computed(() =>
     chartTypesSignal.value.filter((chartType) => !chartType.ignore).map((chartType) => chartType.mark)
 );
 
-const chartTypeWildcardSignal = computed(() =>
+const chartTypePreferredSignal = computed(() =>
     chartTypesSignal.value
         .filter((chartType) => chartType.prefer)
         .map((chartType) => `${chartType.name}`)
 );
+
+const chartTypeConstrainedSignal = computed(() =>
+    chartTypesSignal.value
+        .filter((chartType) => chartType.ignore)
+        .map((chartType) => `${chartType.name}`)
+);
+
 
 const toggleChartTypePrefer = (target: ChartType) => {
     if (target.ignore) return;
@@ -41,8 +48,9 @@ const toggleChartTypeIgnore = (target: ChartType) => {
 
 export {
     chartTypesSignal,
+    chartTypeConstrainedSignal,
     targetChartTypeSignal,
-    chartTypeWildcardSignal,
+    chartTypePreferredSignal,
     toggleChartTypePrefer,
     toggleChartTypeIgnore,
 };

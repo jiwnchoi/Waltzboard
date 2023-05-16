@@ -94,7 +94,11 @@ class Explorer:
         )
 
         normalized_scores = (
-            (specificity - specificity.mean()) / specificity.std() * oracle.weight.specificity
+            (
+                0
+                if len(preferences) == 0
+                else (specificity - specificity.mean()) / specificity.std() * oracle.weight.specificity
+            )
             + (interestingness - interestingness.mean()) / interestingness.std() * oracle.weight.interestingness
             + (coverage - coverage.mean()) / coverage.std() * oracle.weight.coverage
             + (diversity - diversity.mean()) / diversity.std() * oracle.weight.diversity
@@ -104,6 +108,8 @@ class Explorer:
         result_n_scores: list[tuple[OracleResult, GleanerDashboard, float, float]] = [
             (result, candidates[i], raw_scores[i], normalized_scores[i]) for i, result in enumerate(results)
         ]
+
+        result_n_scores.sort(key=lambda x: x[-1], reverse=True)
 
         return (
             result_n_scores,
@@ -135,8 +141,7 @@ class Explorer:
             conciseness,
         ) = self._infer(gen, oracle, preferences, n_chart, [GleanerChart(c, self.df) for c in fixed_charts])
 
-        expl_idx = np.argmax(normalized_scores)
-        return result_n_scores[expl_idx][1]
+        return result_n_scores[0][1]
 
     def _train(self, gen: Generator, oracle: Oracle, preferences: list[str]) -> TrainResult:
         (

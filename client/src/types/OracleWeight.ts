@@ -1,6 +1,7 @@
 export interface OracleWeight {
     coverage: number;
-    uniqueness: number;
+    diversity: number;
     specificity: number;
     interestingness: number;
+    conciseness: number;
 }

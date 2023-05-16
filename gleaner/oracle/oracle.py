@@ -10,10 +10,11 @@ from gleaner.oracle.scores import (
     get_interestingness,
     get_specificity_from_nodes,
     get_conciseness_from_nodes,
+    get_statistic_features,
 )
 
 if TYPE_CHECKING:
-    from gleaner.model import GleanerDashboard
+    from gleaner.model import GleanerDashboard, GleanerChart
 
 
 class Oracle:
@@ -33,6 +34,9 @@ class Oracle:
             specificity=get_specificity_from_nodes(nodes, preferences),
             conciseness=get_conciseness_from_nodes(nodes, self.df),
         )
+
+    def get_statistics_from_chart(self, chart: "GleanerChart") -> dict[str, list[str | None]]:
+        return get_statistic_features(chart)
 
     def update(
         self,

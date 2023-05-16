@@ -70,7 +70,7 @@ class GleanerConfig:
         self,
         df: pd.DataFrame,
         robustness: int = 150,
-        n_epoch: int = 50,
+        n_epoch: int = 5,
         n_candidates: int = 100,
         halving_ratio: float = 0.1,
     ) -> None:
@@ -78,20 +78,22 @@ class GleanerConfig:
         self.n_epoch = n_epoch
         self.n_candidates = n_candidates
         self.halving_ratio = halving_ratio
-
         self.df = df
+        self.init_constraints()
+
+    def give_constraints(self, constraints: list[str]):
+        self.attr_names = [m for m in self.attr_names if m not in constraints]
+        self.chart_type = [m for m in self.chart_type if m not in constraints]
+        self.agg_type = [m for m in self.agg_type if m not in constraints]
+
+    def init_constraints(self):
         self.attr_names = [
             col
-            for col in df.columns
-            if (df[col].dtype == "object" and df[col].nunique() < 10) or df[col].dtype != "object"
+            for col in self.df.columns
+            if (self.df[col].dtype == "object" and self.df[col].nunique() < 10) or self.df[col].dtype != "object"
         ]
         self.attrs: list[Attribute] = [
-            Attribute(col, "C" if df[col].dtype == "object" else "Q") for col in self.attr_names
+            Attribute(col, "C" if self.df[col].dtype == "object" else "Q") for col in self.attr_names
         ]
         self.chart_type = list(set([m[0] for m in chart_map]))
         self.agg_type = list(set([m[-1] for m in chart_map]))
-
-    def constraint(self, constraint: list[str]):
-        self.attr_names = [m for m in self.attr_names if m not in constraint]
-        self.chart_type = [m for m in self.chart_type if m not in constraint]
-        self.agg_type = [m for m in self.agg_type if m not in constraint]

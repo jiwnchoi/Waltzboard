@@ -5,6 +5,7 @@ interface AttributeFetched {
 
 interface Attribute extends AttributeFetched {
     prefer: boolean;
+    ignore: boolean;
 }
 
 export type { AttributeFetched, Attribute };

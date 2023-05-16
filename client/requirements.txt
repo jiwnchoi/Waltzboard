@@ -1,3 +1,4 @@
 gleaner
 fastapi
 uvicorn
+python-dotenv

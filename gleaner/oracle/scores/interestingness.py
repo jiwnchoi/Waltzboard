@@ -66,7 +66,7 @@ def has_significance_qn(df: pd.DataFrame, attr_q: str, attr_n: str) -> str | Non
     return "has_significance" if p < 0.05 else None
 
 
-hashmap = {}
+hashmap: dict[str, list[str | None]] = {}
 df_hash_map = {}
 
 
@@ -74,19 +74,19 @@ def mean(l):
     return sum(l) / len(l)
 
 
-def get_statistic_features(node: "GleanerChart") -> list[list[str | None]]:
+def get_statistic_features(node: "GleanerChart") -> dict[str, list[str | None]]:
     attr_combinations: list[tuple[Attribute, ...]] = [
         *list(combinations(node.attrs, 1)),
         *list(combinations(node.attrs, 2)),
     ]
-    features = []
+    features = {}
     for comb in attr_combinations:
-        key = ""
-        if node.filters is not None:
-            for f in node.filters:
-                key += f"{str((f[0], f[1]))}/"
+        # if node.filters is not None:
+        #     for f in node.filters:
+        #         key += f"{str((f[0], f[1]))}/"
+
         target_attrs = [attr.name for attr in comb]
-        key += f"{target_attrs}"
+        key = "/".join(target_attrs)
 
         try:
             if key not in hashmap:
@@ -113,7 +113,7 @@ def get_statistic_features(node: "GleanerChart") -> list[list[str | None]]:
                         has_correlation_nn(df_notnull, comb[0].name, comb[1].name),
                         has_outliers_nn(df_notnull, comb[0].name, comb[1].name),
                     ]
-            features.append(hashmap[key])
+            features[key] = hashmap[key]
         except Exception as e:
             print(f"Error in {key} with {comb} and {node.filters}")
             raise e
@@ -131,4 +131,4 @@ def get_interestingness(
 ) -> float:
     node_features = [get_statistic_features(node) for node in nodes]
 
-    return mean([feature_to_interestingness(feature) for feature in node_features])
+    return mean([feature_to_interestingness(list(feature.values())) for feature in node_features])

@@ -168,6 +168,7 @@ exclude = [
   "/.ipynb_checkpoints",
   "/docs",
   "/*.ipynb",
+  "/client"
 ]
 
 [tool.hatch.build.targets.wheel]
