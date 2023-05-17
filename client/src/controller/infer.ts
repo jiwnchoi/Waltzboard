@@ -15,12 +15,14 @@ const inferResponseSignal = signal<InferResponse>({
         interestingness: 0,
         conciseness: 0,
     },
-    scores: [],
-    specificity: [],
-    interestingness: [],
-    coverage: [],
-    diversity: [],
-    conciseness: [],
+    dist: {
+        score: [],
+        specificity: [],
+        interestingness: [],
+        coverage: [],
+        diversity: [],
+        conciseness: [],
+    },
 });
 
 

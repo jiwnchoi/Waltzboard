@@ -1,10 +1,17 @@
-import { Badge, Center, Divider, Flex, Icon, Text } from '@chakra-ui/react';
-import { RiDeleteBinLine, RiPushpinFill, RiPushpinLine } from 'react-icons/ri';
+import { Badge, Center, Collapse, Divider, Flex, Icon, Text } from '@chakra-ui/react';
+import {
+  RiArrowDownSLine,
+  RiArrowUpSLine,
+  RiDeleteBinLine,
+  RiPushpinFill,
+  RiPushpinLine,
+} from 'react-icons/ri';
 import { TbExchange } from 'react-icons/tb';
 import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
 import type { ChartView } from '../types/ChartView';
 import { removeChart, togglePinChart } from '../controller/dashboard';
+import { useSignal } from '@preact/signals-react';
 
 const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
   if (feature === null) return null;
@@ -16,6 +23,10 @@ interface ChartViewProps {
   height: number;
 }
 const ChartView = ({ chart, width, height }: ChartViewProps) => {
+  const showStatistics = useSignal(false);
+  const toggleShowStatistics = () => {
+    showStatistics.value = !showStatistics.value;
+  };
   return (
     <Flex
       flexDir={'column'}
@@ -25,10 +36,8 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
       borderRadius={'md'}
       boxShadow="sm"
       p={2}
-      gap={2}
     >
-      <Flex flexDir={'row'} justifyContent={'space-between'} align="top">
-        <Icon mr={2} as={TbExchange} boxSize={4} onClick={() => {}} />
+      <Flex flexDir={'row'} justifyContent={'space-between'} align="top" mb={2}>
         <Icon
           mr={4}
           as={chart.isPinned ? RiPushpinFill : RiPushpinLine}
@@ -59,7 +68,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           }}
         />
       </Flex>
-      <Center height="full" px={4}>
+      <Center height="full" px={4} mb={2}>
         <VegaLite
           height={height}
           width={width}
@@ -68,20 +77,35 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           tooltip={new Handler().call}
         />
       </Center>
-      <Divider />
-      {Object.keys(chart.statistics).map((key) => {
-        if (chart.statistics[key].filter((f) => f !== null).length === 0) return null;
-        return (
-          <Flex gap={1}>
-            <Text fontSize={'xs'} textAlign="center" fontWeight={400} mr="auto">
-              {key.replace("['", '').replace("']", '').replace("', '", ' & ')}
-            </Text>
-            {chart.statistics[key].map((feature) => (
-              <StatisticFeatureBadge feature={feature} />
-            ))}
-          </Flex>
-        );
-      })}
+      <Divider mb={2} />
+      <Flex flexDir={'row'} justifyContent={'space-between'} align="center">
+        <Text fontSize={'xs'} textAlign="center" fontWeight={400} mr="auto">
+          Statistics
+        </Text>
+        {showStatistics.value ? (
+          <Icon as={RiArrowDownSLine} boxSize={4} onClick={toggleShowStatistics} />
+        ) : (
+          <Icon as={RiArrowUpSLine} boxSize={4} onClick={toggleShowStatistics} />
+        )}
+      </Flex>
+
+      <Collapse in={showStatistics.value} animateOpacity>
+        <Flex flexDir={'column'} gap={2} mt={2}>
+          {Object.keys(chart.statistics).map((key) => {
+            if (chart.statistics[key].filter((f) => f !== null).length === 0) return null;
+            return (
+              <Flex gap={1}>
+                <Text fontSize={'xs'} textAlign="center" fontWeight={400} mr="auto">
+                  {key.replace("['", '').replace("']", '').replace("', '", ' & ')}
+                </Text>
+                {chart.statistics[key].map((feature) => (
+                  <StatisticFeatureBadge feature={feature} />
+                ))}
+              </Flex>
+            );
+          })}
+        </Flex>
+      </Collapse>
     </Flex>
   );
 };

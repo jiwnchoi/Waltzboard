@@ -67,6 +67,15 @@ class GleanerChartModel(BaseModel):
         )
 
 
+class ScoreDistModel(BaseModel):
+    score: list[float]
+    specificity: list[float]
+    interestingness: list[float]
+    diversity: list[float]
+    coverage: list[float]
+    conciseness: list[float]
+
+
 # Bodys
 
 
@@ -109,13 +118,7 @@ class InitResponse(BaseModel):
 class InferResponse(BaseModel):
     charts: list[GleanerChartModel]
     result: OracleResultModel
-
-    scores: list[float]
-    specificity: list[float]
-    interestingness: list[float]
-    coverage: list[float]
-    diversity: list[float]
-    conciseness: list[float]
+    dist: ScoreDistModel
 
 
 class RecommendResponse(BaseModel):

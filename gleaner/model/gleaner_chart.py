@@ -217,6 +217,7 @@ class GleanerChart:
                 y=alt.Y(y.name, type=y.long_type()),
                 z=alt.Color(z.name, type=z.long_type(), aggregate=agg_type),
             )
+        chart_hash[self.key] = self
 
     def get_vegalite(self) -> str:
         chart = self.display()

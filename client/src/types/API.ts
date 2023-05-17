@@ -10,6 +10,15 @@ interface AttributeModel {
     type: string;
 }
 
+interface ScoreDistModel {
+    score: number[];
+    specificity: number[];
+    interestingness: number[];
+    coverage: number[];
+    diversity: number[];
+    conciseness: number[];
+}
+
 interface GleanerChartModel {
     key: string;
     title: string[];
@@ -49,12 +58,7 @@ interface InitResponse {
 interface InferResponse {
     charts: GleanerChartModel[];
     result: OracleResult;
-    scores: number[];
-    specificity: number[];
-    interestingness: number[];
-    coverage: number[];
-    diversity: number[];
-    conciseness: number[];
+    dist: ScoreDistModel;
 }
 
 interface RecommendResponse {

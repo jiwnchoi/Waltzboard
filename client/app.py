@@ -15,6 +15,7 @@ from gleaner.model import get_gleaner_chart_from_key
 df = data.movies()
 
 gl = Gleaner(df)
+gl.config.n_epoch = 50
 app = FastAPI()
 
 package = NPMPackage("./package.json")
@@ -40,6 +41,7 @@ app.add_middleware(
 
 @app.get("/init")
 async def init() -> InitResponse:
+    gl.__init__(df)
     return InitResponse(
         chartTypes=list(chart_types.values()),
         taskTypes=list(task_types.values()),
@@ -85,17 +87,20 @@ async def infer(body: InferBody) -> InferResponse:
     return InferResponse(
         charts=charts,
         result=OracleResultModel.from_oracle_result(result),
-        scores=list(raw_scores),
-        specificity=list(specificity),
-        interestingness=list(interestingness),
-        coverage=list(coverage),
-        diversity=list(diversity),
-        conciseness=list(conciseness),
+        dist=ScoreDistModel(
+            score=list(raw_scores),
+            specificity=list(specificity),
+            interestingness=list(interestingness),
+            coverage=list(coverage),
+            diversity=list(diversity),
+            conciseness=list(conciseness),
+        ),
     )
 
 
 @app.post("/recommend")
 async def recommend(body: RecommendBody) -> RecommendResponse:
+    print(body)
     charts = [get_gleaner_chart_from_key(c) for c in body.chartKeys]
     results = gl.recommend(GleanerDashboard(charts), body.nResults)
     return RecommendResponse(

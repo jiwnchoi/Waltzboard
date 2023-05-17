@@ -23,6 +23,7 @@ const recommendChart = async () => {
     const response: RecommendResponse = (await axios.post(`${URI}/recommend`, recommendBodySignal.peek())).data
     recommendedChartsSignal.value = response.charts.map((chart, i) => {
         const specObject = JSON.parse(chart.spec);
+        specObject.title = null
         const title: string[] = JSON.parse(specObject.description!);
         const titleToken: TitleToken[] = title.map((t) => {
             return {
@@ -43,6 +44,7 @@ const recommendChart = async () => {
         };
     })
     isRecommendingSignal.value = false
+    console.log(response)
 }
 
 
