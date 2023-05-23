@@ -70,7 +70,6 @@ class Explorer:
 
         if len(fixed_charts):
             n_charts = [max(1, n - len(fixed_charts)) for n in n_charts]
-
         candidates: list[GleanerDashboard] = [gen.sample_dashboard(round(n_chart)) for n_chart in n_charts]
 
         if len(fixed_charts):
@@ -83,14 +82,14 @@ class Explorer:
         interestingness = np.array([r.interestingness for r in results])
         coverage = np.array([r.coverage for r in results])
         diversity = np.array([r.diversity for r in results])
-        conciseness = np.array([r.conciseness for r in results])
+        parsimony = np.array([r.parsimony for r in results])
 
         raw_scores: np.ndarray = (
             specificity * oracle.weight.specificity
             + interestingness * oracle.weight.interestingness
             + coverage * oracle.weight.coverage
             + diversity * oracle.weight.diversity
-            + conciseness * oracle.weight.conciseness
+            + parsimony * oracle.weight.parsimony
         )
 
         normalized_scores = (
@@ -102,7 +101,7 @@ class Explorer:
             + (interestingness - interestingness.mean()) / interestingness.std() * oracle.weight.interestingness
             + (coverage - coverage.mean()) / coverage.std() * oracle.weight.coverage
             + (diversity - diversity.mean()) / diversity.std() * oracle.weight.diversity
-            + (conciseness - conciseness.mean()) / conciseness.std() * oracle.weight.conciseness
+            + (parsimony - parsimony.mean()) / parsimony.std() * oracle.weight.parsimony
         )
 
         result_n_scores: list[tuple[OracleResult, GleanerDashboard, float, float]] = [
@@ -119,7 +118,7 @@ class Explorer:
             interestingness,
             coverage,
             diversity,
-            conciseness,
+            parsimony,
         )
 
     def infer(
@@ -138,7 +137,7 @@ class Explorer:
             interestingness,
             coverage,
             diversity,
-            conciseness,
+            parsimony,
         ) = self._infer(gen, oracle, preferences, n_chart, [GleanerChart(c, self.df) for c in fixed_charts])
 
         return result_n_scores[0][1]
@@ -152,7 +151,7 @@ class Explorer:
             interestingness,
             coverage,
             diversity,
-            conciseness,
+            parsimony,
         ) = self._infer(gen, oracle, preferences)
 
         expl_idx = np.argmax(normalized_scores)
@@ -185,7 +184,7 @@ class Explorer:
             interestingness,
             coverage,
             diversity,
-            conciseness,
+            parsimony,
             np.array([len(d[1]) for d in result_n_scores]),
         )
 

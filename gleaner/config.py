@@ -57,6 +57,7 @@ for c in chart_map:
 class GleanerConfig:
     # Generator config
     robustness: int
+    attr_names: list[str]
     chart_type: list[str]
     agg_type: list[str]
     chart_map: list[list[str | None]] = chart_map
@@ -69,7 +70,7 @@ class GleanerConfig:
     def __init__(
         self,
         df: pd.DataFrame,
-        robustness: int = 150,
+        robustness: int = 100,
         n_epoch: int = 5,
         n_candidates: int = 100,
         halving_ratio: float = 0.1,

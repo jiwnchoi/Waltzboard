@@ -13,7 +13,7 @@ const inferResponseSignal = signal<InferResponse>({
         coverage: 0,
         specificity: 0,
         interestingness: 0,
-        conciseness: 0,
+        parsimony: 0,
     },
     dist: {
         score: [],
@@ -21,7 +21,7 @@ const inferResponseSignal = signal<InferResponse>({
         interestingness: [],
         coverage: [],
         diversity: [],
-        conciseness: [],
+        parsimony: [],
     },
 });
 

@@ -4,5 +4,5 @@ export interface OracleResult {
     diversity: number;
     specificity: number;
     interestingness: number;
-    conciseness: number;
+    parsimony: number;
 }

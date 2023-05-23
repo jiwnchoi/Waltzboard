@@ -10,7 +10,7 @@ class OracleResult:
     diversity: float
     specificity: float
     interestingness: float
-    conciseness: float
+    parsimony: float
 
     def get_score(self) -> float:
         return (
@@ -18,7 +18,7 @@ class OracleResult:
             + self.weight.diversity * self.diversity
             + self.weight.interestingness * self.interestingness
             + self.weight.specificity * self.specificity
-            + self.weight.conciseness * self.conciseness
+            + self.weight.parsimony * self.parsimony
         )
 
     def to_dict(self) -> dict[str, float]:
@@ -28,7 +28,7 @@ class OracleResult:
             "diversity": self.diversity,
             "specificity": self.specificity,
             "interestingness": self.interestingness,
-            "conciseness": self.conciseness,
+            "parsimony": self.parsimony,
         }
 
     def display(self) -> pd.DataFrame:

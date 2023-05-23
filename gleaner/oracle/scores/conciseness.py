@@ -1,4 +1,6 @@
-import pandas as pd 
+import numpy as np
+import pandas as pd
 
-def get_conciseness_from_nodes(nodes, df: pd.DataFrame):
-    return len(df.columns) / len(nodes)
+
+def get_parsimony_from_nodes(nodes):
+    return 2 - 2 / (1 + np.exp(-len(nodes) + 4) / 2)

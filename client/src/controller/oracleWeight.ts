@@ -6,7 +6,7 @@ const weightSignal = signal<OracleWeight>({
     interestingness: 1,
     coverage: 1,
     diversity: 1,
-    conciseness: 1,
+    parsimony: 1,
 });
 
 

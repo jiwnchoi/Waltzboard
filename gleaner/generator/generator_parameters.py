@@ -16,7 +16,9 @@ class DirichletPrior:
         return self.count / np.sum(self.count)
 
     def update(self, x: np.ndarray):
+        r = np.sum(self.count)
         self.count += x
+        self.count = self.count / np.sum(self.count) * r
         self.history.append(np.copy(self.count))
 
     def sample(self):
@@ -56,7 +58,8 @@ class PriorParameters:
     ) -> None:
         self.config = config
 
-        attrs = [None] + self.config.attr_names
+        attrs: list[str | None] = [None] + self.config.attr_names
+        self.attrs = attrs
         self.x = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
         self.y = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
         self.z = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)

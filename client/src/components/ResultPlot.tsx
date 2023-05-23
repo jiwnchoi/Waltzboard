@@ -5,13 +5,7 @@ import { BoxPlot } from '@visx/stats';
 import { weightSignal } from '../controller/oracleWeight';
 import { inferResponseSignal } from '../controller/infer';
 
-type Target =
-  | 'score'
-  | 'diversity'
-  | 'coverage'
-  | 'interestingness'
-  | 'specificity'
-  | 'conciseness';
+type Target = 'score' | 'diversity' | 'coverage' | 'interestingness' | 'specificity' | 'parsimony';
 
 interface ResultPlotProps {
   width: number;
@@ -27,9 +21,9 @@ const getMinMax = (target: Target) => {
         weightSignal.peek().interestingness +
         weightSignal.peek().coverage +
         weightSignal.peek().diversity +
-        weightSignal.peek().conciseness,
+        weightSignal.peek().parsimony,
     ];
-  } else if (target === 'conciseness') {
+  } else if (target === 'parsimony') {
     return [0, 2];
   } else {
     return [0, 1];

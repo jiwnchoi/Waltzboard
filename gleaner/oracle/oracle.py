@@ -9,7 +9,7 @@ from gleaner.oracle.scores import (
     get_diversity_from_nodes,
     get_interestingness,
     get_specificity_from_nodes,
-    get_conciseness_from_nodes,
+    get_parsimony_from_nodes,
     get_statistic_features,
 )
 
@@ -32,7 +32,7 @@ class Oracle:
             diversity=get_diversity_from_nodes(nodes, preferences),
             interestingness=get_interestingness(nodes),
             specificity=get_specificity_from_nodes(nodes, preferences),
-            conciseness=get_conciseness_from_nodes(nodes, self.df),
+            parsimony=get_parsimony_from_nodes(nodes),
         )
 
     def get_statistics_from_chart(self, chart: "GleanerChart") -> dict[str, list[str | None]]:
@@ -44,7 +44,7 @@ class Oracle:
         interestingness: float | None = None,
         coverage: float | None = None,
         diversity: float | None = None,
-        conciseness: float | None = None,
+        parsimony: float | None = None,
     ) -> None:
         if specificity is not None:
             self.weight.specificity = specificity
@@ -54,5 +54,5 @@ class Oracle:
             self.weight.coverage = coverage
         if diversity is not None:
             self.weight.diversity = diversity
-        if conciseness is not None:
-            self.weight.conciseness = conciseness
+        if parsimony is not None:
+            self.weight.parsimony = parsimony

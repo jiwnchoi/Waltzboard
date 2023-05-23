@@ -11,7 +11,7 @@ import { weightSignal } from '../controller/oracleWeight';
 import { unSelectTaskType } from '../controller/taskType';
 
 interface WeightSliderProps extends FlexProps {
-  title: 'coverage' | 'diversity' | 'interestingness' | 'specificity' | 'conciseness';
+  title: 'coverage' | 'diversity' | 'interestingness' | 'specificity' | 'parsimony';
 }
 
 const WeightSlider = (props: WeightSliderProps) => {

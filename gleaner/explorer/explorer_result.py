@@ -9,5 +9,5 @@ class TrainResult:
     interestingness: np.ndarray
     coverage: np.ndarray
     diversity: np.ndarray
-    conciseness: np.ndarray
+    parsimony: np.ndarray
     n_charts: np.ndarray

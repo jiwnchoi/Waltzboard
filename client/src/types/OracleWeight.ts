@@ -3,5 +3,5 @@ export interface OracleWeight {
     diversity: number;
     specificity: number;
     interestingness: number;
-    conciseness: number;
+    parsimony: number;
 }

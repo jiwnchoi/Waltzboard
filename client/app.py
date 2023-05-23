@@ -1,10 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from pynpm import NPMPackage
 from vega_datasets import data
-import os
 
 from api.config import config
 from api.models import *
@@ -17,14 +14,6 @@ df = data.movies()
 gl = Gleaner(df)
 gl.config.n_epoch = 50
 app = FastAPI()
-
-package = NPMPackage("./package.json")
-
-if not os.path.exists("node_modules"):
-    package.install()
-
-if not os.path.exists("dist"):
-    package.run("build")
 
 
 app.add_middleware(
@@ -59,7 +48,7 @@ async def train(train: TrainBody):
             interestingness=train.weight.interestingness,
             coverage=train.weight.coverage,
             diversity=train.weight.diversity,
-            conciseness=train.weight.conciseness,
+            parsimony=train.weight.parsimony,
         )
         gl.train(train.preferences)
         return {"success": True}
@@ -78,7 +67,7 @@ async def infer(body: InferBody) -> InferResponse:
         interestingness,
         coverage,
         diversity,
-        conciseness,
+        parsimony,
     ) = gl.explorer._infer(gl.generator, gl.oracle, gl.preferences)
     dashboard = result_n_scores[0][1]
     result = result_n_scores[0][0]
@@ -93,7 +82,7 @@ async def infer(body: InferBody) -> InferResponse:
             interestingness=list(interestingness),
             coverage=list(coverage),
             diversity=list(diversity),
-            conciseness=list(conciseness),
+            parsimony=list(parsimony),
         ),
     )
 

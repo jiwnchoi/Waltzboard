@@ -15,11 +15,11 @@ def display_function(epoch, train_results):
             "interestingness": [r.interestingness.mean() for r in train_results],
             "coverage": [r.coverage.mean() for r in train_results],
             "diversity": [r.diversity.mean() for r in train_results],
-            "conciseness": [r.conciseness.mean() for r in train_results],
+            "parsimony": [r.parsimony.mean() for r in train_results],
             "n_charts": [r.n_charts.mean() for r in train_results],
         }
     )
-    if epoch % 5 == 0:
+    if epoch % 10 == 0:
         clear_output(wait=True)
         print(f"Epoch {epoch}")
         line = (
@@ -41,10 +41,8 @@ def display_function(epoch, train_results):
                 | line.encode(y=alt.Y("coverage", scale=alt.Scale(zero=False)))
                 | line.encode(y=alt.Y("diversity", scale=alt.Scale(zero=False)))
                 | (
-                    line.encode(y=alt.Y("conciseness", scale=alt.Scale(zero=False)))
-                    + line.encode(
-                        y=alt.Y("n_charts", scale=alt.Scale(zero=False))
-                    ).mark_line(color="orange")
+                    line.encode(y=alt.Y("parsimony", scale=alt.Scale(zero=False)))
+                    + line.encode(y=alt.Y("n_charts", scale=alt.Scale(zero=False))).mark_line(color="orange")
                 ).resolve_scale(y="independent")
             )
         )

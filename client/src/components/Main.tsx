@@ -79,7 +79,7 @@ export const Main = () => {
           <WeightSlider title="interestingness" />
           <WeightSlider title="coverage" />
           <WeightSlider title="diversity" />
-          <WeightSlider title="conciseness" />
+          <WeightSlider title="parsimony" />
         </Section>
         <Section title="Configuration" gap={1.5} w={200}>
           <Flex flexDir={'row'} justifyContent={'space-between'} align="center">
@@ -119,7 +119,7 @@ export const Main = () => {
           <ResultPlot width={250} height={20} target="interestingness" />
           <ResultPlot width={250} height={20} target="coverage" />
           <ResultPlot width={250} height={20} target="diversity" />
-          <ResultPlot width={250} height={20} target="conciseness" />
+          <ResultPlot width={250} height={20} target="parsimony" />
         </Section>
         <Section title="Chart Recommendation" gap={1.5}>
           {recommendedChartsSignal.value.map((chart, i) => (

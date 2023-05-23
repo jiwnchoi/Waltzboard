@@ -16,7 +16,7 @@ interface ScoreDistModel {
     interestingness: number[];
     coverage: number[];
     diversity: number[];
-    conciseness: number[];
+    parsimony: number[];
 }
 
 interface GleanerChartModel {

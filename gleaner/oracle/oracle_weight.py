@@ -7,7 +7,7 @@ class OracleWeight:
     diversity: float = 1.0
     specificity: float = 1.0
     interestingness: float = 1.0
-    conciseness: float = 1.0
+    parsimony: float = 1.0
 
     def to_dict(self) -> dict[str, float]:
         return {
@@ -15,5 +15,5 @@ class OracleWeight:
             "diversity": self.diversity,
             "specificity": self.specificity,
             "interestingness": self.interestingness,
-            "conciseness": self.conciseness,
+            "parsimony": self.parsimony,
         }
