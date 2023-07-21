@@ -36,13 +36,13 @@ const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
     >
       <Flex flexDir={'row'} justifyContent={'space-between'} align="top">
         <Text w="full" fontSize={'2xs'} lineHeight={'3'} textAlign="center">
-          {chart.title.map((t) =>
+          {chart.title.map((t, i) =>
             t.isPrefered ? (
-              <Text as="span" fontWeight={800} color="pink.400">
+              <Text key={`rec-chart-${i}`} as="span" fontWeight={800} color="pink.400">
                 {`${t.text} `}
               </Text>
             ) : (
-              <Text as="span" fontWeight={500}>
+              <Text key={`rec-chart-${i}`} as="span" fontWeight={500}>
                 {`${t.text} `}
               </Text>
             )

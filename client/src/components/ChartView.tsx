@@ -47,13 +47,13 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           }}
         />
         <Text w="full" fontSize={'xs'} textAlign="center">
-          {chart.title.map((t) =>
+          {chart.title.map((t, index) =>
             t.isPrefered ? (
-              <Text as="span" fontWeight={800} color="pink.400">
+              <Text key={index} as="span" fontWeight={800} color="pink.400">
                 {`${t.text} `}
               </Text>
             ) : (
-              <Text as="span" fontWeight={500}>
+              <Text key={index} as="span" fontWeight={500}>
                 {`${t.text} `}
               </Text>
             )
@@ -91,10 +91,10 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
 
       <Collapse in={showStatistics.value} animateOpacity>
         <Flex flexDir={'column'} gap={2} mt={2}>
-          {Object.keys(chart.statistics).map((key) => {
+          {Object.keys(chart.statistics).map((key, i) => {
             if (chart.statistics[key].filter((f) => f !== null).length === 0) return null;
             return (
-              <Flex gap={1}>
+              <Flex gap={1} key={`stat-${i}`}>
                 <Text fontSize={'xs'} textAlign="center" fontWeight={400} mr="auto">
                   {key.replace("['", '').replace("']", '').replace("', '", ' & ')}
                 </Text>
