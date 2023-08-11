@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-
+from itertools import combinations
 from dataclasses import dataclass
 from collections import Counter
 import pandas as pd
@@ -193,3 +193,25 @@ class Explorer:
         for _ in range(self.config.n_epoch):
             results.append(self._train(gen, oracle, preferences))
         return results
+
+    def search(self, gen: Generator, oracle: Oracle, preferences: list[str]):
+        def _beam_search(current: list[list[GleanerChart]], space: list[GleanerChart]):
+            leaves = [c + [s] for c in current for s in space if s not in c]
+            scores = [oracle.get_result(GleanerDashboard(leaf), set(preferences)).get_score() for leaf in leaves]
+            next_indices = np.argsort(scores)[-self.config.n_beam :]
+            next_leaves, next_scores = [leaves[i] for i in next_indices], [scores[i] for i in next_indices]
+            return next_leaves, next_scores
+
+        search_space = gen.sample_n(self.config.n_search_space)
+        pairs = [[search_space[i], search_space[j]] for i, j in combinations(range(len(search_space)), 2)]
+        pairs_scores = [oracle.get_result(GleanerDashboard(pair), set(preferences)).get_score() for pair in pairs]
+        root_indices = np.argsort(pairs_scores)[-self.config.n_beam :]
+        leaves, scores = [pairs[i] for i in root_indices], [pairs_scores[i] for i in root_indices]
+
+        while True:
+            next_leaves, next_scores = _beam_search(leaves, search_space)
+            if next_scores[-1] < scores[0]:
+                break
+            leaves, scores = next_leaves, next_scores
+
+        return GleanerDashboard(leaves[-1]), oracle.get_result(GleanerDashboard(leaves[-1]), set(preferences))

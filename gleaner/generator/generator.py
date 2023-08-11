@@ -63,8 +63,8 @@ class Generator:
         current.append(choice(self.config.agg_type, p=p(self.prior.at.sample() * mask_at)))
 
         return get_gleaner_chart(current, self.df)
-
-    def sample_dashboard(self, n: int) -> GleanerDashboard:
+    
+    def sample_n(self, n:int) -> list[GleanerChart]:
         keys: set[str] = set()
         charts: list[GleanerChart] = []
 
@@ -73,5 +73,8 @@ class Generator:
             if str(chart.sample) not in keys:
                 keys.add(str(chart.sample))
                 charts.append(chart)
+                
+        return charts
 
-        return GleanerDashboard(charts)
+    def sample_dashboard(self, n: int) -> GleanerDashboard:
+        return GleanerDashboard(self.sample_n(n))

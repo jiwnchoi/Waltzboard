@@ -41,6 +41,7 @@ async def init() -> InitResponse:
 @app.post("/train")
 async def train(train: TrainBody):
     print(train)
+    gl.config.n_epoch = 25
     try:
         gl.config.give_constraints(train.constraints)
         gl.oracle.update(

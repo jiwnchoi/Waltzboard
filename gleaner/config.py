@@ -65,13 +65,15 @@ class GleanerConfig:
     # Explorer config
     n_epoch: int
     n_candidates: int
+    n_search_space: int = 100
+    n_beam: int = 10
     halving_ratio: float
 
     def __init__(
         self,
         df: pd.DataFrame,
         robustness: int = 100,
-        n_epoch: int = 5,
+        n_epoch: int = 50,
         n_candidates: int = 100,
         halving_ratio: float = 0.1,
     ) -> None:

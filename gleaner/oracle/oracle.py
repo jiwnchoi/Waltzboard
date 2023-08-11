@@ -32,7 +32,7 @@ class Oracle:
             diversity=get_diversity_from_nodes(nodes, preferences),
             interestingness=get_interestingness(nodes),
             specificity=get_specificity_from_nodes(nodes, preferences),
-            parsimony=get_parsimony_from_nodes(nodes),
+            parsimony=get_parsimony_from_nodes(nodes, self.df.columns),
         )
 
     def get_statistics_from_chart(self, chart: "GleanerChart") -> dict[str, list[str | None]]:
