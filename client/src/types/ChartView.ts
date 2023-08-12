@@ -16,7 +16,8 @@ interface ChartView extends GleanerChartModel {
     statistics: StatisticFeature;
 
     isPinned: boolean;
-    title: TitleToken[];
+    titleToken: TitleToken[];
 }
+
 
 export type { ChartView, StatisticFeature, TitleToken };

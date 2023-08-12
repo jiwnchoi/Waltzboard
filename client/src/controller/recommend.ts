@@ -39,7 +39,8 @@ const recommendChart = async () => {
             key: chart.key,
             spec: specObject,
             statistics: chart.statistics,
-            title: titleToken,
+            titleToken,
+            title,
             isPinned: false,
         };
     })

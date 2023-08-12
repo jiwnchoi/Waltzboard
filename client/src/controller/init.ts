@@ -6,6 +6,7 @@ import { ChartType } from '../types/ChartType'
 import { attributesSignal } from './attribute'
 import { chartTypesSignal } from './chartType'
 import { selectedTaskTypeSignal, taskTypesSignal } from './taskType'
+import { aggregationsSignal } from './aggregation'
 
 const initializedSignal = signal<boolean>(false);
 
@@ -23,6 +24,13 @@ const f = async () => {
         chartTypesSignal.value = response.chartTypes.map((chartType) => {
             return {
                 ...chartType,
+                prefer: false,
+                ignore: false,
+            };
+        });
+        aggregationsSignal.value = response.aggregations.map((aggregation) => {
+            return {
+                ...aggregation,
                 prefer: false,
                 ignore: false,
             };

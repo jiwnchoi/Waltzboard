@@ -19,8 +19,8 @@ const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
   const spec = chart.spec;
   spec.config = {
     axis: {
-      labelFontSize: 8,
-      titleFontSize: 8,
+      labelFontSize: 6,
+      titleFontSize: 6,
     },
   };
   return (
@@ -28,15 +28,12 @@ const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
       flexDir={'column'}
       w={'full'}
       h="fit-content"
-      bgColor="white"
-      borderRadius={'md'}
-      boxShadow="sm"
       p={0}
       gap={1}
     >
       <Flex flexDir={'row'} justifyContent={'space-between'} align="top">
-        <Text w="full" fontSize={'2xs'} lineHeight={'3'} textAlign="center">
-          {chart.title.map((t, i) =>
+        <Text w="full" fontSize={1} lineHeight={'3'} textAlign="center">
+          {chart.titleToken.map((t, i) =>
             t.isPrefered ? (
               <Text key={`rec-chart-${i}`} as="span" fontWeight={800} color="pink.400">
                 {`${t.text} `}
@@ -58,7 +55,6 @@ const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
           tooltip={new Handler().call}
         />
       </Center>
-      <Divider />
     </Flex>
   );
 };

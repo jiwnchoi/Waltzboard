@@ -28,15 +28,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
     showStatistics.value = !showStatistics.value;
   };
   return (
-    <Flex
-      flexDir={'column'}
-      w={'full'}
-      h="fit-content"
-      bgColor="white"
-      borderRadius={'md'}
-      boxShadow="sm"
-      p={2}
-    >
+    <Flex flexDir={'column'} w={'full'} h="fit-content" p={2}>
       <Flex flexDir={'row'} justifyContent={'space-between'} align="top" mb={2}>
         <Icon
           mr={4}
@@ -45,9 +37,10 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           onClick={() => {
             togglePinChart(chart.key);
           }}
+          _hover={{ cursor: 'pointer' }}
         />
         <Text w="full" fontSize={'xs'} textAlign="center">
-          {chart.title.map((t, index) =>
+          {chart.titleToken.map((t, index) =>
             t.isPrefered ? (
               <Text key={index} as="span" fontWeight={800} color="pink.400">
                 {`${t.text} `}
@@ -66,6 +59,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           onClick={() => {
             removeChart(chart.key);
           }}
+          _hover={{ cursor: 'pointer' }}
         />
       </Flex>
       <Center height="full" px={4} mb={2}>

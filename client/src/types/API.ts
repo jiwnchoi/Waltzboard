@@ -1,3 +1,4 @@
+import { AggregationFetched } from './Aggregation';
 import type { AttributeFetched } from './Attribute';
 import type { ChartTypeFetched } from './ChartType';
 import { StatisticFeature } from './ChartView';
@@ -53,6 +54,7 @@ interface InitResponse {
     chartTypes: ChartTypeFetched[];
     taskTypes: TaskTypeFetched[];
     attributes: AttributeFetched[];
+    aggregations: AggregationFetched[];
 }
 
 interface InferResponse {

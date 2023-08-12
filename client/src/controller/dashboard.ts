@@ -24,7 +24,8 @@ const dashboardSignal = computed<ChartView[]>(() =>
             spec: specObject,
             statistics: chart.statistics,
             isPinned: pinnedKeysSignal.value.includes(chart.key),
-            title: titleToken,
+            title,
+            titleToken,
         };
     })
 );
@@ -37,7 +38,10 @@ const pinnedKeysSignal = signal<string[]>([]);
 
 
 const removeChart = (key: string) => {
-    inferResponseSignal.value.charts = inferResponseSignal.peek().charts.filter((chart) => chart.key !== key);
+    inferResponseSignal.value = {
+        ...inferResponseSignal.peek(),
+        charts: inferResponseSignal.peek().charts.filter((chart) => chart.key !== key)
+    }
 
 };
 

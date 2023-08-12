@@ -24,7 +24,7 @@ const Header = () => {
 
 const Footer = () => {
   return (
-    <Flex mt="auto" align="center" py={4} px={4} flexDir="column" alignItems="start">
+    <Flex mt="auto" align="center" py={4} px={4} flexDir="column" alignItems="start" position={"fixed"} bottom={0}>
       <Link href="https://idclab.skku.edu" isExternal>
         <Flex>
           <Text variant={'layout'} fontFamily="Rajdhani" fontWeight={900} fontSize="xl">
@@ -63,6 +63,7 @@ const Section = (props: SectionProps) => {
 
   return (
     <Flex
+      maxH={props.maxH}
       flexDir={'column'}
       w="full"
       h={props.height}
@@ -89,6 +90,16 @@ const Section = (props: SectionProps) => {
           bgColor="white"
           borderRadius="md"
           boxShadow="sm"
+          maxH={props.maxH}
+          overflow={"scroll"}
+          sx={
+            {
+              '::-webkit-scrollbar': {
+                display: 'none',
+              },
+            }
+          }
+          
         >
           {props.children}
         </Flex>
@@ -97,4 +108,48 @@ const Section = (props: SectionProps) => {
   );
 };
 
-export { Header, Footer, Section };
+const HSection = (props: SectionProps) => {
+  const show = useSignal<boolean | undefined>(!props.collapsed);
+
+  const toggleShow = () => {
+    show.value = !show.value;
+  };
+
+  return (
+    <Flex
+      flexDir={'column'}
+      w="full"
+      h={props.height}
+      minH={props.minH}
+      gap={props.gap}
+      p={2}
+      bgColor="white"
+      borderRadius="md"
+      boxShadow="sm"
+    >
+      <Flex flexDir={'row'} justifyContent={'space-between'} alignItems={'center'}>
+        <Heading variant={'section'}>{props.title}</Heading>
+        {show.value ? (
+          <Icon as={RiArrowDownSLine} boxSize={4} onClick={toggleShow} />
+        ) : (
+          <Icon as={RiArrowUpSLine} boxSize={4} onClick={toggleShow} />
+        )}
+      </Flex>
+      <Collapse in={show.value} animateOpacity>
+        <Flex
+          flexDir={'row'}
+          w="full"
+          gap={props.gap}
+          bgColor="white"
+          borderRadius="md"
+          boxShadow="sm"
+        >
+          {props.children}
+        </Flex>
+      </Collapse>
+    </Flex>
+
+  )
+}
+
+export { Header, Footer, Section, HSection };

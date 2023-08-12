@@ -46,6 +46,11 @@ class TaskTypeModel(BaseModel):
     chartTypes: list["ChartTypeModel"]
 
 
+class AggTypeModel(BaseModel):
+    name: str
+    type: str | None
+
+
 class AttributeModel(BaseModel):
     name: str
     type: str
@@ -112,6 +117,7 @@ class ScoreBody(BaseModel):
 class InitResponse(BaseModel):
     chartTypes: list[ChartTypeModel]
     taskTypes: list[TaskTypeModel]
+    aggregations: list[AggTypeModel]
     attributes: list[AttributeModel]
 
 
@@ -140,6 +146,15 @@ chart_types: dict[str, ChartTypeModel] = {
     "stripplot": ChartTypeModel(name="Strip Plot", mark="tick"),
 }
 
+# Count, Mean, Sum, Min, Max
+agg_types: dict[str, AggTypeModel] = {
+    "none": AggTypeModel(name="None", type=None),
+    "count": AggTypeModel(name="Count", type="count"),
+    "mean": AggTypeModel(name="Mean", type="mean"),
+    "sum": AggTypeModel(name="Sum", type="sum"),
+    "min": AggTypeModel(name="Min", type="min"),
+    "max": AggTypeModel(name="Max", type="max"),
+}
 
 task_types: dict[str, TaskTypeModel] = {
     "retrieve": TaskTypeModel(

@@ -12,7 +12,7 @@ import {
 import { toggleAttributeIgnore, toggleAttributePrefer } from '../controller/attribute';
 import type { Attribute } from '../types/Attribute';
 
-const Attribute = ({ attribute }: { attribute: Attribute }) => {
+const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
   return (
     <Flex flexDir={'row'} align="center" bgColor="gray.50" py={1} px={2} borderRadius="md">
       <Icon
@@ -38,7 +38,6 @@ const Attribute = ({ attribute }: { attribute: Attribute }) => {
         textOverflow="ellipsis"
         overflow={'hidden'}
         whiteSpace="nowrap"
-        w={85}
       >
         {attribute.name}
       </Text>
@@ -62,4 +61,4 @@ const Attribute = ({ attribute }: { attribute: Attribute }) => {
   );
 };
 
-export default Attribute;
+export default AttributeSelector;

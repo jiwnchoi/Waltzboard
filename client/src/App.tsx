@@ -13,7 +13,7 @@ const App = () => (
       </>
     ) : (
       <Center minH={'80vh'} flexDir="column" gap={10}>
-        Building Design Space ...
+        Loading ...
         <Spinner size="xl" />
       </Center>
     )}

@@ -33,6 +33,7 @@ async def init() -> InitResponse:
     gl.__init__(df)
     return InitResponse(
         chartTypes=list(chart_types.values()),
+        aggregations=list(agg_types.values()),
         taskTypes=list(task_types.values()),
         attributes=[AttributeModel(name=a.name, type=a.type) for a in gl.config.attrs],
     )
@@ -41,7 +42,7 @@ async def init() -> InitResponse:
 @app.post("/train")
 async def train(train: TrainBody):
     print(train)
-    gl.config.n_epoch = 25
+    gl.config.n_epoch = 5
     try:
         gl.config.give_constraints(train.constraints)
         gl.oracle.update(

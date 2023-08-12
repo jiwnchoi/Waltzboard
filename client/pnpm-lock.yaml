@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@chakra-ui/react':
     specifier: ^2.6.1
@@ -16,6 +20,9 @@ dependencies:
   '@preact/signals-react':
     specifier: 1.1.1
     version: 1.1.1(react@18.2.0)
+  '@types/d3-scale-chromatic':
+    specifier: ^3.0.0
+    version: 3.0.0
   '@visx/group':
     specifier: ^3.0.0
     version: 3.0.0(react@18.2.0)
@@ -31,6 +38,9 @@ dependencies:
   axios:
     specifier: ^1.4.0
     version: 1.4.0
+  d3-scale-chromatic:
+    specifier: ^3.0.0
+    version: 3.0.0
   framer-motion:
     specifier: ^10.12.11
     version: 10.12.11(react-dom@18.2.0)(react@18.2.0)
@@ -1431,6 +1441,7 @@ packages:
 
   /@emotion/memoize@0.7.4:
     resolution: {integrity: sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==}
+    requiresBuild: true
     dev: false
     optional: true
 
@@ -1783,6 +1794,10 @@ packages:
 
   /@types/d3-path@1.0.9:
     resolution: {integrity: sha512-NaIeSIBiFgSC6IGUBjZWcscUJEq7vpVu7KthHN8eieTV9d9MqkSOZLH4chq1PmcKy06PNe3axLeKmRIyxJ+PZQ==}
+    dev: false
+
+  /@types/d3-scale-chromatic@3.0.0:
+    resolution: {integrity: sha512-dsoJGEIShosKVRBZB0Vo3C8nqSDqVGujJU6tPznsBJxNJNwMF8utmS83nvCBKQYPpjCzaaHcrf66iTRpZosLPw==}
     dev: false
 
   /@types/d3-scale@4.0.3:
@@ -2267,6 +2282,14 @@ packages:
   /d3-quadtree@3.0.1:
     resolution: {integrity: sha512-04xDrxQTDTCFwP5H6hRhsRcb9xxv2RzkcsygFzmkSIOJy3PeRJP7sNk3VRIbKXcog561P9oU0/rVH6vDROAgUw==}
     engines: {node: '>=12'}
+    dev: false
+
+  /d3-scale-chromatic@3.0.0:
+    resolution: {integrity: sha512-Lx9thtxAKrO2Pq6OO2Ua474opeziKr279P/TKZsMAhYyNDD3EnCffdbgeSYN5O7m2ByQsxtuP2CSDczNUIZ22g==}
+    engines: {node: '>=12'}
+    dependencies:
+      d3-color: 3.1.0
+      d3-interpolate: 3.0.1
     dev: false
 
   /d3-scale@4.0.2:
