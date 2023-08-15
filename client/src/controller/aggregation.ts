@@ -11,13 +11,13 @@ const targetAggregationSignal = computed(() =>
 const aggregationPreferredSignal = computed(() =>
     aggregationsSignal.value
         .filter((aggregation) => aggregation.prefer)
-        .map((aggregation) => `${aggregation.name}`)
+        .map((aggregation) => `${aggregation.type}`)
 );
 
 const aggregationConstrainedSignal = computed(() =>
     aggregationsSignal.value
         .filter((aggregation) => aggregation.ignore)
-        .map((aggregation) => `${aggregation.name}`)
+        .map((aggregation) => `${aggregation.type}`)
 );
 
 

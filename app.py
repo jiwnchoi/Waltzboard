@@ -12,7 +12,7 @@ from gleaner.model import get_gleaner_chart_from_key
 df = data.movies()
 
 gl = Gleaner(df)
-gl.config.n_epoch = 50
+gl.config.n_epoch = 10
 app = FastAPI()
 
 
@@ -41,8 +41,7 @@ async def init() -> InitResponse:
 
 @app.post("/train")
 async def train(train: TrainBody) -> TrainResponse:
-    print(train)
-    gl.config.n_epoch = 5
+    gl.__init__(df)
     gl.config.give_constraints(train.constraints)
     gl.oracle.update(
         specificity=train.weight.specificity,
@@ -51,9 +50,9 @@ async def train(train: TrainBody) -> TrainResponse:
         diversity=train.weight.diversity,
         parsimony=train.weight.parsimony,
     )
-    gl.train(train.preferences)
+    print(train.constraints, train.preferences)
+    train_result = gl.train(train.preferences)
     attrs, cts, ags = gl.generator.prior.export()
-    print(attrs, cts, ags)
     return TrainResponse(
         attribute=[AttributeDistModel.model_validate(attr) for attr in attrs],
         chartType=[ChartTypeDistModel.model_validate(ct) for ct in cts],
@@ -63,7 +62,6 @@ async def train(train: TrainBody) -> TrainResponse:
 
 @app.post("/infer")
 async def infer(body: InferBody) -> InferResponse:
-    print(body)
     (
         result_n_scores,
         raw_scores,

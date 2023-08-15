@@ -5,6 +5,7 @@ import { Text } from '@visx/text';
 import { inferResponseSignal } from '../controller/infer';
 import { ScaleSVG } from '@visx/responsive';
 import { Group } from '@visx/group';
+import { schemeCategory10 } from 'd3-scale-chromatic';
 
 interface Margin {
   top: number;
@@ -34,7 +35,7 @@ type RadarRangeMarkProps = {
 } & RadarAxisProps;
 
 const LABEL: string[] = ['Spe', 'Int', 'Cov', 'Div', 'Par'];
-const margin = { top: 20, bottom: 20, left: 20, right: 20 };
+const margin = { top: 0, bottom: 40, left: 35, right: 35 };
 
 const genAngles = (length: number) =>
   [...new Array(length + 1)].map((_, i) => ({
@@ -72,12 +73,12 @@ const radialScale = scaleLinear<number>({
   range: [0, Math.PI * 2],
 });
 
-export const RadarAxis = (props: RadarAxisProps) => {
-  const { width, height, margin } = props;
+export const RadarAxis = (props: RadarAxisProps & { data: number[] }) => {
+  const { width, height, margin, data } = props;
   const yMax = height - margin.top - margin.bottom;
   const xMax = width - margin.left - margin.right;
   const radius = Math.min(xMax, yMax) / 2;
-  const labelRadius = Math.min(xMax, yMax) / 2 + 10;
+  const labelRadius = Math.min(xMax, yMax) / 2 + 20;
 
   const webs = genAngles(5);
   const points = genPoints(5, radius);
@@ -104,18 +105,34 @@ export const RadarAxis = (props: RadarAxisProps) => {
         <Line key={`radar-line-${i}`} from={zeroPoint} to={points[i]} stroke={'#E2E2E2'} />
       ))}
       {labelPoints.map((value, i) => (
-        <Text
-          key={`radar-label-${i}`}
-          x={labelPoints[i].x}
-          y={labelPoints[i].y}
-          fontSize={10}
-          textAnchor={i === 0 || i === 3 ? 'middle' : i < 3 ? 'start' : 'end'}
-          verticalAnchor="middle"
-          fill="gray"
-          fontWeight="bold"
-        >
-          {LABEL[(i + 4) % LABEL.length]}
-        </Text>
+        <>
+          <Text
+            key={`radar-label-${i}`}
+            x={labelPoints[i].x}
+            y={labelPoints[i].y}
+            dy={-8}
+            fontSize={14}
+            textAnchor={'middle'}
+            verticalAnchor="middle"
+            fill="gray"
+            fontWeight="bold"
+          >
+            {LABEL[(i + 4) % LABEL.length]}
+          </Text>
+          <Text
+            key={`radar-label-${i}`}
+            x={labelPoints[i].x}
+            y={labelPoints[i].y}
+            fontSize={14}
+            dy={8}
+            textAnchor={'middle'}
+            verticalAnchor="middle"
+            fill={schemeCategory10[0]}
+            fontWeight="bold"
+          >
+            {data[(i + 4) % LABEL.length].toFixed(2)}
+          </Text>
+        </>
       ))}
     </>
   );
@@ -248,7 +265,18 @@ export const ScoreDistView = ({ width, height }: ScoreDistViewProps) => {
   return (
     <ScaleSVG width={width} height={height}>
       <Group top={height / 2} left={width / 2}>
-        <RadarAxis width={width} height={height} margin={margin} />
+        <RadarAxis
+          width={width}
+          height={height}
+          margin={margin}
+          data={[
+            currentScore.specificity,
+            currentScore.interestingness,
+            currentScore.coverage,
+            currentScore.diversity,
+            currentScore.parsimony,
+          ]}
+        />
         <RadarRangeMark
           width={width}
           height={height}
@@ -273,7 +301,7 @@ export const ScoreDistView = ({ width, height }: ScoreDistViewProps) => {
           width={width}
           height={height}
           margin={margin}
-          color={'#4880C8'}
+          color={schemeCategory10[0]}
           data={[
             currentScore.specificity,
             currentScore.interestingness,

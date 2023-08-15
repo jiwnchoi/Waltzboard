@@ -29,12 +29,11 @@ export const ChartTypeSelector = ({ chartType }: { chartType: ChartType }) => {
         <Icon
           as={chartType.prefer ? RiHeartAddFill : RiHeartAddLine}
           boxSize={3.5}
-          color={chartType.ignore ? 'gray.400' : 'red.400'}
+          color={chartType.ignore ? 'gray.400' : 'pink.400'}
           cursor="pointer"
           onClick={() => toggleChartTypePrefer(chartType)}
         />
       </Flex>
-        
-      </Flex>
+    </Flex>
   );
 };

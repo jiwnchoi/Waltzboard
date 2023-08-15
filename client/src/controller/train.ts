@@ -2,17 +2,24 @@ import { computed, signal } from '@preact/signals-react';
 import axios from 'axios';
 import { URI } from '../../config';
 import type { TrainBody, TrainResponse } from '../types/API';
+import { aggregationConstrainedSignal, aggregationPreferredSignal } from './aggregation';
 import { attributeContrainedSignal, attributePreferedSignal } from './attribute';
 import { chartTypeConstrainedSignal, chartTypePreferredSignal } from './chartType';
 import { weightSignal } from './oracleWeight';
 
 const trainBodySignal = computed<TrainBody>(() => {
-    const weight = weightSignal.value;
-
     return {
         weight: weightSignal.value,
-        preferences: [...attributePreferedSignal.value, ...chartTypePreferredSignal.value],
-        constraints: [...attributeContrainedSignal.value, ...chartTypeConstrainedSignal.value],
+        preferences: [
+            ...attributePreferedSignal.value,
+            ...chartTypePreferredSignal.value,
+            ...aggregationPreferredSignal.value,
+        ],
+        constraints: [
+            ...attributeContrainedSignal.value,
+            ...chartTypeConstrainedSignal.value,
+            ...aggregationConstrainedSignal.value,
+        ],
     };
 });
 
@@ -33,11 +40,6 @@ const trainGleaner = async () => {
     trainResponseSignal.value = response;
     isTrainingSignal.value = false;
     isTrainedSignal.value = true;
-
-    console.log('train response', response);
-    console.log(attributeDistSignal.peek());
-    console.log(chartTypeDistSignal.peek());
-    console.log(aggregationDistSignal.peek());
 };
 
 const isTrainingSignal = signal<boolean>(false);
@@ -49,5 +51,6 @@ export {
     chartTypeDistSignal,
     isTrainedSignal,
     isTrainingSignal,
-    trainGleaner,
+    trainGleaner
 };
+

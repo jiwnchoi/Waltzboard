@@ -45,7 +45,6 @@ const recommendChart = async () => {
         };
     })
     isRecommendingSignal.value = false
-    console.log(response)
 }
 
 

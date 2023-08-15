@@ -8,7 +8,6 @@ import {
 import { toggleAggregationIgnore, toggleAggregationPrefer } from '../controller/aggregation';
 import { Aggregation } from '../types/Aggregation';
 
-
 export const AggregationSelector = ({ aggregation }: { aggregation: Aggregation }) => {
   return (
     <Flex flexDir={'row'} align="center" bgColor="gray.50" py={1} px={2} borderRadius="md">
@@ -27,7 +26,7 @@ export const AggregationSelector = ({ aggregation }: { aggregation: Aggregation 
       <Icon
         as={aggregation.prefer ? RiHeartAddFill : RiHeartAddLine}
         boxSize={3.5}
-        color={aggregation.ignore ? 'gray.400' : 'red.400'}
+        color={aggregation.ignore ? 'gray.400' : 'pink.400'}
         cursor="pointer"
         onClick={() => toggleAggregationPrefer(aggregation)}
       />

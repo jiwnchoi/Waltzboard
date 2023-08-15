@@ -11,13 +11,13 @@ const targetChartTypeSignal = computed(() =>
 const chartTypePreferredSignal = computed(() =>
     chartTypesSignal.value
         .filter((chartType) => chartType.prefer)
-        .map((chartType) => `${chartType.name}`)
+        .map((chartType) => `${chartType.mark}`)
 );
 
 const chartTypeConstrainedSignal = computed(() =>
     chartTypesSignal.value
         .filter((chartType) => chartType.ignore)
-        .map((chartType) => `${chartType.name}`)
+        .map((chartType) => `${chartType.mark}`)
 );
 
 
