@@ -63,7 +63,7 @@ export const Main = () => {
           ))}
           <Box minH={8}></Box>
         </Section>
-        
+
         <Section title="Attributes" gap={1.5} maxH={240}>
           {attributesSignal.value.map((attribute, i) => (
             <AttributeSelector attribute={attribute} key={`attribute-${i}`} />
@@ -110,7 +110,7 @@ export const Main = () => {
           <ScoreDistView width={300} height={300} />
         </Section>
         <Section title="Space Distributions">
-          <SpaceDistView width={300} svgWidth={300} />
+          <SpaceDistView width={300} svgWidth={300} svgHeight={300} />
         </Section>
       </Flex>
       <Flex flexDir={'column'} w={'full'} h="fit-content" gap={2}>

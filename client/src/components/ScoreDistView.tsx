@@ -105,7 +105,7 @@ export const RadarAxis = (props: RadarAxisProps) => {
       ))}
       {labelPoints.map((value, i) => (
         <Text
-          key={`radar-label-${value}`}
+          key={`radar-label-${i}`}
           x={labelPoints[i].x}
           y={labelPoints[i].y}
           fontSize={10}

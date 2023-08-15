@@ -40,22 +40,25 @@ async def init() -> InitResponse:
 
 
 @app.post("/train")
-async def train(train: TrainBody):
+async def train(train: TrainBody) -> TrainResponse:
     print(train)
     gl.config.n_epoch = 5
-    try:
-        gl.config.give_constraints(train.constraints)
-        gl.oracle.update(
-            specificity=train.weight.specificity,
-            interestingness=train.weight.interestingness,
-            coverage=train.weight.coverage,
-            diversity=train.weight.diversity,
-            parsimony=train.weight.parsimony,
-        )
-        gl.train(train.preferences)
-        return {"success": True}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+    gl.config.give_constraints(train.constraints)
+    gl.oracle.update(
+        specificity=train.weight.specificity,
+        interestingness=train.weight.interestingness,
+        coverage=train.weight.coverage,
+        diversity=train.weight.diversity,
+        parsimony=train.weight.parsimony,
+    )
+    gl.train(train.preferences)
+    attrs, cts, ags = gl.generator.prior.export()
+    print(attrs, cts, ags)
+    return TrainResponse(
+        attribute=[AttributeDistModel.model_validate(attr) for attr in attrs],
+        chartType=[ChartTypeDistModel.model_validate(ct) for ct in cts],
+        aggregation=[AggregationDistModel.model_validate(ag) for ag in ags],
+    )
 
 
 @app.post("/infer")

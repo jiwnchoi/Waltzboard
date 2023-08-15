@@ -56,6 +56,23 @@ class AttributeModel(BaseModel):
     type: str
 
 
+class AttributeDistModel(BaseModel):
+    name: str
+    x: float
+    y: float
+    z: float
+
+
+class ChartTypeDistModel(BaseModel):
+    name: str
+    prob: float
+
+
+class AggregationDistModel(BaseModel):
+    name: str
+    prob: float
+
+
 class GleanerChartModel(BaseModel):
     key: str
     spec: str
@@ -125,6 +142,12 @@ class InferResponse(BaseModel):
     charts: list[GleanerChartModel]
     result: OracleResultModel
     dist: ScoreDistModel
+
+
+class TrainResponse(BaseModel):
+    attribute: list[AttributeDistModel]
+    chartType: list[ChartTypeDistModel]
+    aggregation: list[AggregationDistModel]
 
 
 class RecommendResponse(BaseModel):

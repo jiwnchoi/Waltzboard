@@ -4,6 +4,7 @@ import type { ChartTypeFetched } from './ChartType';
 import { StatisticFeature } from './ChartView';
 import type { OracleResult } from './OracleResult';
 import { OracleWeight } from './OracleWeight';
+import { AggregationDist, AttributeDist, ChartTypeDist } from './Space';
 import { TaskTypeFetched } from './TaskType';
 
 interface AttributeModel {
@@ -26,6 +27,7 @@ interface GleanerChartModel {
     spec: string;
     statistics: StatisticFeature;
 }
+
 
 interface InferBody {
     nCharts: number | null;
@@ -68,8 +70,9 @@ interface RecommendResponse {
 }
 
 interface TrainResponse {
-    success: boolean;
-    error?: string;
+    attribute: AttributeDist[];
+    chartType: ChartTypeDist[];
+    aggregation: AggregationDist[];
 }
 
 interface ScoreBody {
@@ -93,5 +96,4 @@ export type {
     AttributeModel,
     ScoreBody,
     ScoreResponse,
-
 };

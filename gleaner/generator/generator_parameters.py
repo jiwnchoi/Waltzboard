@@ -86,3 +86,29 @@ class PriorParameters:
         display(attribute_data)
         display(chart_type_data)
         display(agg_type_data)
+
+    def export(self):
+        attrs = [
+            {
+                "name": str(attr),
+                "x": self.x.count[i] / np.sum(self.x.count),
+                "y": self.y.count[i] / np.sum(self.y.count),
+                "z": self.z.count[i] / np.sum(self.z.count),
+            }
+            for i, attr in enumerate(self.attrs)
+        ]
+        cts = [
+            {
+                "name": str(ct),
+                "prob": self.ct.count[i] / np.sum(self.ct.count),
+            }
+            for i, ct in enumerate(self.config.chart_type)
+        ]
+        ags = [
+            {
+                "name": str(at),
+                "prob": self.at.count[i] / np.sum(self.at.count),
+            }
+            for i, at in enumerate(self.config.agg_type)
+        ]
+        return attrs, cts, ags
