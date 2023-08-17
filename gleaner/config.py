@@ -1,5 +1,6 @@
 from gleaner.model import Attribute
 import pandas as pd
+from gleaner.oracle import OracleWeight
 
 
 chart_map = [
@@ -63,11 +64,14 @@ class GleanerConfig:
     chart_map: list[list[str | None]] = chart_map
 
     # Explorer config
-    n_epoch: int
-    n_candidates: int
+    n_epoch: int = 50
+    n_candidates: int = 100
     n_search_space: int = 100
     n_beam: int = 10
-    halving_ratio: float
+    halving_ratio: float = 0.1
+
+    # Oracle Config
+    weight: OracleWeight
 
     def __init__(
         self,
@@ -82,12 +86,8 @@ class GleanerConfig:
         self.n_candidates = n_candidates
         self.halving_ratio = halving_ratio
         self.df = df
+        self.weight = OracleWeight()
         self.init_constraints()
-
-    def give_constraints(self, constraints: list[str]):
-        self.attr_names = [m for m in self.attr_names if m not in constraints]
-        self.chart_type = [m for m in self.chart_type if m not in constraints]
-        self.agg_type = [m for m in self.agg_type if m not in constraints]
 
     def init_constraints(self):
         self.attr_names = [
@@ -95,8 +95,33 @@ class GleanerConfig:
             for col in self.df.columns
             if (self.df[col].dtype == "object" and self.df[col].nunique() < 10) or self.df[col].dtype != "object"
         ]
+        self.df = self.df[self.attr_names]
         self.attrs: list[Attribute] = [
             Attribute(col, "C" if self.df[col].dtype == "object" else "Q") for col in self.attr_names
         ]
         self.chart_type = list(set([m[0] for m in chart_map]))
         self.agg_type = list(set([m[-1] for m in chart_map]))
+
+    def update_constraints(self, constraints: list[str]):
+        self.attr_names = [m for m in self.attr_names if m not in constraints]
+        self.chart_type = [m for m in self.chart_type if m not in constraints]
+        self.agg_type = [m for m in self.agg_type if m not in constraints]
+
+    def update_weight(
+        self,
+        specificity: float | None = None,
+        interestingness: float | None = None,
+        coverage: float | None = None,
+        diversity: float | None = None,
+        parsimony: float | None = None,
+    ):
+        if specificity is not None:
+            self.weight.specificity = specificity
+        if interestingness is not None:
+            self.weight.interestingness = interestingness
+        if coverage is not None:
+            self.weight.coverage = coverage
+        if diversity is not None:
+            self.weight.diversity = diversity
+        if parsimony is not None:
+            self.weight.parsimony = parsimony

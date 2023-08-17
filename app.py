@@ -30,7 +30,7 @@ app.add_middleware(
 
 @app.get("/init")
 async def init() -> InitResponse:
-    gl.__init__(df)
+    gl.update_config()
     return InitResponse(
         chartTypes=list(chart_types.values()),
         aggregations=list(agg_types.values()),
@@ -41,16 +41,15 @@ async def init() -> InitResponse:
 
 @app.post("/train")
 async def train(train: TrainBody) -> TrainResponse:
-    gl.__init__(df)
-    gl.config.give_constraints(train.constraints)
-    gl.oracle.update(
+    gl.config.update_constraints(train.constraints)
+    gl.config.update_weight(
         specificity=train.weight.specificity,
         interestingness=train.weight.interestingness,
         coverage=train.weight.coverage,
         diversity=train.weight.diversity,
         parsimony=train.weight.parsimony,
     )
-    print(train.constraints, train.preferences)
+    gl.update_config()
     train_result = gl.train(train.preferences)[-1]
     attrs, cts, ags = gl.generator.prior.export()
     return TrainResponse(
@@ -74,7 +73,6 @@ async def infer(body: InferBody) -> InferResponse:
 
 @app.post("/recommend")
 async def recommend(body: RecommendBody) -> RecommendResponse:
-    print(body)
     charts = [get_gleaner_chart_from_key(c) for c in body.chartKeys]
     results = gl.recommend(GleanerDashboard(charts), body.nResults)
     return RecommendResponse(

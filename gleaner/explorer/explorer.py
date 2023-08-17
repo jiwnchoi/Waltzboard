@@ -49,8 +49,8 @@ class Explorer:
     dashboard: GleanerDashboard | None = None
     result: OracleResult | None = None
 
-    def __init__(self, df: pd.DataFrame, config: GleanerConfig) -> None:
-        self.df = df
+    def __init__(self, config: "GleanerConfig"):
+        self.df = config.df
         self.config = config
 
     def _infer(

@@ -8,5 +8,5 @@ def get_coverage_from_nodes(nodes: list["GleanerChart"], df: pd.DataFrame) -> fl
     full_coverage = {key: 0.0 for key in list(df.columns)}
     for coverage in coverages:
         for key, value in coverage.items():
-            full_coverage[key] = min(1, full_coverage[key] + value)
+            full_coverage[key] = min(1.0, full_coverage[key] + value)
     return sum(full_coverage.values()) / (len(full_coverage))

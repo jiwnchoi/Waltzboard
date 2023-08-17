@@ -1,3 +1,4 @@
+from typing import Optional
 from dataclasses import dataclass
 import pandas as pd
 
@@ -16,11 +17,18 @@ class Gleaner:
     config: GleanerConfig
     preferences: list[str]
 
-    def __init__(self, df: pd.DataFrame) -> None:
-        self.config = GleanerConfig(df)
-        self.oracle = Oracle(df)
-        self.generator = Generator(df, self.config)
-        self.explorer = Explorer(df, self.config)
+    def __init__(self, df: pd.DataFrame, config: GleanerConfig | None = None) -> None:
+        self.df = df
+        if config and (df is not config.df):
+            raise RuntimeError("df and config.df must be same")
+
+        self.config = GleanerConfig(df) if not config else config
+        self.update_config()
+
+    def update_config(self):
+        self.oracle = Oracle(self.config)
+        self.generator = Generator(self.config)
+        self.explorer = Explorer(self.config)
 
     def train_display(self, preferences: list[str]) -> None:
         self.preferences = preferences

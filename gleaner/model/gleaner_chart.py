@@ -322,7 +322,8 @@ class GleanerChart:
         return bov
 
     def get_coverage(self, raw_df: pd.DataFrame) -> dict[str, float]:
-        row_ratio = len(self.sub_df) / len(raw_df)
+        # row_ratio = len(self.sub_df) / len(raw_df)
+        row_ratio = 1
         coverage = {attr.name: 1.0 * row_ratio for attr in self.attrs}
         if self.binnings:
             for binning in self.binnings:
