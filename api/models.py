@@ -141,13 +141,13 @@ class InitResponse(BaseModel):
 class InferResponse(BaseModel):
     charts: list[GleanerChartModel]
     result: OracleResultModel
-    dist: ScoreDistModel
 
 
 class TrainResponse(BaseModel):
     attribute: list[AttributeDistModel]
     chartType: list[ChartTypeDistModel]
     aggregation: list[AggregationDistModel]
+    result: ScoreDistModel
 
 
 class RecommendResponse(BaseModel):

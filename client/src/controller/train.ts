@@ -27,6 +27,14 @@ const trainResponseSignal = signal<TrainResponse>({
     attribute: [],
     chartType: [],
     aggregation: [],
+    result: {
+        score: [],
+        specificity: [],
+        interestingness: [],
+        coverage: [],
+        diversity: [],
+        parsimony: [],
+    }
 });
 
 const attributeDistSignal = computed(() => trainResponseSignal.value.attribute);
@@ -34,6 +42,8 @@ const attributeDistSignal = computed(() => trainResponseSignal.value.attribute);
 const chartTypeDistSignal = computed(() => trainResponseSignal.value.chartType);
 
 const aggregationDistSignal = computed(() => trainResponseSignal.value.aggregation);
+
+const scoreDistSignal = computed(() => trainResponseSignal.value.result);
 
 const trainGleaner = async () => {
     const response: TrainResponse = (await axios.post(`${URI}/train`, trainBodySignal.peek())).data;
@@ -49,6 +59,7 @@ export {
     aggregationDistSignal,
     attributeDistSignal,
     chartTypeDistSignal,
+    scoreDistSignal,
     isTrainedSignal,
     isTrainingSignal,
     trainGleaner

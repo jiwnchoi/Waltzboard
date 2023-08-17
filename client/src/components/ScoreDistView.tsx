@@ -6,6 +6,7 @@ import { inferResponseSignal } from '../controller/infer';
 import { ScaleSVG } from '@visx/responsive';
 import { Group } from '@visx/group';
 import { schemeCategory10 } from 'd3-scale-chromatic';
+import { scoreDistSignal } from '../controller/train';
 
 interface Margin {
   top: number;
@@ -204,7 +205,7 @@ export const RadarMark = (props: RadarMarkProps) => {
   );
 };
 export const ScoreDistView = ({ width, height }: ScoreDistViewProps) => {
-  const scoreDist = inferResponseSignal.peek().dist;
+  const scoreDist = scoreDistSignal.value;
   const sortedScoreDist = {
     score: scoreDist.score.sort((a, b) => a - b),
     specificity: scoreDist.specificity.sort((a, b) => a - b),

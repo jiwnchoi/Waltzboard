@@ -15,26 +15,16 @@ const inferResponseSignal = signal<InferResponse>({
         interestingness: 0,
         parsimony: 0,
     },
-    dist: {
-        score: [],
-        specificity: [],
-        interestingness: [],
-        coverage: [],
-        diversity: [],
-        parsimony: [],
-    },
 });
-
 
 const inferBodySignal = computed<InferBody>(() => {
     return {
         nCharts: configSignal.value.nChart,
         chartKeys: pinnedKeysSignal.value,
-    }
+    };
 });
 
 const isInferingSignal = signal<boolean>(false);
-
 
 const inferDashboard = async () => {
     const response = await axios.post(`${URI}/infer`, inferBodySignal.peek());
@@ -42,10 +32,4 @@ const inferDashboard = async () => {
     isInferingSignal.value = false;
 };
 
-
-export {
-    inferResponseSignal,
-    isInferingSignal,
-    inferBodySignal,
-    inferDashboard,
-};
+export { inferBodySignal, inferDashboard, inferResponseSignal, isInferingSignal };

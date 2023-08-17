@@ -12,7 +12,7 @@ from gleaner.model import get_gleaner_chart_from_key
 df = data.movies()
 
 gl = Gleaner(df)
-gl.config.n_epoch = 10
+gl.config.n_epoch = 5
 app = FastAPI()
 
 
@@ -51,42 +51,24 @@ async def train(train: TrainBody) -> TrainResponse:
         parsimony=train.weight.parsimony,
     )
     print(train.constraints, train.preferences)
-    train_result = gl.train(train.preferences)
+    train_result = gl.train(train.preferences)[-1]
     attrs, cts, ags = gl.generator.prior.export()
     return TrainResponse(
         attribute=[AttributeDistModel.model_validate(attr) for attr in attrs],
         chartType=[ChartTypeDistModel.model_validate(ct) for ct in cts],
         aggregation=[AggregationDistModel.model_validate(ag) for ag in ags],
+        result=ScoreDistModel.model_validate(train_result.to_dict()),
     )
 
 
 @app.post("/infer")
 async def infer(body: InferBody) -> InferResponse:
-    (
-        result_n_scores,
-        raw_scores,
-        normalized_scores,
-        specificity,
-        interestingness,
-        coverage,
-        diversity,
-        parsimony,
-    ) = gl.explorer._infer(gl.generator, gl.oracle, gl.preferences)
-    dashboard = result_n_scores[0][1]
-    result = result_n_scores[0][0]
+    dashboard, result = gl.explorer.search(gl.generator, gl.oracle, gl.preferences)
     charts = [GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in dashboard.charts]
 
     return InferResponse(
         charts=charts,
         result=OracleResultModel.from_oracle_result(result),
-        dist=ScoreDistModel(
-            score=list(raw_scores),
-            specificity=list(specificity),
-            interestingness=list(interestingness),
-            coverage=list(coverage),
-            diversity=list(diversity),
-            parsimony=list(parsimony),
-        ),
     )
 
 

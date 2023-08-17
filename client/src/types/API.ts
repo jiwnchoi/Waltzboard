@@ -28,10 +28,9 @@ interface GleanerChartModel {
     statistics: StatisticFeature;
 }
 
-
 interface InferBody {
     nCharts: number | null;
-    chartKeys: string[]
+    chartKeys: string[];
 }
 
 interface TrainBody {
@@ -41,7 +40,7 @@ interface TrainBody {
 }
 
 interface RecommendBody {
-    chartKeys: string[]
+    chartKeys: string[];
     nResults: number;
 }
 
@@ -62,7 +61,6 @@ interface InitResponse {
 interface InferResponse {
     charts: GleanerChartModel[];
     result: OracleResult;
-    dist: ScoreDistModel;
 }
 
 interface RecommendResponse {
@@ -73,6 +71,7 @@ interface TrainResponse {
     attribute: AttributeDist[];
     chartType: ChartTypeDist[];
     aggregation: AggregationDist[];
+    result: ScoreDistModel;
 }
 
 interface ScoreBody {
@@ -84,16 +83,16 @@ interface ScoreResponse {
 }
 
 export type {
-    InitResponse,
-    InferResponse,
-    RecommendResponse,
-    TrainResponse,
-    InferBody,
-    TrainBody,
-    RecommendBody,
-    SetConfigBody,
-    GleanerChartModel,
     AttributeModel,
+    GleanerChartModel,
+    InferBody,
+    InferResponse,
+    InitResponse,
+    RecommendBody,
+    RecommendResponse,
     ScoreBody,
     ScoreResponse,
+    SetConfigBody,
+    TrainBody,
+    TrainResponse,
 };
