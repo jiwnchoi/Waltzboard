@@ -1,6 +1,7 @@
 from gleaner.model import Attribute
 import pandas as pd
 from gleaner.oracle import OracleWeight
+from collections import Counter
 
 
 chart_map = [
@@ -9,9 +10,9 @@ chart_map = [
     ["Q", None, None, "boxplot", None],
     ["C", None, None, "bar", "count"],
     ["C", None, None, "arc", "count"],
-    ["T", None, None, "bar", "count"],
-    ["T", None, None, "arc", "count"],
-    ["T", None, None, "tick", None],
+    # ["T", None, None, "bar", "count"],
+    # ["T", None, None, "arc", "count"],
+    # ["T", None, None, "tick", None],
     ["Q", "Q", None, "point", None],
     ["Q", "Q", None, "rect", "count"],
     ["C", "Q", None, "bar", "sum"],
@@ -61,7 +62,7 @@ class GleanerConfig:
     attr_names: list[str]
     chart_type: list[str]
     agg_type: list[str]
-    chart_map: list[list[str | None]] = chart_map
+    chart_map: list[list[str | None]]
 
     # Explorer config
     n_epoch: int = 50
@@ -84,6 +85,7 @@ class GleanerConfig:
         self.robustness = robustness
         self.n_epoch = n_epoch
         self.n_candidates = n_candidates
+        self.chart_map = chart_map
         self.halving_ratio = halving_ratio
         self.df = df
         self.weight = OracleWeight()
@@ -96,16 +98,38 @@ class GleanerConfig:
             if (self.df[col].dtype == "object" and self.df[col].nunique() < 10) or self.df[col].dtype != "object"
         ]
         self.df = self.df[self.attr_names]
-        self.attrs: list[Attribute] = [
-            Attribute(col, "C" if self.df[col].dtype == "object" else "Q") for col in self.attr_names
-        ]
+        self.attrs = self.get_attrs()
         self.chart_type = list(set([m[0] for m in chart_map]))
         self.agg_type = list(set([m[-1] for m in chart_map]))
+        self.chart_map = chart_map
+
+    def get_attrs(self) -> list[Attribute | None]:
+        return [None] + [Attribute(col, "C" if self.df[col].dtype == "object" else "Q") for col in self.attr_names]
+
+    def get_chart_map(self) -> list[list[str | None]]:
+        def get_type(counter: Counter, key: str) -> int:
+            return counter[key] if key in counter else 0
+
+        filtered_chart_map = [c for c in chart_map if c[0] in self.chart_type and c[4] in self.agg_type]  # type: ignore
+        attr_types = [a.type if a is not None else None for a in self.get_attrs()]
+        attr_type_counter = Counter(attr_types)
+        filtered_chart_map = [
+            c
+            for c in chart_map
+            if get_type(Counter(c), "C") <= attr_type_counter["C"]
+            and get_type(Counter(c), "Q") <= attr_type_counter["Q"]
+            and get_type(Counter(c), "T") <= attr_type_counter["T"]
+        ]
+        print(f"filtered_chart_map: {(filtered_chart_map)}")
+        return filtered_chart_map
 
     def update_constraints(self, constraints: list[str]):
+        self.init_constraints()
         self.attr_names = [m for m in self.attr_names if m not in constraints]
+        self.attrs = self.get_attrs()
         self.chart_type = [m for m in self.chart_type if m not in constraints]
         self.agg_type = [m for m in self.agg_type if m not in constraints]
+        self.chart_map = self.get_chart_map()
 
     def update_weight(
         self,

@@ -18,18 +18,17 @@ def is_valid_map(current: list, map: list) -> bool:
 class Generator:
     def __init__(self, config: "GleanerConfig") -> None:
         self.df = config.df
-        self.attrs = [None] + config.attrs
         self.config = config
         self.prior = PriorParameters(self.config)
 
-    def attr_mask(self, current: list["Attribute"]):
+    def attr_mask(self, current: list):
         valid_map = [e for e in self.config.chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
         weight_mask = np.array(
             [
                 (e is None and e in valid_type)
                 or (isinstance(e, Attribute) and e.type in valid_type and e not in current)
-                for e in self.attrs
+                for e in self.config.attrs
             ]
         )
         return weight_mask
@@ -48,16 +47,17 @@ class Generator:
 
     def sample_one(self) -> GleanerChart:
         current: list = []
-        current.append(choice(self.config.chart_type, p=p(self.prior.ct.sample())))
+        mask_ct = self.ct_mask(current)
+        current.append(choice(self.config.chart_type, p=p(self.prior.ct.sample() * mask_ct)))
 
         mask_x = self.attr_mask(current)
-        current.append(choice(self.attrs, p=p(self.prior.x.sample() * mask_x)))  # type: ignore
+        current.append(choice(self.config.attrs, p=p(self.prior.x.sample() * mask_x)))  # type: ignore
 
         mask_y = self.attr_mask(current)
-        current.append(choice(self.attrs, p=p(self.prior.y.sample() * mask_y)))  # type: ignore
+        current.append(choice(self.config.attrs, p=p(self.prior.y.sample() * mask_y)))  # type: ignore
 
         mask_z = self.attr_mask(current)
-        current.append(choice(self.attrs, p=p(self.prior.z.sample() * mask_z)))  # type: ignore
+        current.append(choice(self.config.attrs, p=p(self.prior.z.sample() * mask_z)))  # type: ignore
 
         mask_at = self.at_mask(current)
         current.append(choice(self.config.agg_type, p=p(self.prior.at.sample() * mask_at)))
@@ -68,7 +68,12 @@ class Generator:
         keys: set[str] = set()
         charts: list[GleanerChart] = []
 
+        limit = 0
         while len(charts) < n:
+            limit += 1
+            if limit > 1000:
+                print("Cannot sample enough charts", len(charts), n)
+                break
             chart = self.sample_one()
             if str(chart.sample) not in keys:
                 keys.add(str(chart.sample))

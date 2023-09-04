@@ -121,7 +121,7 @@ export const RadarAxis = (props: RadarAxisProps & { data: number[] }) => {
             {LABEL[(i + 4) % LABEL.length]}
           </Text>
           <Text
-            key={`radar-label-${i}`}
+            key={`radar-score-${i}`}
             x={labelPoints[i].x}
             y={labelPoints[i].y}
             fontSize={14}

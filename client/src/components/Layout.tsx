@@ -24,7 +24,16 @@ const Header = () => {
 
 const Footer = () => {
   return (
-    <Flex mt="auto" align="center" py={4} px={4} flexDir="column" alignItems="start" position={"fixed"} bottom={0}>
+    <Flex
+      mt="auto"
+      align="center"
+      py={4}
+      px={4}
+      flexDir="column"
+      alignItems="start"
+      position={'relative'}
+      bottom={0}
+    >
       <Link href="https://idclab.skku.edu" isExternal>
         <Flex>
           <Text variant={'layout'} fontFamily="Rajdhani" fontWeight={900} fontSize="xl">
@@ -91,15 +100,12 @@ const Section = (props: SectionProps) => {
           borderRadius="md"
           boxShadow="sm"
           maxH={props.maxH}
-          overflow={"scroll"}
-          sx={
-            {
-              '::-webkit-scrollbar': {
-                display: 'none',
-              },
-            }
-          }
-          
+          overflow={'scroll'}
+          sx={{
+            '::-webkit-scrollbar': {
+              display: 'none',
+            },
+          }}
         >
           {props.children}
         </Flex>
@@ -148,8 +154,7 @@ const HSection = (props: SectionProps) => {
         </Flex>
       </Collapse>
     </Flex>
-
-  )
-}
+  );
+};
 
 export { Header, Footer, Section, HSection };

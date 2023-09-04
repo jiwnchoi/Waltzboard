@@ -7,6 +7,7 @@ from api.config import config
 from api.models import *
 
 from gleaner import Gleaner, GleanerChart, GleanerDashboard
+from gleaner.config import GleanerConfig
 from gleaner.model import get_gleaner_chart_from_key
 
 df = data.movies()
@@ -30,17 +31,20 @@ app.add_middleware(
 
 @app.get("/init")
 async def init() -> InitResponse:
+    gl.__init__(df)
+    gl.config.n_epoch = 5
     gl.update_config()
     return InitResponse(
         chartTypes=list(chart_types.values()),
         aggregations=list(agg_types.values()),
         taskTypes=list(task_types.values()),
-        attributes=[AttributeModel(name=a.name, type=a.type) for a in gl.config.attrs],
+        attributes=[AttributeModel(name=a.name, type=a.type) for a in gl.config.attrs[1:]],  # type: ignore
     )
 
 
 @app.post("/train")
 async def train(train: TrainBody) -> TrainResponse:
+    print(train)
     gl.config.update_constraints(train.constraints)
     gl.config.update_weight(
         specificity=train.weight.specificity,
@@ -62,6 +66,7 @@ async def train(train: TrainBody) -> TrainResponse:
 
 @app.post("/infer")
 async def infer(body: InferBody) -> InferResponse:
+    print(f"infer: {body}")
     dashboard, result = gl.explorer.search(gl.generator, gl.oracle, gl.preferences)
     charts = [GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in dashboard.charts]
 

@@ -7,16 +7,14 @@ const App = () => (
   <Flex flexDir={'column'}>
     <Header />
     {initializedSignal.value ? (
-      <>
-        <Main />
-        <Footer />
-      </>
+      <Main />
     ) : (
       <Center minH={'80vh'} flexDir="column" gap={10}>
         Loading ...
         <Spinner size="xl" />
       </Center>
     )}
+    <Footer />
   </Flex>
 );
 
