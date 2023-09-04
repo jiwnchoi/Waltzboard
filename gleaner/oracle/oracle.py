@@ -31,9 +31,9 @@ class Oracle:
             weight=self.weight,
             specificity=get_specificity_from_nodes(nodes, preferences),
             interestingness=get_interestingness(nodes),
-            coverage=get_coverage_from_nodes(nodes, self.df),
+            coverage=get_coverage_from_nodes(nodes, self.config.attr_names),
             diversity=get_diversity_from_nodes(nodes, preferences),
-            parsimony=get_parsimony_from_nodes(nodes, self.df),
+            parsimony=get_parsimony_from_nodes(nodes, self.config.attr_names),
         )
 
     def get_statistics_from_chart(self, chart: "GleanerChart") -> dict[str, list[str | None]]:

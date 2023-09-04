@@ -32,6 +32,7 @@ class GleanerChart:
     sample: list[Union["Attribute", str, None]]
     key: str
     index: Optional[int]
+    df: pd.DataFrame
     sub_df: pd.DataFrame
     attrs: list["Attribute"]
 
@@ -45,6 +46,7 @@ class GleanerChart:
 
     def __init__(self, result: list, df: pd.DataFrame) -> None:
         chart_type, x, y, z, agg_type = result
+        self.df = df
         self.key = str(
             [
                 chart_type,
@@ -321,7 +323,7 @@ class GleanerChart:
             bov.add(self.encoding.chart_type)
         return bov
 
-    def get_coverage(self, raw_df: pd.DataFrame) -> dict[str, float]:
+    def get_coverage(self) -> dict[str, float]:
         # row_ratio = len(self.sub_df) / len(raw_df)
         row_ratio = 1
         coverage = {attr.name: 1.0 * row_ratio for attr in self.attrs}
