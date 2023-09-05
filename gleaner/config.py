@@ -2,58 +2,7 @@ from gleaner.model import Attribute
 import pandas as pd
 from gleaner.oracle import OracleWeight
 from collections import Counter
-
-
-chart_map = [
-    ["Q", None, None, "bar", "count"],
-    ["Q", None, None, "tick", None],
-    ["Q", None, None, "boxplot", None],
-    ["N", None, None, "bar", "count"],
-    ["N", None, None, "arc", "count"],
-    # ["T", None, None, "bar", "count"],
-    # ["T", None, None, "arc", "count"],
-    # ["T", None, None, "tick", None],
-    ["Q", "Q", None, "point", None],
-    ["Q", "Q", None, "rect", "count"],
-    ["N", "Q", None, "bar", "sum"],
-    ["N", "Q", None, "bar", "mean"],
-    ["N", "Q", None, "bar", "max"],
-    ["N", "Q", None, "bar", "min"],
-    ["N", "Q", None, "arc", "sum"],
-    ["N", "Q", None, "arc", "mean"],
-    ["N", "Q", None, "arc", "max"],
-    ["N", "Q", None, "arc", "min"],
-    ["N", "Q", None, "tick", None],
-    ["N", "Q", None, "boxplot", None],
-    # Layered Histogram
-    ["Q", "N", None, "bar", "count"],
-    # cc heatmap
-    ["N", "N", None, "rect", "count"],
-    # tq
-    # ["T", "Q", None, "line", "max"],
-    # ["T", "Q", None, "line", "mean"],
-    # ["T", "Q", None, "line", "sum"],
-    # ["T", "Q", None, "line", "min"],
-    # colored scatter qqq
-    ["Q", "Q", "Q", "point", None],
-    # heatmap agg to xy
-    ["Q", "Q", "Q", "rect", "max"],
-    ["Q", "Q", "Q", "rect", "mean"],
-    # Colored scatter qqc
-    ["Q", "Q", "N", "point", None],
-    # heatmap bin to q, agg to q
-    ["Q", "N", "Q", "rect", "max"],
-    ["Q", "N", "Q", "rect", "mean"],
-    # Stacked Bar agg to q
-    ["N", "Q", "N", "bar", "sum"],
-    # Heatmap agg to q
-    ["N", "N", "Q", "rect", "mean"],
-    ["N", "N", "Q", "rect", "max"],
-]
-
-for c in chart_map:
-    mark = c.pop(3)
-    c.insert(0, mark)
+from gleaner.model import ChartMap, ChartKeyTokens, ChartMapType
 
 
 class GleanerConfig:
@@ -62,7 +11,7 @@ class GleanerConfig:
     attr_names: list[str]
     chart_type: list[str]
     agg_type: list[str]
-    chart_map: list[list[str | None]]
+    chart_map: dict[ChartKeyTokens, type]
 
     # Explorer config
     n_epoch: int = 50
@@ -85,7 +34,7 @@ class GleanerConfig:
         self.robustness = robustness
         self.n_epoch = n_epoch
         self.n_candidates = n_candidates
-        self.chart_map = chart_map
+        self.chart_map = ChartMap
         self.halving_ratio = halving_ratio
         self.df = df
         self.weight = OracleWeight()
@@ -99,28 +48,39 @@ class GleanerConfig:
         ]
         self.df = self.df[self.attr_names]
         self.attrs = self.get_attrs()
-        self.chart_type = list(set([m[0] for m in chart_map]))
-        self.agg_type = list(set([m[-1] for m in chart_map]))
-        self.chart_map = chart_map
+        self.chart_type = list(set([m[0] for m in ChartMap]))
+        self.txs = list(set([m[4] for m in ChartMap if m[4]]))
+        self.tys = list(set([m[5] for m in ChartMap if m[5]]))
+        self.tzs = list(set([m[6] for m in ChartMap if m[6]]))
+        self.agg_type = list(set(self.txs + self.tys + self.tzs))
+        self.chart_map = ChartMap
 
-    def get_attrs(self) -> list[Attribute | None]:
-        return [None] + [Attribute(col, "N" if self.df[col].dtype == "object" else "Q") for col in self.attr_names]
+    def get_attrs(self) -> list[Attribute]:
+        return [Attribute(None, None)] + [
+            Attribute(col, "N" if self.df[col].dtype == "object" else "Q") for col in self.attr_names
+        ]
 
-    def get_chart_map(self) -> list[list[str | None]]:
+    def get_chart_map(self) -> ChartMapType:
         def get_type(counter: Counter, key: str) -> int:
             return counter[key] if key in counter else 0
 
-        filtered_chart_map = [c for c in chart_map if c[0] in self.chart_type and c[4] in self.agg_type]  # type: ignore
-        attr_types = [a.type if a is not None else None for a in self.get_attrs()]
+        filtered_chart_map = {
+            key: value
+            for key, value in ChartMap.items()
+            if key[0] in self.chart_type
+            and key[4] in self.agg_type
+            and key[5] in self.agg_type
+            and key[6] in self.agg_type
+        }
+        attr_types = [a.type for a in self.get_attrs() if a.type]
         attr_type_counter = Counter(attr_types)
-        filtered_chart_map = [
-            c
-            for c in chart_map
-            if get_type(Counter(c), "N") <= attr_type_counter["N"]
-            and get_type(Counter(c), "Q") <= attr_type_counter["Q"]
-            and get_type(Counter(c), "T") <= attr_type_counter["T"]
-        ]
-        print(f"filtered_chart_map: {(filtered_chart_map)}")
+        filtered_chart_map = {
+            key: value
+            for key, value in ChartMap.items()
+            if get_type(Counter(key), "N") <= attr_type_counter["N"]
+            and get_type(Counter(key), "Q") <= attr_type_counter["Q"]
+            and get_type(Counter(key), "T") <= attr_type_counter["T"]
+        }
         return filtered_chart_map
 
     def update_constraints(self, constraints: list[str]):

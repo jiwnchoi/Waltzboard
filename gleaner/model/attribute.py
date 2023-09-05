@@ -5,8 +5,8 @@ AttrTypes = Literal["Q", "N", "T"] | None
 
 
 @dataclass
-class AttributeNotNull:
-    name: str
+class Attribute:
+    name: str | None
     type: AttrTypes
 
     def __str__(self):
@@ -22,7 +22,3 @@ class AttributeNotNull:
             "T": "temporal",
             None: None,
         }[self.type]
-
-
-class Attribute(AttributeNotNull):
-    name: str | None

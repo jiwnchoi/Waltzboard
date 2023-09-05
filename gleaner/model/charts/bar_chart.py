@@ -11,6 +11,7 @@ class SingleBarChart(BaseChart):
             x=alt.X(
                 self.altair_token.x,
                 timeUnit=self.altair_token.agg_x,
+                bin=True if self.altair_token.x[-1] == "Q" else False,
             )
         )
         c: alt.Chart = c.encode(y=alt.Y(y=self.altair_token.y, aggregate=self.altair_token.agg_y))

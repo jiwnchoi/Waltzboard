@@ -5,18 +5,18 @@ from typing import Literal, Optional, Set, Tuple, Union
 import altair as alt
 import pandas as pd
 
-from gleaner.model import Attribute, AttributeNotNull
+from gleaner.model import Attribute
 
 from .attribute import AttrTypes
 from .data_transforms import AggTypes, AggXTypes
 from .charts import BaseChart
-from .chart_map import chart_map
+from .chart_map import ChartMap
 
 MarkTypes = Literal["bar", "arc", "tick", "point", "rect", "line", "boxplot"]
 
 AllTokenTypes = MarkTypes | AttrTypes | AggTypes | AggXTypes
 
-ChartSampled = tuple[MarkTypes, AttributeNotNull, Attribute, Attribute, AggXTypes, AggTypes, AggTypes]
+ChartSampled = tuple[MarkTypes, Attribute, Attribute, Attribute, AggXTypes, AggTypes, AggTypes]
 ChartTokens = tuple[MarkTypes, str, str | None, str | None, AggXTypes, AggTypes, AggTypes]
 ChartKeyTokens = tuple[MarkTypes, AttrTypes, AttrTypes, AttrTypes, AggXTypes, AggTypes, AggTypes]
 
@@ -51,5 +51,5 @@ def get_gleaner_chart(sample: ChartSampled, df: pd.DataFrame) -> "BaseChart":
         sample[5],
         sample[6],
     )
-    chart = chart_hash.get(chart_tokens)
-    return chart if chart else chart_map[chart_key_tokens](sample, df)
+    chart = chart_hash.get(chart_tokens)  # type: ignore
+    return chart if chart else ChartMap[chart_key_tokens](sample, df)

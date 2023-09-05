@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from gleaner.model.attribute import Attribute, AttributeNotNull
+    from gleaner.model.attribute import Attribute
 
 
 class BaseChart:
     tokens: ChartTokens
     df: pd.DataFrame
-    attrs: list["Attribute | AttributeNotNull"]
+    attrs: list["Attribute"]
     num_attrs: int
     agg_types: list[AggXTypes | AggTypes]
     num_aggs: int
@@ -23,7 +23,7 @@ class BaseChart:
         mark, x, y, z, tx, ty, tz = result
         self.tokens: ChartTokens = (
             mark,
-            x.name,
+            x.name,  # type: ignore
             y.name,
             z.name,
             tx,

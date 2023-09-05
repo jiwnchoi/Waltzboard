@@ -7,7 +7,7 @@ import numpy as np
 from gleaner.explorer import TrainResult
 
 from gleaner.oracle import Oracle, OracleResult
-from gleaner.model import GleanerChart, GleanerDashboard
+from gleaner.model import GleanerDashboard
 from gleaner.config import GleanerConfig
 
 from gleaner.generator import Generator
@@ -28,10 +28,10 @@ class PosteriorCounter(Counter):
 class Counters:
     def __init__(self, attr_names):
         self.attr_names = attr_names
+        self.ct = PosteriorCounter(attr_names)
         self.x = PosteriorCounter(attr_names)
         self.y = PosteriorCounter(attr_names)
         self.z = PosteriorCounter(attr_names)
-        self.ct = PosteriorCounter(attr_names)
         self.at = PosteriorCounter(attr_names)
 
     def update(self, node: GleanerChart):

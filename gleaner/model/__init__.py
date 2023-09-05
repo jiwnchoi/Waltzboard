@@ -1,5 +1,6 @@
 from .attribute import Attribute, AttrTypes, AttributeNotNull
 from .data_transforms import AggTypes, AggXTypes
+from .chart_map import *
 from .gleaner_chart import (
     BaseChart,
     get_gleaner_chart,

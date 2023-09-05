@@ -1,7 +1,9 @@
 from .charts import *
 from gleaner.model.gleaner_chart import ChartKeyTokens
 
-chart_map: dict[ChartKeyTokens, type] = {
+ChartMapType = dict[ChartKeyTokens, type]
+
+ChartMap: ChartMapType = {
     # Bar Chart (Single)
     ("bar", "Q", None, None, None, "count", None): SingleBarChart,
     ("bar", "T", None, None, "year", "count", None): SingleBarChart,

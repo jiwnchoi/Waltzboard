@@ -1,5 +1,6 @@
 import pandas as pd
 from gleaner.config import GleanerConfig
+from gleaner.model import Attribute
 import numpy as np
 from IPython.display import display
 
@@ -18,7 +19,7 @@ class DirichletPrior:
     def update(self, x: np.ndarray):
         r = np.sum(self.count)
         self.count += x
-        self.count = self.count / np.sum(self.count) * r
+        self.count = self.count / np.sum(self.count) * r  # type: ignore
         self.history.append(np.copy(self.count))
 
     def sample(self):
@@ -44,28 +45,30 @@ class NormalPrior:
 
 
 class PriorParameters:
+    ct: DirichletPrior
     x: DirichletPrior
     y: DirichletPrior
     z: DirichletPrior
-    ct: DirichletPrior
-    at: DirichletPrior
+    tx: DirichletPrior
+    ty: DirichletPrior
+    tz: DirichletPrior
     n_charts: NormalPrior
-    attrs: list[str | None]
+    attrs: list[Attribute]
 
     def __init__(
         self,
         config: GleanerConfig,
     ) -> None:
         self.config = config
-
-        attrs: list[str | None] = [None] + self.config.attr_names
-        self.attrs = attrs
-        self.x = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
-        self.y = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
-        self.z = DirichletPrior(np.ones(len(attrs)) * self.config.robustness)
+        self.attrs = self.config.attrs
         self.ct = DirichletPrior(np.ones(len(self.config.chart_type)) * self.config.robustness)
-        self.at = DirichletPrior(np.ones(len(self.config.agg_type)) * self.config.robustness)
-        self.n_charts = NormalPrior(len(attrs) - 1)
+        self.x = DirichletPrior(np.ones(len(self.attrs)) * self.config.robustness)
+        self.y = DirichletPrior(np.ones(len(self.attrs)) * self.config.robustness)
+        self.z = DirichletPrior(np.ones(len(self.attrs)) * self.config.robustness)
+        self.tx = DirichletPrior(np.ones(len(self.config.txs)) * self.config.robustness)
+        self.ty = DirichletPrior(np.ones(len(self.config.tys)) * self.config.robustness)
+        self.tz = DirichletPrior(np.ones(len(self.config.tzs)) * self.config.robustness)
+        self.n_charts = NormalPrior(len(self.attrs) - 1)
 
     def display(self):
         attribute_data = pd.DataFrame(
@@ -80,7 +83,11 @@ class PriorParameters:
             {"ct": self.ct.count / np.sum(self.ct.count)}, index=self.config.chart_type
         ).transpose()
         agg_type_data = pd.DataFrame(
-            {"at": self.at.count / np.sum(self.at.count)}, index=self.config.agg_type
+            {
+                "tx": self.tx.count / np.sum(self.tx.count),
+                "ty": self.ty.count / np.sum(self.ty.count),
+                "tz": self.tz.count / np.sum(self.tz.count),
+            },
         ).transpose()
         display(self.n_charts.mean)
         display(attribute_data)
@@ -107,7 +114,9 @@ class PriorParameters:
         ags = [
             {
                 "name": str(at),
-                "prob": self.at.count[i] / np.sum(self.at.count),
+                "x": self.tx.count[i] / np.sum(self.tx.count),
+                "y": self.ty.count[i] / np.sum(self.ty.count),
+                "z": self.tz.count[i] / np.sum(self.tz.count),
             }
             for i, at in enumerate(self.config.agg_type)
         ]
