@@ -8,27 +8,27 @@ chart_map = [
     ["Q", None, None, "bar", "count"],
     ["Q", None, None, "tick", None],
     ["Q", None, None, "boxplot", None],
-    ["C", None, None, "bar", "count"],
-    ["C", None, None, "arc", "count"],
+    ["N", None, None, "bar", "count"],
+    ["N", None, None, "arc", "count"],
     # ["T", None, None, "bar", "count"],
     # ["T", None, None, "arc", "count"],
     # ["T", None, None, "tick", None],
     ["Q", "Q", None, "point", None],
     ["Q", "Q", None, "rect", "count"],
-    ["C", "Q", None, "bar", "sum"],
-    ["C", "Q", None, "bar", "mean"],
-    ["C", "Q", None, "bar", "max"],
-    ["C", "Q", None, "bar", "min"],
-    ["C", "Q", None, "arc", "sum"],
-    ["C", "Q", None, "arc", "mean"],
-    ["C", "Q", None, "arc", "max"],
-    ["C", "Q", None, "arc", "min"],
-    ["C", "Q", None, "tick", None],
-    ["C", "Q", None, "boxplot", None],
+    ["N", "Q", None, "bar", "sum"],
+    ["N", "Q", None, "bar", "mean"],
+    ["N", "Q", None, "bar", "max"],
+    ["N", "Q", None, "bar", "min"],
+    ["N", "Q", None, "arc", "sum"],
+    ["N", "Q", None, "arc", "mean"],
+    ["N", "Q", None, "arc", "max"],
+    ["N", "Q", None, "arc", "min"],
+    ["N", "Q", None, "tick", None],
+    ["N", "Q", None, "boxplot", None],
     # Layered Histogram
-    ["Q", "C", None, "bar", "count"],
+    ["Q", "N", None, "bar", "count"],
     # cc heatmap
-    ["C", "C", None, "rect", "count"],
+    ["N", "N", None, "rect", "count"],
     # tq
     # ["T", "Q", None, "line", "max"],
     # ["T", "Q", None, "line", "mean"],
@@ -40,15 +40,15 @@ chart_map = [
     ["Q", "Q", "Q", "rect", "max"],
     ["Q", "Q", "Q", "rect", "mean"],
     # Colored scatter qqc
-    ["Q", "Q", "C", "point", None],
+    ["Q", "Q", "N", "point", None],
     # heatmap bin to q, agg to q
-    ["Q", "C", "Q", "rect", "max"],
-    ["Q", "C", "Q", "rect", "mean"],
+    ["Q", "N", "Q", "rect", "max"],
+    ["Q", "N", "Q", "rect", "mean"],
     # Stacked Bar agg to q
-    ["C", "Q", "C", "bar", "sum"],
+    ["N", "Q", "N", "bar", "sum"],
     # Heatmap agg to q
-    ["C", "C", "Q", "rect", "mean"],
-    ["C", "C", "Q", "rect", "max"],
+    ["N", "N", "Q", "rect", "mean"],
+    ["N", "N", "Q", "rect", "max"],
 ]
 
 for c in chart_map:
@@ -104,7 +104,7 @@ class GleanerConfig:
         self.chart_map = chart_map
 
     def get_attrs(self) -> list[Attribute | None]:
-        return [None] + [Attribute(col, "C" if self.df[col].dtype == "object" else "Q") for col in self.attr_names]
+        return [None] + [Attribute(col, "N" if self.df[col].dtype == "object" else "Q") for col in self.attr_names]
 
     def get_chart_map(self) -> list[list[str | None]]:
         def get_type(counter: Counter, key: str) -> int:
@@ -116,7 +116,7 @@ class GleanerConfig:
         filtered_chart_map = [
             c
             for c in chart_map
-            if get_type(Counter(c), "C") <= attr_type_counter["C"]
+            if get_type(Counter(c), "N") <= attr_type_counter["N"]
             and get_type(Counter(c), "Q") <= attr_type_counter["Q"]
             and get_type(Counter(c), "T") <= attr_type_counter["T"]
         ]

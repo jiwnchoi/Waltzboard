@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from typing import Literal
 
+AttrTypes = Literal["Q", "N", "T", None]
+
 
 @dataclass
 class Attribute:
     name: str
-    type: Literal["Q", "C", "T", "O", "N"]
+    type: Types
 
     def __str__(self):
         return self.name
@@ -16,8 +18,7 @@ class Attribute:
     def long_type(self):
         return {
             "Q": "quantitative",
-            "C": "nominal",
+            "N": "nominal",
             "T": "temporal",
-            "O": "ordinal",
             "N": "name",
         }[self.type]

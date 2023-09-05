@@ -78,7 +78,7 @@ class GleanerChart:
         elif dim == 1 and x.type == "Q":
             self.encoding = Encodings(chart_type=chart_type, x=alt.X(x.name, type=x.long_type()))
 
-        elif dim == 1 and x.type == "C" and chart_type == "arc":
+        elif dim == 1 and x.type == "N" and chart_type == "arc":
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -86,7 +86,7 @@ class GleanerChart:
                 y=alt.Theta(x.name, aggregate=agg_type),
             )
 
-        elif dim == 1 and x.type == "C":
+        elif dim == 1 and x.type == "N":
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -110,7 +110,7 @@ class GleanerChart:
                 y=alt.Y(y.name, type=y.long_type()),
             )
 
-        elif dim == 2 and x.type == "C" and y.type == "Q" and chart_type == "bar" and agg_type == "count":
+        elif dim == 2 and x.type == "N" and y.type == "Q" and chart_type == "bar" and agg_type == "count":
             self.binnings = [Binning(x.name)]
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
@@ -120,7 +120,7 @@ class GleanerChart:
                 z=alt.Color(y.name, type=y.long_type()),
             )
 
-        elif dim == 2 and x.type == "C" and y.type == "Q" and chart_type == "bar":
+        elif dim == 2 and x.type == "N" and y.type == "Q" and chart_type == "bar":
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -128,7 +128,7 @@ class GleanerChart:
                 y=alt.Y(y.name, type=y.long_type(), aggregate=agg_type),
             )
 
-        elif dim == 2 and x.type == "C" and y.type == "Q" and chart_type == "arc":
+        elif dim == 2 and x.type == "N" and y.type == "Q" and chart_type == "arc":
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -136,14 +136,14 @@ class GleanerChart:
                 y=alt.Theta(y.name, type=y.long_type(), aggregate=agg_type),
             )
 
-        elif dim == 2 and x.type == "C" and y.type == "Q":
+        elif dim == 2 and x.type == "N" and y.type == "Q":
             self.encoding = Encodings(
                 chart_type=chart_type,
                 x=alt.X(x.name, type=x.long_type()),
                 y=alt.Y(y.name, type=y.long_type()),
             )
 
-        elif dim == 2 and x.type == "Q" and y.type == "C":
+        elif dim == 2 and x.type == "Q" and y.type == "N":
             self.binnings = [Binning(x.name)]
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
@@ -153,7 +153,7 @@ class GleanerChart:
                 z=alt.Color(y.name, type=y.long_type()),
             )
 
-        elif dim == 2 and x.type == "C" and y.type == "C":
+        elif dim == 2 and x.type == "N" and y.type == "N":
             self.aggregation = Aggregation([x.name, y.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -181,7 +181,7 @@ class GleanerChart:
                 z=alt.Color(z.name, type=z.long_type(), aggregate=agg_type),
             )
 
-        elif dim == 3 and x.type == "Q" and y.type == "Q" and z.type == "C":
+        elif dim == 3 and x.type == "Q" and y.type == "Q" and z.type == "N":
             self.encoding = Encodings(
                 chart_type=chart_type,
                 x=alt.X(x.name, type=x.long_type()),
@@ -190,7 +190,7 @@ class GleanerChart:
             )
 
         # qcq rect agg
-        elif dim == 3 and x.type == "Q" and y.type == "C" and z.type == "Q":
+        elif dim == 3 and x.type == "Q" and y.type == "N" and z.type == "Q":
             self.aggregation = Aggregation([x.name, y.name], agg_type)
             self.binnings = [Binning(x.name)]
             self.encoding = Encodings(
@@ -201,7 +201,7 @@ class GleanerChart:
             )
 
         # cqc bar sum
-        elif dim == 3 and x.type == "C" and y.type == "Q" and z.type == "C":
+        elif dim == 3 and x.type == "N" and y.type == "Q" and z.type == "N":
             self.aggregation = Aggregation([x.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -211,7 +211,7 @@ class GleanerChart:
             )
 
         # ccq react mean
-        elif dim == 3 and x.type == "C" and y.type == "C" and z.type == "Q":
+        elif dim == 3 and x.type == "N" and y.type == "N" and z.type == "Q":
             self.aggregation = Aggregation([x.name, y.name], agg_type)
             self.encoding = Encodings(
                 chart_type=chart_type,
@@ -230,10 +230,6 @@ class GleanerChart:
         num_fields = len(self.attrs)
         axis_names = [attr.name for attr in self.attrs]
         value_field_name = axis_names[-1]
-
-        filter_tokens = (
-            [["and" if i > 0 else "", f[0], "is", f[1]] for i, f in enumerate(self.filters)] if self.filters else [],
-        )
 
         tokens: list[str] = [
             [f"{self.aggregation.type[0].upper()}{self.aggregation.type[1:]}", "of"] if self.aggregation else [],
@@ -293,21 +289,6 @@ class GleanerChart:
         self.title_tokens = tokens
         return chart.properties(description=json.dumps(tokens))
 
-    def get_number_of_types(
-        self,
-    ) -> dict[Literal["Q", "C", "T", "O", "N"], list["Attribute"]]:
-        types: dict[Literal["Q", "C", "T", "O", "N"], list["Attribute"]] = {
-            "Q": [],
-            "C": [],
-            "O": [],
-            "T": [],
-            "N": [],
-        }
-        for attr in self.attrs:
-            if self.sub_df[attr.name].nunique() != 1:
-                types[attr.type].append(attr)
-        return types
-
     def get_bov(self) -> Set[str]:
         bov: Set[str] = set()
         bov.update([f"{attr.name}" for attr in self.attrs])
@@ -334,16 +315,3 @@ class GleanerChart:
             for attr in self.aggregation.by:
                 coverage[attr] *= 0.5
         return coverage
-
-    def get_info(self) -> str:
-        info = ""
-        info += f"Attributes: {[attr.name for attr in self.attrs]}\n"
-        if self.filters:
-            info += f"Filters: {[[f[0], f[1]]  for f in self.filters]}\n"
-        if self.binnings:
-            info += f"Binnings: {[binning.by for binning in self.binnings]}\n"
-        if self.aggregation:
-            info += f"Aggregation: {self.aggregation.type}({self.aggregation.by})\n"
-        if self.encoding:
-            info += f"Encodings: {self.encoding}\n"
-        return info

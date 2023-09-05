@@ -97,18 +97,18 @@ def get_statistic_features(node: "GleanerChart") -> dict[str, list[str | None]]:
                         has_skewness_q(df_notnull, comb[0].name),
                         has_kurtosis(df_notnull, comb[0].name),
                     ]
-                elif len(comb) == 1 and comb[0].type == "C":
+                elif len(comb) == 1 and comb[0].type == "N":
                     hashmap[key] = [has_outliers_n(df_notnull, comb[0].name)]
-                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "C":
+                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "N":
                     hashmap[key] = [has_significance_qn(df_notnull, comb[0].name, comb[1].name)]
-                elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "C":
+                elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "N":
                     hashmap[key] = [has_significance_qn(df_notnull, comb[1].name, comb[0].name)]
                 elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "Q":
                     hashmap[key] = [
                         has_correlation_qq(df_notnull, comb[0].name, comb[1].name),
                         has_outliers_qq(df_notnull, comb[0].name, comb[1].name),
                     ]
-                elif len(comb) == 2 and comb[0].type == "C" and comb[1].type == "C":
+                elif len(comb) == 2 and comb[0].type == "N" and comb[1].type == "N":
                     hashmap[key] = [
                         has_correlation_nn(df_notnull, comb[0].name, comb[1].name),
                         has_outliers_nn(df_notnull, comb[0].name, comb[1].name),
