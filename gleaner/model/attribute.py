@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import Literal
 
-AttrTypes = Literal["Q", "N", "T", None]
+AttrTypes = Literal["Q", "N", "T"] | None
 
 
 @dataclass
-class Attribute:
+class AttributeNotNull:
     name: str
-    type: Types
+    type: AttrTypes
 
     def __str__(self):
         return self.name
@@ -20,5 +20,9 @@ class Attribute:
             "Q": "quantitative",
             "N": "nominal",
             "T": "temporal",
-            "N": "name",
+            None: None,
         }[self.type]
+
+
+class Attribute(AttributeNotNull):
+    name: str | None

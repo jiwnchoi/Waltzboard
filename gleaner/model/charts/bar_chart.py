@@ -35,7 +35,7 @@ class MultipleBarChart(BaseChart):
             )
         )
 
-        if self.self.altair_token[5] == "sum":
+        if self.altair_token.agg_y == "sum":
             c: alt.Chart = c.encode(color=alt.Color(self.altair_token.z))
         else:
             c: alt.Chart = c.encode(color=alt.Color(self.altair_token.z))
