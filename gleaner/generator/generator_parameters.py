@@ -81,7 +81,7 @@ class PriorParameters:
                 "y": self.y.count / np.sum(self.y.count),
                 "z": self.z.count / np.sum(self.z.count),
             },
-            index=self.attrs,
+            index=[a.name for a in self.config.attrs],
         ).transpose()
         chart_type_data = pd.DataFrame(
             {"ct": self.ct.count / np.sum(self.ct.count)}, index=self.config.chart_type
@@ -106,7 +106,7 @@ class PriorParameters:
                 "y": self.y.count[i] / np.sum(self.y.count),
                 "z": self.z.count[i] / np.sum(self.z.count),
             }
-            for i, attr in enumerate(self.attrs)
+            for i, attr in enumerate(self.config.attrs)
         ]
         cts = [
             {

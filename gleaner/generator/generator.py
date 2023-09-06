@@ -69,7 +69,6 @@ class Generator:
         current.append(choice(self.config.attrs, p=p(self.prior.z.sample() * mask_z)))
 
         mask_agg_x = self.at_mask(current)
-        print(mask_agg_x, self.config.txs, current, self.config.attrs)
         current.append(choice(self.config.txs, p=p(self.prior.tx.sample() * mask_agg_x)))
 
         mask_agg_y = self.at_mask(current)

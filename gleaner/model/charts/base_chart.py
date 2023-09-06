@@ -81,14 +81,12 @@ class BaseChart:
         return bot
 
     def get_altair_token(self):
-        a = AltairToken(
+        return AltairToken(
             mark=self.tokens[0],
             x=AltairAttribute(self.attrs[0].name, self.attrs[0].long_type(), self.tokens[4]),
             y=AltairAttribute(self.attrs[1].name, self.attrs[1].long_type(), self.tokens[5]),
             z=AltairAttribute(self.attrs[2].name, self.attrs[2].long_type(), self.tokens[6]),
         )
-        print(a)
-        return a
 
     @abstractmethod
     def display(self) -> Chart:

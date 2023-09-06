@@ -20,13 +20,13 @@ class PosteriorCounter(Counter):
         super().__init__({n: 0 for n in names})
 
     def get_posteriors(self):
-        return np.array(self.values())
+        return np.array(list(self.values()))
 
 
 class Counters:
     def __init__(self, config: GleanerConfig):
         self.ct = PosteriorCounter(config.chart_type)
-        self.x = PosteriorCounter(config.attr_names)
+        self.x = PosteriorCounter([None] + config.attr_names)
         self.y = PosteriorCounter([None] + config.attr_names)
         self.z = PosteriorCounter([None] + config.attr_names)
         self.tx = PosteriorCounter(config.txs)

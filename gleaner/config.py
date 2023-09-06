@@ -10,7 +10,7 @@ class GleanerConfig:
     robustness: int
     attr_names: list[str]
     chart_type: list[str]
-    agg_type: list[str]
+    agg_type: list[str | None]
     chart_map: dict[ChartKeyTokens, type]
 
     # Explorer config
@@ -44,7 +44,9 @@ class GleanerConfig:
         self.attr_names = [
             col
             for col in self.df.columns
-            if (self.df[col].dtype == "object" and self.df[col].nunique() < 10) or self.df[col].dtype != "object"
+            if (self.df[col].dtype == "object" and self.df[col].nunique() < 10)
+            or self.df[col].dtype != "object"
+            or "date" in col.lower()
         ]
         self.df = self.df[self.attr_names]
         self.attrs = self.get_attrs()
@@ -57,7 +59,8 @@ class GleanerConfig:
 
     def get_attrs(self) -> list[Attribute]:
         return [Attribute(None, None)] + [
-            Attribute(col, "N" if self.df[col].dtype == "object" else "Q") for col in self.attr_names
+            Attribute(col, "T" if "date" in col.lower() else "N" if self.df[col].dtype == "object" else "Q")
+            for col in self.attr_names
         ]
 
     def get_chart_map(self) -> ChartMapType:

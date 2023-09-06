@@ -71,18 +71,20 @@ df_hash_map = {}
 
 
 def mean(l):
-    return sum(l) / len(l)
+    return sum(l) / len(l) if len(l) > 0 else 0
 
 
 def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
-    attr_notnull = [attr for attr in node.attrs if attr.name]
+    attr_notnull = [attr for attr in node.attrs if attr.type != None and attr.type != "T"]
     attr_combinations: list[tuple[Attribute, ...]] = [
         *list(combinations(attr_notnull, 1)),
         *list(combinations(attr_notnull, 2)),
     ]
     features = {}
+    if len(attr_notnull) == 0:
+        return features
     for comb in attr_combinations:
-        target_attrs = [attr.name for attr in comb]
+        target_attrs: list[str] = [attr.name for attr in comb if attr.name]
         key = "/".join(target_attrs)
 
         try:

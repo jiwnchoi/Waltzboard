@@ -13,7 +13,6 @@ class BoxPlot(BaseChart):
                     self.altair_token.x.name,
                     type=self.altair_token.x.type,
                 ),
-                alt.Color(self.altair_token.x.name, type=self.altair_token.x.type),
                 alt.Y(self.altair_token.y.name, type=self.altair_token.y.type),
             )
         )
