@@ -5,15 +5,18 @@ from .base_chart import BaseChart
 
 class LineChart(BaseChart):
     def display(self) -> Chart:
-        c = alt.Chart(self.df, self.title)
-        c: alt.Chart = c.mark_line()
-        c: alt.Chart = c.encode(
-            x=alt.X(
-                self.altair_token.x,
-                timeUnit=self.altair_token.agg_x,
+        return (
+            alt.Chart(self.df, title=self.title)
+            .mark_line()
+            .encode(
+                x=alt.X(
+                    self.altair_token.x.name,
+                    type=self.altair_token.x.type,
+                    timeUnit=self.altair_token.x.aggregate,
+                ),
+                y=alt.Y(
+                    self.altair_token.y.name, type=self.altair_token.y.type, aggregate=self.altair_token.y.aggregate
+                ),
+                color=alt.Color(self.altair_token.z.name, type=self.altair_token.z.type),
             )
         )
-        c: alt.Chart = c.encode(y=alt.Y(y=self.altair_token.y, aggregate=self.altair_token.agg_y))
-        c: alt.Chart = c.encode(color=alt.Color(self.altair_token.z))
-
-        return c

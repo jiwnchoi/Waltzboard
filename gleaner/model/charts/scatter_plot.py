@@ -6,18 +6,19 @@ from .base_chart import BaseChart
 
 class ScatterPlot(BaseChart):
     def display(self) -> Chart:
-        c = alt.Chart(self.df, self.title)
-        c: alt.Chart = c.mark_circle()
-        c: alt.Chart = c.encode(
-            x=alt.X(
-                self.altair_token.x,
+        return (
+            alt.Chart(self.df, title=self.title)
+            .mark_circle()
+            .encode(
+                alt.X(
+                    self.altair_token.x.name,
+                    type=self.altair_token.x.type,
+                ),
+                alt.Y(self.altair_token.y.name, type=self.altair_token.y.type),
+                alt.Color(
+                    self.altair_token.z.name,
+                    type=self.altair_token.z.type,
+                    bin=True if self.altair_token.z.aggregate == "bin" else False,
+                ),
             )
         )
-        c: alt.Chart = c.encode(y=alt.Y(y=self.altair_token.y, aggregate=self.altair_token.agg_y))
-        c: alt.Chart = c.encode(
-            color=alt.Color(
-                self.altair_token.z,
-                bin=True if isinstance(self.altair_token.z, str) and self.altair_token.z[-1] == "Q" else False,
-            )
-        )
-        return c

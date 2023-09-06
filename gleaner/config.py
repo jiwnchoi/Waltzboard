@@ -49,9 +49,9 @@ class GleanerConfig:
         self.df = self.df[self.attr_names]
         self.attrs = self.get_attrs()
         self.chart_type = list(set([m[0] for m in ChartMap]))
-        self.txs = list(set([m[4] for m in ChartMap if m[4]]))
-        self.tys = list(set([m[5] for m in ChartMap if m[5]]))
-        self.tzs = list(set([m[6] for m in ChartMap if m[6]]))
+        self.txs = list(set([m[4] for m in ChartMap]))
+        self.tys = list(set([m[5] for m in ChartMap]))
+        self.tzs = list(set([m[6] for m in ChartMap]))
         self.agg_type = list(set(self.txs + self.tys + self.tzs))
         self.chart_map = ChartMap
 
@@ -81,6 +81,7 @@ class GleanerConfig:
             and get_type(Counter(key), "Q") <= attr_type_counter["Q"]
             and get_type(Counter(key), "T") <= attr_type_counter["T"]
         }
+        print(len(filtered_chart_map))
         return filtered_chart_map
 
     def update_constraints(self, constraints: list[str]):

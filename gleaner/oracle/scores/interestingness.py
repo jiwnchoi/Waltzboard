@@ -6,7 +6,7 @@ from scipy.stats import chi2_contingency
 from .anova import f_oneway
 from itertools import combinations
 
-from gleaner.model import GleanerChart, Attribute
+from gleaner.model import BaseChart, Attribute
 
 lof = LocalOutlierFactor()
 
@@ -74,23 +74,20 @@ def mean(l):
     return sum(l) / len(l)
 
 
-def get_statistic_features(node: "GleanerChart") -> dict[str, list[str | None]]:
+def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
+    attr_notnull = [attr for attr in node.attrs if attr.name]
     attr_combinations: list[tuple[Attribute, ...]] = [
-        *list(combinations(node.attrs, 1)),
-        *list(combinations(node.attrs, 2)),
+        *list(combinations(attr_notnull, 1)),
+        *list(combinations(attr_notnull, 2)),
     ]
     features = {}
     for comb in attr_combinations:
-        # if node.filters is not None:
-        #     for f in node.filters:
-        #         key += f"{str((f[0], f[1]))}/"
-
         target_attrs = [attr.name for attr in comb]
         key = "/".join(target_attrs)
 
         try:
             if key not in hashmap:
-                df_notnull = df_hash_map[key] if key in df_hash_map else node.sub_df.dropna()
+                df_notnull = df_hash_map[key] if key in df_hash_map else node.df.dropna()
                 if len(comb) == 1 and comb[0].type == "Q":
                     hashmap[key] = [
                         has_outliers_q(df_notnull, comb[0].name),
@@ -115,7 +112,7 @@ def get_statistic_features(node: "GleanerChart") -> dict[str, list[str | None]]:
                     ]
             features[key] = hashmap[key]
         except Exception as e:
-            print(f"Error in {key} with {comb} and {node.filters}")
+            print(f"Error in {key} with {comb}")
             raise e
 
     return features
@@ -127,7 +124,7 @@ def feature_to_interestingness(features: list[list[str | None]]) -> float:
 
 
 def get_interestingness(
-    nodes: list["GleanerChart"],
+    nodes: list["BaseChart"],
 ) -> float:
     node_features = [get_statistic_features(node) for node in nodes]
 

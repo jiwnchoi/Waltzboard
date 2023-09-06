@@ -10,7 +10,7 @@ from gleaner.model import (
     ChartKeyTokens,
     ChartSampled,
     GleanerDashboard,
-    get_gleaner_chart,
+    get_chart_from_sample,
 )
 
 
@@ -30,9 +30,15 @@ class Generator:
         self.chart_keys = self.config.get_chart_map().keys()
 
     def attr_mask(self, current: list):
-        valid_map = [e for e in self.chart_keys if is_valid_map(current, e)]
-        valid_type = set([e[len(current)] for e in valid_map])
-        weight_mask = np.array([e.type in valid_type and e.name not in current for e in self.config.attrs])
+        valid_map = [key for key in self.chart_keys if is_valid_map(current, key)]
+        valid_type = set([map[len(current)] for map in valid_map])
+        weight_mask = np.array(
+            [
+                attr.type in valid_type
+                and attr.name not in [c.name for c in current if isinstance(c, Attribute) and c.name]
+                for attr in self.config.attrs
+            ]
+        )
         return weight_mask
 
     def ct_mask(self, current: list):
@@ -42,9 +48,10 @@ class Generator:
         return weight_mask
 
     def at_mask(self, current: list):
+        aggs = self.config.txs if len(current) == 4 else self.config.tys if len(current) == 5 else self.config.tzs
         valid_map = [e for e in self.config.chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
-        weight_mask = np.array([e in valid_type for e in self.config.agg_type])
+        weight_mask = np.array([e in valid_type for e in aggs])
         return weight_mask
 
     def sample_one(self) -> BaseChart:
@@ -53,15 +60,16 @@ class Generator:
         current.append(choice(self.config.chart_type, p=p(self.prior.ct.sample() * mask_ct)))
 
         mask_x = self.attr_mask(current)
-        current.append(choice(self.config.attrs, p=p(self.prior.x.sample() * mask_x)))  # type: ignore
+        current.append(choice(self.config.attrs, p=p(self.prior.x.sample() * mask_x)))
 
         mask_y = self.attr_mask(current)
-        current.append(choice(self.config.attrs, p=p(self.prior.y.sample() * mask_y)))  # type: ignore
+        current.append(choice(self.config.attrs, p=p(self.prior.y.sample() * mask_y)))
 
         mask_z = self.attr_mask(current)
-        current.append(choice(self.config.attrs, p=p(self.prior.z.sample() * mask_z)))  # type: ignore
+        current.append(choice(self.config.attrs, p=p(self.prior.z.sample() * mask_z)))
 
         mask_agg_x = self.at_mask(current)
+        print(mask_agg_x, self.config.txs, current, self.config.attrs)
         current.append(choice(self.config.txs, p=p(self.prior.tx.sample() * mask_agg_x)))
 
         mask_agg_y = self.at_mask(current)
@@ -69,8 +77,8 @@ class Generator:
 
         mask_agg_z = self.at_mask(current)
         current.append(choice(self.config.tzs, p=p(self.prior.tz.sample() * mask_agg_z)))
-        sampled_token: ChartSampled = tuple(current)  # type: ignore
-        return get_gleaner_chart(sampled_token, self.df)
+        sampled: ChartSampled = tuple(current)
+        return get_chart_from_sample(sampled, self.df)
 
     def sample_n(self, n: int) -> list[BaseChart]:
         keys: set[str] = set()

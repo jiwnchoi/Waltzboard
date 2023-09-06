@@ -1,45 +1,47 @@
 import altair as alt
 from altair import Chart
+from altair.utils.schemapi import Undefined
 from .base_chart import BaseChart
 
 
 class SingleBarChart(BaseChart):
     def display(self) -> Chart:
-        c = alt.Chart(self.df, self.title)
-        c: alt.Chart = c.mark_bar()
-        c: alt.Chart = c.encode(
-            x=alt.X(
-                self.altair_token.x,
-                timeUnit=self.altair_token.agg_x,
-                bin=True if self.altair_token.x[-1] == "Q" else False,
-            )
+        x = alt.X(
+            self.altair_token.x.name,
+            type=self.altair_token.x.type,
+            timeUnit=self.altair_token.x.aggregate if self.altair_token.x.aggregate != "bin" else Undefined,
+            bin=True if self.altair_token.x.aggregate == "bin" else False,
         )
-        c: alt.Chart = c.encode(y=alt.Y(y=self.altair_token.y, aggregate=self.altair_token.agg_y))
-        return c
+        y = alt.Y(
+            self.altair_token.y.name,
+            type=self.altair_token.y.type,
+            aggregate=self.altair_token.y.aggregate,
+        )
+        return alt.Chart(self.df, title=self.title).mark_bar().encode(x, y)
 
 
 class MultipleBarChart(BaseChart):
     def display(self) -> Chart:
-        c = alt.Chart(self.df, self.title)
-        c: alt.Chart = c.mark_bar()
-        c: alt.Chart = c.encode(
-            x=alt.X(
-                self.altair_token.x,
-                timeUnit=self.altair_token.agg_x,
+        c = (
+            alt.Chart(self.df, title=self.title)
+            .mark_bar()
+            .encode(
+                alt.X(
+                    self.altair_token.x.name,
+                    type=self.altair_token.x.type,
+                    timeUnit=self.altair_token.x.aggregate,
+                    bin=True if self.altair_token.x.aggregate == "bin" else False,
+                ),
+                alt.Y(
+                    self.altair_token.y.name,
+                    type=self.altair_token.y.type,
+                    aggregate=self.altair_token.y.aggregate,
+                ),
+                alt.Color(self.altair_token.z.name, type=self.altair_token.z.type),
             )
         )
 
-        c: alt.Chart = c.encode(
-            y=alt.Y(
-                self.altair_token.y,
-                aggregate=self.altair_token.agg_y,
-            )
-        )
-
-        if self.altair_token.agg_y == "sum":
-            c: alt.Chart = c.encode(color=alt.Color(self.altair_token.z))
-        else:
-            c: alt.Chart = c.encode(color=alt.Color(self.altair_token.z))
-            c: alt.Chart = c.encode(xOffset=alt.XOffset(self.altair_token.z))
+        if self.altair_token.y.aggregate != "sum":
+            c = c.encode(alt.XOffset(self.altair_token.z.name, type=self.altair_token.z.type))
 
         return c

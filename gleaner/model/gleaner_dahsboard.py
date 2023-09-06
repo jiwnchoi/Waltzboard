@@ -1,6 +1,5 @@
 import altair as alt
 from gleaner.model import BaseChart
-from gleaner.oracle import OracleResult
 from dataclasses import dataclass
 
 

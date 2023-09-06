@@ -5,14 +5,15 @@ from .base_chart import BaseChart
 
 class BoxPlot(BaseChart):
     def display(self) -> Chart:
-        c = alt.Chart(self.df, self.title)
-        c: alt.Chart = c.mark_boxplot()
-        c: alt.Chart = c.encode(
-            x=alt.X(
-                self.altair_token.x,
+        return (
+            alt.Chart(self.df, title=self.title)
+            .mark_boxplot()
+            .encode(
+                alt.X(
+                    self.altair_token.x.name,
+                    type=self.altair_token.x.type,
+                ),
+                alt.Color(self.altair_token.x.name, type=self.altair_token.x.type),
+                alt.Y(self.altair_token.y.name, type=self.altair_token.y.type),
             )
         )
-        c: alt.Chart = c.encode(y=alt.Y(y=self.altair_token.y))
-        c: alt.Chart = c.encode(color=alt.Color(self.altair_token.y))
-
-        return c

@@ -1,11 +1,11 @@
 from .charts import *
-from gleaner.model.gleaner_chart import ChartKeyTokens
+from gleaner.model import ChartKeyTokens
 
 ChartMapType = dict[ChartKeyTokens, type]
 
 ChartMap: ChartMapType = {
     # Bar Chart (Single)
-    ("bar", "Q", None, None, None, "count", None): SingleBarChart,
+    ("bar", "Q", None, None, "bin", "count", None): SingleBarChart,
     ("bar", "T", None, None, "year", "count", None): SingleBarChart,
     ("bar", "T", None, None, "month", "count", None): SingleBarChart,
     ("bar", "T", None, None, "dayofweek", "count", None): SingleBarChart,
@@ -68,7 +68,7 @@ ChartMap: ChartMapType = {
     ("tick", "Q", "N", None, None, None, None): StripPlot,
     # Boxplot
     ("boxplot", "Q", None, None, None, None, None): BoxPlot,
-    ("boxplot", "Q", "N", None, None, None, None): BoxPlot,
+    ("boxplot", "N", "Q", None, None, None, None): BoxPlot,
     # Pie Chart
     ("arc", "N", None, None, None, "count", None): PieChart,
     ("arc", "N", "Q", None, None, "sum", None): PieChart,
@@ -80,12 +80,12 @@ ChartMap: ChartMapType = {
     ("point", "Q", "Q", "N", None, None, None): ScatterPlot,
     ("point", "Q", "Q", "Q", None, None, None): ScatterPlot,
     # Heatmap
-    ("rect", "Q", "Q", None, None, None, "count"): Heatmap,
+    ("rect", "Q", "Q", None, "bin", "bin", "count"): Heatmap,
     ("rect", "N", "N", None, None, None, "count"): Heatmap,
-    ("rect", "Q", "Q", "Q", None, None, "mean"): Heatmap,
-    ("rect", "Q", "Q", "Q", None, None, "max"): Heatmap,
-    ("rect", "Q", "Q", "Q", None, None, "min"): Heatmap,
-    ("rect", "Q", "Q", "Q", None, None, "sum"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "mean"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "max"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "min"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "sum"): Heatmap,
     ("rect", "N", "N", "Q", None, None, "mean"): Heatmap,
     ("rect", "N", "N", "Q", None, None, "max"): Heatmap,
 }

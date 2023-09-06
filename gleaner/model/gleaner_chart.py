@@ -1,37 +1,24 @@
-import json
-from ast import literal_eval
-from typing import Literal, Optional, Set, Tuple, Union
-
-import altair as alt
+from typing import Literal, TYPE_CHECKING
 import pandas as pd
 
-from gleaner.model import Attribute
-
-from .attribute import AttrTypes
-from .data_transforms import AggTypes, AggXTypes
-from .charts import BaseChart
+from gleaner.model import Attribute, ChartTokens, ChartSampled
 from .chart_map import ChartMap
 
-MarkTypes = Literal["bar", "arc", "tick", "point", "rect", "line", "boxplot"]
 
-AllTokenTypes = MarkTypes | AttrTypes | AggTypes | AggXTypes
+if TYPE_CHECKING:
+    from gleaner.model import BaseChart
 
-ChartSampled = tuple[MarkTypes, Attribute, Attribute, Attribute, AggXTypes, AggTypes, AggTypes]
-ChartTokens = tuple[MarkTypes, str, str | None, str | None, AggXTypes, AggTypes, AggTypes]
-ChartKeyTokens = tuple[MarkTypes, AttrTypes, AttrTypes, AttrTypes, AggXTypes, AggTypes, AggTypes]
 
 chart_hash: dict[ChartTokens, "BaseChart"] = {}
 
 
-def get_gleaner_chart_from_key(key: ChartTokens) -> "BaseChart":
+def get_chart_from_tokens(key: ChartTokens, df: pd.DataFrame) -> "BaseChart":
     chart = chart_hash.get(key)
-    if not chart:
-        raise Exception("Chart not found")
-    return chart
+    return chart if chart else ChartMap[key](key, df)
 
 
-def get_gleaner_chart(sample: ChartSampled, df: pd.DataFrame) -> "BaseChart":
-    if sample[0] and sample[1].name:
+def get_chart_from_sample(sample: ChartSampled, df: pd.DataFrame) -> "BaseChart":
+    if not (sample[0] and sample[1].name):
         raise Exception("Chart sample is not valid")
     chart_tokens = (
         sample[0],
@@ -52,4 +39,7 @@ def get_gleaner_chart(sample: ChartSampled, df: pd.DataFrame) -> "BaseChart":
         sample[6],
     )
     chart = chart_hash.get(chart_tokens)  # type: ignore
-    return chart if chart else ChartMap[chart_key_tokens](sample, df)
+    if not chart:
+        chart = ChartMap[chart_key_tokens](sample, df)
+        chart_hash[chart_tokens] = chart
+    return chart

@@ -1,2 +1,3 @@
 from .gleaner import Gleaner
-from .model import GleanerChart, GleanerDashboard
+from .config import GleanerConfig
+from .model import GleanerDashboard

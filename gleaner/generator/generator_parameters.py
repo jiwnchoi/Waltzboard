@@ -23,7 +23,10 @@ class DirichletPrior:
         self.history.append(np.copy(self.count))
 
     def sample(self):
-        return np.random.dirichlet(self.count)
+        c = np.random.dirichlet(self.count)
+        if c.sum() == 0:
+            print(c)
+        return c
 
 
 class NormalPrior:
@@ -41,7 +44,10 @@ class NormalPrior:
         self.history.append(self.mean)
 
     def sample(self):
-        return max(np.random.normal(self.mean, np.sqrt(self.var)), 2)
+        sampled = np.random.normal(self.mean, np.sqrt(self.var))
+        if sampled == np.nan:
+            sampled = 0
+        return np.max([sampled, 2])
 
 
 class PriorParameters:
@@ -53,22 +59,20 @@ class PriorParameters:
     ty: DirichletPrior
     tz: DirichletPrior
     n_charts: NormalPrior
-    attrs: list[Attribute]
 
     def __init__(
         self,
         config: GleanerConfig,
     ) -> None:
         self.config = config
-        self.attrs = self.config.attrs
         self.ct = DirichletPrior(np.ones(len(self.config.chart_type)) * self.config.robustness)
-        self.x = DirichletPrior(np.ones(len(self.attrs)) * self.config.robustness)
-        self.y = DirichletPrior(np.ones(len(self.attrs)) * self.config.robustness)
-        self.z = DirichletPrior(np.ones(len(self.attrs)) * self.config.robustness)
+        self.x = DirichletPrior(np.ones(len(self.config.attrs)) * self.config.robustness)
+        self.y = DirichletPrior(np.ones(len(self.config.attrs)) * self.config.robustness)
+        self.z = DirichletPrior(np.ones(len(self.config.attrs)) * self.config.robustness)
         self.tx = DirichletPrior(np.ones(len(self.config.txs)) * self.config.robustness)
         self.ty = DirichletPrior(np.ones(len(self.config.tys)) * self.config.robustness)
         self.tz = DirichletPrior(np.ones(len(self.config.tzs)) * self.config.robustness)
-        self.n_charts = NormalPrior(len(self.attrs) - 1)
+        self.n_charts = NormalPrior(len(self.config.attrs) - 1)
 
     def display(self):
         attribute_data = pd.DataFrame(

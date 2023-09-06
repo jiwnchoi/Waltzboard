@@ -8,7 +8,7 @@ from api.models import *
 
 from gleaner import Gleaner, GleanerChart, GleanerDashboard
 from gleaner.config import GleanerConfig
-from gleaner.model import get_gleaner_chart_from_key
+from gleaner.model import get_chart_from_tokens
 
 df = data.movies()
 
@@ -78,7 +78,7 @@ async def infer(body: InferBody) -> InferResponse:
 
 @app.post("/recommend")
 async def recommend(body: RecommendBody) -> RecommendResponse:
-    charts = [get_gleaner_chart_from_key(c) for c in body.chartKeys]
+    charts = [get_chart_from_tokens(c) for c in body.chartKeys]
     results = gl.recommend(GleanerDashboard(charts), body.nResults)
     return RecommendResponse(
         charts=[GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in results]
@@ -87,7 +87,7 @@ async def recommend(body: RecommendBody) -> RecommendResponse:
 
 @app.post("/score")
 async def score(body: ScoreBody) -> ScoreResponse:
-    dashboard = GleanerDashboard([get_gleaner_chart_from_key(c) for c in body.chartKeys])
+    dashboard = GleanerDashboard([get_chart_from_tokens(c) for c in body.chartKeys])
     results = gl.oracle.get_result(dashboard, set(gl.preferences))
     return ScoreResponse(
         result=OracleResultModel.from_oracle_result(results),
