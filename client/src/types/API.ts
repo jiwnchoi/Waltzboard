@@ -1,10 +1,10 @@
-import { AggregationFetched } from './Aggregation';
+import { TransformationFetched } from './Transformation';
 import type { AttributeFetched } from './Attribute';
 import type { ChartTypeFetched } from './ChartType';
 import { StatisticFeature } from './ChartView';
 import type { OracleResult } from './OracleResult';
 import { OracleWeight } from './OracleWeight';
-import { AggregationDist, AttributeDist, ChartTypeDist } from './Space';
+import { TransformationDist, AttributeDist, ChartTypeDist } from './Space';
 import { TaskTypeFetched } from './TaskType';
 
 interface AttributeModel {
@@ -55,7 +55,7 @@ interface InitResponse {
     chartTypes: ChartTypeFetched[];
     taskTypes: TaskTypeFetched[];
     attributes: AttributeFetched[];
-    aggregations: AggregationFetched[];
+    transformations: TransformationFetched[];
 }
 
 interface InferResponse {
@@ -70,7 +70,7 @@ interface RecommendResponse {
 interface TrainResponse {
     attribute: AttributeDist[];
     chartType: ChartTypeDist[];
-    aggregation: AggregationDist[];
+    transformation: TransformationDist[];
     result: ScoreDistModel;
 }
 

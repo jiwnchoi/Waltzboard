@@ -6,7 +6,7 @@ import pandas as pd
 
 from typing import TYPE_CHECKING
 
-from gleaner.model import ChartTokens, AggTypes, AggXTypes, ChartSampled
+from gleaner.model import ChartTokens, TrsTypes, TrsXTypes, ChartSampled
 
 if TYPE_CHECKING:
     from gleaner.model.attribute import Attribute
@@ -18,8 +18,8 @@ class BaseChart:
     sub_df: pd.DataFrame
     attrs: list["Attribute"]
     num_attrs: int
-    agg_types: list[AggXTypes | AggTypes]
-    num_aggs: int
+    trs_types: list[TrsXTypes | TrsTypes]
+    num_trss: int
 
     def __init__(self, result: ChartSampled, df: pd.DataFrame) -> None:
         mark, x, y, z, tx, ty, tz = result
@@ -36,8 +36,8 @@ class BaseChart:
         self.attrs = [x, y, z]
         self.sub_df = df[[a.name for a in self.attrs if a.name]]
         self.num_attrs = len([a.name for a in self.attrs if a.name])
-        self.agg_types = [tx, ty, tz]
-        self.num_aggs = len([a for a in self.agg_types if a])
+        self.trs_types = [tx, ty, tz]
+        self.num_trss = len([a for a in self.trs_types if a])
         self.title, self.title_tokens = self.get_title()
         self.altair_token = self.get_altair_token()
 
@@ -45,11 +45,11 @@ class BaseChart:
         quantitatives = [a for a in self.attrs if a.type == "Q"]
         value_field_name = quantitatives[-1].name if len(quantitatives) else self.attrs[self.num_attrs - 1].name
         rest_field_names = [a.name for a in self.attrs if a.name != value_field_name]
-        value_agg = [a for a in self.agg_types if a][-1] if self.num_aggs else None
+        value_trs = [a for a in self.trs_types if a][-1] if self.num_trss else None
 
         tokens: list[list[str | None]] = [
-            [f"{value_agg[0].upper()}{value_agg[1:]}"] if value_agg else [],
-            ["of"] if value_agg else [],
+            [f"{value_trs[0].upper()}{value_trs[1:]}"] if value_trs else [],
+            ["of"] if value_trs else [],
             [f"{value_field_name}"],
             ["by"] if self.num_attrs > 1 else [],
             [rest_field_names[0], "and", rest_field_names[1]]
@@ -79,11 +79,11 @@ class BaseChart:
     def get_bot(self) -> set[str]:
         bot = set([t for t in self.tokens if t])
         # if self.tokens[4]:
-        #     bot.update([f"aggx_{self.tokens[4]}"])
+        #     bot.update([f"trsx_{self.tokens[4]}"])
         # if self.tokens[5]:
-        #     bot.update([f"aggy_{self.tokens[5]}"])
+        #     bot.update([f"trsy_{self.tokens[5]}"])
         # if self.tokens[6]:
-        #     bot.update([f"aggz_{self.tokens[6]}"])
+        #     bot.update([f"trsz_{self.tokens[6]}"])
         return bot
 
     def get_altair_token(self):
@@ -102,15 +102,15 @@ class BaseChart:
 class AltairAttribute:
     name: str | UndefinedType
     type: str | UndefinedType
-    aggregate: str | UndefinedType
+    trsregate: str | UndefinedType
 
-    def __init__(self, name, type, aggregate) -> None:
+    def __init__(self, name, type, trsregate) -> None:
         self.name = name if name else Undefined
         self.type = type if type else Undefined
-        self.aggregate = aggregate if aggregate else Undefined
+        self.trsregate = trsregate if trsregate else Undefined
 
     def __repr__(self) -> str:
-        return f"{self.name} {self.type} {self.aggregate}"
+        return f"{self.name} {self.type} {self.trsregate}"
 
 
 @dataclass

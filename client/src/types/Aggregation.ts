@@ -1,11 +1,11 @@
-interface AggregationFetched {
+interface TransformationFetched {
     name: string;
     type: string;
 }
 
-interface Aggregation extends AggregationFetched {
+interface Transformation extends TransformationFetched {
     ignore: boolean;
     prefer: boolean;
 }
 
-export type { Aggregation, AggregationFetched }
+export type { Transformation, TransformationFetched }

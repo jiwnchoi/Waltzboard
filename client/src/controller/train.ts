@@ -2,7 +2,7 @@ import { computed, signal } from '@preact/signals-react';
 import axios from 'axios';
 import { URI } from '../../config';
 import type { TrainBody, TrainResponse } from '../types/API';
-import { aggregationConstrainedSignal, aggregationPreferredSignal } from './aggregation';
+import { transformationConstrainedSignal, transformationPreferredSignal } from './transformation';
 import { attributeContrainedSignal, attributePreferedSignal } from './attribute';
 import { chartTypeConstrainedSignal, chartTypePreferredSignal } from './chartType';
 import { weightSignal } from './oracleWeight';
@@ -13,12 +13,12 @@ const trainBodySignal = computed<TrainBody>(() => {
         preferences: [
             ...attributePreferedSignal.value,
             ...chartTypePreferredSignal.value,
-            ...aggregationPreferredSignal.value,
+            ...transformationPreferredSignal.value,
         ],
         constraints: [
             ...attributeContrainedSignal.value,
             ...chartTypeConstrainedSignal.value,
-            ...aggregationConstrainedSignal.value,
+            ...transformationConstrainedSignal.value,
         ],
     };
 });
@@ -26,7 +26,7 @@ const trainBodySignal = computed<TrainBody>(() => {
 const trainResponseSignal = signal<TrainResponse>({
     attribute: [],
     chartType: [],
-    aggregation: [],
+    transformation: [],
     result: {
         score: [],
         specificity: [],
@@ -41,7 +41,7 @@ const attributeDistSignal = computed(() => trainResponseSignal.value.attribute);
 
 const chartTypeDistSignal = computed(() => trainResponseSignal.value.chartType);
 
-const aggregationDistSignal = computed(() => trainResponseSignal.value.aggregation);
+const transformationDistSignal = computed(() => trainResponseSignal.value.transformation);
 
 const scoreDistSignal = computed(() => trainResponseSignal.value.result);
 
@@ -56,7 +56,7 @@ const isTrainingSignal = signal<boolean>(false);
 const isTrainedSignal = signal<boolean>(false);
 
 export {
-    aggregationDistSignal,
+    transformationDistSignal,
     attributeDistSignal,
     chartTypeDistSignal,
     scoreDistSignal,

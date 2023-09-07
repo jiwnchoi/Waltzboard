@@ -12,10 +12,10 @@ class LineChart(BaseChart):
                 x=alt.X(
                     self.altair_token.x.name,
                     type=self.altair_token.x.type,
-                    timeUnit=self.altair_token.x.aggregate,
+                    timeUnit=self.altair_token.x.trsregate,
                 ),
                 y=alt.Y(
-                    self.altair_token.y.name, type=self.altair_token.y.type, aggregate=self.altair_token.y.aggregate
+                    self.altair_token.y.name, type=self.altair_token.y.type, trsregate=self.altair_token.y.trsregate
                 ),
                 color=alt.Color(self.altair_token.z.name, type=self.altair_token.z.type),
             )

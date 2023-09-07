@@ -48,10 +48,10 @@ class Generator:
         return weight_mask
 
     def at_mask(self, current: list):
-        aggs = self.config.txs if len(current) == 4 else self.config.tys if len(current) == 5 else self.config.tzs
+        trss = self.config.txs if len(current) == 4 else self.config.tys if len(current) == 5 else self.config.tzs
         valid_map = [e for e in self.config.chart_map if is_valid_map(current, e)]
         valid_type = set([e[len(current)] for e in valid_map])
-        weight_mask = np.array([e in valid_type for e in aggs])
+        weight_mask = np.array([e in valid_type for e in trss])
         return weight_mask
 
     def sample_one(self) -> BaseChart:
@@ -68,14 +68,14 @@ class Generator:
         mask_z = self.attr_mask(current)
         current.append(choice(self.config.attrs, p=p(self.prior.z.sample() * mask_z)))
 
-        mask_agg_x = self.at_mask(current)
-        current.append(choice(self.config.txs, p=p(self.prior.tx.sample() * mask_agg_x)))
+        mask_trs_x = self.at_mask(current)
+        current.append(choice(self.config.txs, p=p(self.prior.tx.sample() * mask_trs_x)))
 
-        mask_agg_y = self.at_mask(current)
-        current.append(choice(self.config.tys, p=p(self.prior.ty.sample() * mask_agg_y)))
+        mask_trs_y = self.at_mask(current)
+        current.append(choice(self.config.tys, p=p(self.prior.ty.sample() * mask_trs_y)))
 
-        mask_agg_z = self.at_mask(current)
-        current.append(choice(self.config.tzs, p=p(self.prior.tz.sample() * mask_agg_z)))
+        mask_trs_z = self.at_mask(current)
+        current.append(choice(self.config.tzs, p=p(self.prior.tz.sample() * mask_trs_z)))
         sampled: ChartSampled = tuple(current)
         return get_chart_from_sample(sampled, self.df)
 

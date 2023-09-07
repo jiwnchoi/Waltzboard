@@ -22,7 +22,7 @@ class Heatmap(BaseChart):
                 alt.Color(
                     self.altair_token.z.name,
                     type=self.altair_token.z.type,
-                    aggregate=self.altair_token.z.aggregate,
+                    trsregate=self.altair_token.z.trsregate,
                 ),
             )
         )

@@ -35,7 +35,7 @@ async def init() -> InitResponse:
     gl.update_config()
     return InitResponse(
         chartTypes=list(chart_types.values()),
-        aggregations=list(agg_types.values()),
+        transformations=list(trs_types.values()),
         taskTypes=list(task_types.values()),
         attributes=[AttributeModel(name=a.name, type=a.type) for a in gl.config.attrs[1:]],  # type: ignore
     )
@@ -58,7 +58,7 @@ async def train(train: TrainBody) -> TrainResponse:
     return TrainResponse(
         attribute=[AttributeDistModel.model_validate(attr) for attr in attrs],
         chartType=[ChartTypeDistModel.model_validate(ct) for ct in cts],
-        aggregation=[AggregationDistModel.model_validate(ag) for ag in ags],
+        transformation=[TransformationDistModel.model_validate(ag) for ag in ags],
         result=ScoreDistModel.model_validate(train_result.to_dict()),
     )
 
@@ -77,7 +77,7 @@ async def infer(body: InferBody) -> InferResponse:
 
 @app.post("/recommend")
 async def recommend(body: RecommendBody) -> RecommendResponse:
-    charts = [get_chart_from_tokens(c) for c in body.chartKeys]
+    charts = [get_chart_from_tokens(c, df) for c in [tuple(c) for c in body.chartKeys]]  # type: ignore
     results = gl.recommend(GleanerDashboard(charts), body.nResults)
     return RecommendResponse(
         charts=[GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in results]
@@ -86,7 +86,7 @@ async def recommend(body: RecommendBody) -> RecommendResponse:
 
 @app.post("/score")
 async def score(body: ScoreBody) -> ScoreResponse:
-    dashboard = GleanerDashboard([get_chart_from_tokens(c) for c in body.chartKeys])
+    dashboard = GleanerDashboard([get_chart_from_tokens(c, df) for c in [tuple(c) for c in body.chartKeys]])  # type: ignore
     results = gl.oracle.get_result(dashboard, set(gl.preferences))
     return ScoreResponse(
         result=OracleResultModel.from_oracle_result(results),

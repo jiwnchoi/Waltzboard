@@ -5,14 +5,16 @@ interface AttributeDist {
     z: number;
 }
 
-interface ChartTypeDist { 
+interface ChartTypeDist {
     name: string;
     prob: number;
 }
 
-interface AggregationDist {
+interface TransformationDist {
     name: string;
-    prob: number;
+    x: number;
+    y: number;
+    z: number;
 }
 
-export type { AttributeDist, ChartTypeDist, AggregationDist }
+export type { AttributeDist, ChartTypeDist, TransformationDist }

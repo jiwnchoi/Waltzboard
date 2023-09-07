@@ -10,7 +10,7 @@ class GleanerConfig:
     robustness: int
     attr_names: list[str]
     chart_type: list[str]
-    agg_type: list[str | None]
+    trs_type: list[str | None]
     chart_map: dict[ChartKeyTokens, type]
 
     # Explorer config
@@ -54,7 +54,7 @@ class GleanerConfig:
         self.txs = list(set([m[4] for m in ChartMap]))
         self.tys = list(set([m[5] for m in ChartMap]))
         self.tzs = list(set([m[6] for m in ChartMap]))
-        self.agg_type = list(set(self.txs + self.tys + self.tzs))
+        self.trs_type = list(set(self.txs + self.tys + self.tzs))
         self.chart_map = ChartMap
 
     def get_attrs(self) -> list[Attribute]:
@@ -71,9 +71,9 @@ class GleanerConfig:
             key: value
             for key, value in ChartMap.items()
             if key[0] in self.chart_type
-            and key[4] in self.agg_type
-            and key[5] in self.agg_type
-            and key[6] in self.agg_type
+            and key[4] in self.trs_type
+            and key[5] in self.trs_type
+            and key[6] in self.trs_type
         }
         attr_types = [a.type for a in self.get_attrs() if a.type]
         attr_type_counter = Counter(attr_types)
@@ -92,7 +92,7 @@ class GleanerConfig:
         self.attr_names = [m for m in self.attr_names if m not in constraints]
         self.attrs = self.get_attrs()
         self.chart_type = [m for m in self.chart_type if m not in constraints]
-        self.agg_type = [m for m in self.agg_type if m not in constraints]
+        self.trs_type = [m for m in self.trs_type if m not in constraints]
         self.chart_map = self.get_chart_map()
 
     def update_weight(

@@ -1,13 +1,23 @@
 import { Box, Button, Flex, Select, SimpleGrid } from '@chakra-ui/react';
-import { aggregationsSignal } from '../controller/aggregation';
+import { transformationsSignal } from '../controller/transformation';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
 import { dashboardSignal } from '../controller/dashboard';
 import { inferDashboard, isInferingSignal } from '../controller/infer';
-import { recommendChart, recommendedChartsSignal } from '../controller/recommend';
-import { selectedTaskTypeSignal, taskTypesSignal } from '../controller/taskType';
-import { isTrainedSignal, isTrainingSignal, trainGleaner } from '../controller/train';
-import { AggregationSelector } from './AggregationSelector';
+import {
+  recommendChart,
+  recommendedChartsSignal,
+} from '../controller/recommend';
+import {
+  selectedTaskTypeSignal,
+  taskTypesSignal,
+} from '../controller/taskType';
+import {
+  isTrainedSignal,
+  isTrainingSignal,
+  trainGleaner,
+} from '../controller/train';
+import { TransformationSelector } from './TransformationSelector';
 import AttributeSelector from './AttributeSelector';
 import { ChartTypeSelector } from './ChartTypeSelector';
 import ChartView from './ChartView';
@@ -19,7 +29,14 @@ import WeightSlider from './WeightSlider';
 
 export const Main = () => {
   return (
-    <Flex w="full" minH="80vh" flexDir={'row'} justifyContent="space-between" px={4} gap={4}>
+    <Flex
+      w="full"
+      minH="80vh"
+      flexDir={'row'}
+      justifyContent="space-between"
+      px={4}
+      gap={4}
+    >
       <Flex flexDir={'column'} w={150} gap={2} h="fit-content">
         <Button
           boxShadow={'sm'}
@@ -64,9 +81,12 @@ export const Main = () => {
           ))}
           <Box minH={10}></Box>
         </Section>
-        <Section title="Aggregations" gap={1.5} maxH={120} w="full">
-          {aggregationsSignal.value.map((aggregation, i) => (
-            <AggregationSelector aggregation={aggregation} key={`attribute-${i}`} />
+        <Section title="Transformations" gap={1.5} maxH={120} w="full">
+          {transformationsSignal.value.map((transformation, i) => (
+            <TransformationSelector
+              transformation={transformation}
+              key={`attribute-${i}`}
+            />
           ))}
           <Box minH={8}></Box>
         </Section>
@@ -79,7 +99,12 @@ export const Main = () => {
         </Section>
       </Flex>
       <Flex flexDir={'column'} w={300} h="fit-content" gap={2}>
-        <Flex flexDir={'row'} justifyContent={'space-between'} align="center" gap={2}>
+        <Flex
+          flexDir={'row'}
+          justifyContent={'space-between'}
+          align="center"
+          gap={2}
+        >
           <Button
             boxShadow={'sm'}
             colorScheme="orange"
@@ -108,7 +133,12 @@ export const Main = () => {
       <Flex flexDir={'column'} w={'full'} h="fit-content" gap={2}>
         <HSection title="Recommendation" gap={1.5}>
           {recommendedChartsSignal.value.map((chart, i) => (
-            <RecommendedChartView chart={chart} key={`chart-rec-${i}`} width={250} height={100} />
+            <RecommendedChartView
+              chart={chart}
+              key={`chart-rec-${i}`}
+              width={250}
+              height={100}
+            />
           ))}
         </HSection>
         <HSection
@@ -120,9 +150,19 @@ export const Main = () => {
           maxH={'100vh'}
         >
           {dashboardSignal.value.length ? (
-            <SimpleGrid w="full" h="fit-content" spacing={2} minChildWidth={300}>
+            <SimpleGrid
+              w="full"
+              h="fit-content"
+              spacing={2}
+              minChildWidth={300}
+            >
               {dashboardSignal.value.map((chart, i) => (
-                <ChartView chart={chart} key={`chart-${i}`} width={300} height={150} />
+                <ChartView
+                  chart={chart}
+                  key={`chart-${i}`}
+                  width={300}
+                  height={150}
+                />
               ))}
             </SimpleGrid>
           ) : (

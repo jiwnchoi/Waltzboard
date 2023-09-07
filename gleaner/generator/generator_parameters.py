@@ -86,7 +86,7 @@ class PriorParameters:
         chart_type_data = pd.DataFrame(
             {"ct": self.ct.count / np.sum(self.ct.count)}, index=self.config.chart_type
         ).transpose()
-        agg_type_data = pd.DataFrame(
+        trs_type_data = pd.DataFrame(
             {
                 "tx": self.tx.count / np.sum(self.tx.count),
                 "ty": self.ty.count / np.sum(self.ty.count),
@@ -96,12 +96,12 @@ class PriorParameters:
         display(self.n_charts.mean)
         display(attribute_data)
         display(chart_type_data)
-        display(agg_type_data)
+        display(trs_type_data)
 
     def export(self):
         attrs = [
             {
-                "name": str(attr),
+                "name": str(attr.name),
                 "x": self.x.count[i] / np.sum(self.x.count),
                 "y": self.y.count[i] / np.sum(self.y.count),
                 "z": self.z.count[i] / np.sum(self.z.count),
@@ -110,7 +110,7 @@ class PriorParameters:
         ]
         cts = [
             {
-                "name": str(ct),
+                "name": ct,
                 "prob": self.ct.count[i] / np.sum(self.ct.count),
             }
             for i, ct in enumerate(self.config.chart_type)
@@ -118,10 +118,10 @@ class PriorParameters:
         ags = [
             {
                 "name": str(at),
-                "x": self.tx.count[i] / np.sum(self.tx.count),
-                "y": self.ty.count[i] / np.sum(self.ty.count),
-                "z": self.tz.count[i] / np.sum(self.tz.count),
+                "x": self.tx.count[self.config.txs.index(at)] / np.sum(self.tx.count) if at in self.config.txs else 0,
+                "y": self.ty.count[self.config.tys.index(at)] / np.sum(self.ty.count) if at in self.config.tys else 0,
+                "z": self.tz.count[self.config.tzs.index(at)] / np.sum(self.tz.count) if at in self.config.tzs else 0,
             }
-            for i, at in enumerate(self.config.agg_type)
+            for at in self.config.trs_type
         ]
         return attrs, cts, ags

@@ -1,8 +1,9 @@
 import json
 import altair as alt
 from pydantic import BaseModel
-from gleaner.model import BaseChart
+from gleaner.model import BaseChart, ChartTokens
 from gleaner.oracle import OracleResult
+
 
 # Atoms
 
@@ -46,7 +47,7 @@ class TaskTypeModel(BaseModel):
     chartTypes: list["ChartTypeModel"]
 
 
-class AggTypeModel(BaseModel):
+class TrsTypeModel(BaseModel):
     name: str
     type: str | None
 
@@ -68,9 +69,11 @@ class ChartTypeDistModel(BaseModel):
     prob: float
 
 
-class AggregationDistModel(BaseModel):
+class TransformationDistModel(BaseModel):
     name: str
-    prob: float
+    x: float
+    y: float
+    z: float
 
 
 class GleanerChartModel(BaseModel):
@@ -82,7 +85,7 @@ class GleanerChartModel(BaseModel):
     @staticmethod
     def from_gleaner_chart(chart: BaseChart, statistics: dict[str, list[str | None]] = {}):
         return GleanerChartModel(
-            key=chart.tokens,
+            key=str(chart.tokens),
             spec=chart.get_vegalite(),
             title=chart.title_tokens,
             statistics=statistics,
@@ -134,7 +137,7 @@ class ScoreBody(BaseModel):
 class InitResponse(BaseModel):
     chartTypes: list[ChartTypeModel]
     taskTypes: list[TaskTypeModel]
-    aggregations: list[AggTypeModel]
+    transformations: list[TrsTypeModel]
     attributes: list[AttributeModel]
 
 
@@ -146,7 +149,7 @@ class InferResponse(BaseModel):
 class TrainResponse(BaseModel):
     attribute: list[AttributeDistModel]
     chartType: list[ChartTypeDistModel]
-    aggregation: list[AggregationDistModel]
+    transformation: list[TransformationDistModel]
     result: ScoreDistModel
 
 
@@ -170,13 +173,13 @@ chart_types: dict[str, ChartTypeModel] = {
 }
 
 # Count, Mean, Sum, Min, Max
-agg_types: dict[str, AggTypeModel] = {
-    "none": AggTypeModel(name="None", type=None),
-    "count": AggTypeModel(name="Count", type="count"),
-    "mean": AggTypeModel(name="Mean", type="mean"),
-    "sum": AggTypeModel(name="Sum", type="sum"),
-    "min": AggTypeModel(name="Min", type="min"),
-    "max": AggTypeModel(name="Max", type="max"),
+trs_types: dict[str, TrsTypeModel] = {
+    "none": TrsTypeModel(name="None", type=None),
+    "count": TrsTypeModel(name="Count", type="count"),
+    "mean": TrsTypeModel(name="Mean", type="mean"),
+    "sum": TrsTypeModel(name="Sum", type="sum"),
+    "min": TrsTypeModel(name="Min", type="min"),
+    "max": TrsTypeModel(name="Max", type="max"),
 }
 
 task_types: dict[str, TaskTypeModel] = {

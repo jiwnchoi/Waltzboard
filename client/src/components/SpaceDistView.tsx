@@ -6,17 +6,21 @@ import { BarStackHorizontal, Stack } from '@visx/shape';
 import { Text as SVGText } from '@visx/text';
 import { schemeCategory10 } from 'd3-scale-chromatic';
 import {
-  aggregationDistSignal,
+  transformationDistSignal,
   attributeDistSignal,
   chartTypeDistSignal,
 } from '../controller/train';
-import { AggregationDist, AttributeDist, ChartTypeDist } from '../types/Space';
+import {
+  TransformationDist,
+  AttributeDist,
+  ChartTypeDist,
+} from '../types/Space';
 import { LegendOrdinal } from '@visx/legend';
 
 const BAR_HEIGHT = 15;
 const SVG_WIDTH = 200;
 
-type Data = ChartTypeDist | AggregationDist | AttributeDist;
+type Data = ChartTypeDist | TransformationDist | AttributeDist;
 type Key = 'x' | 'y' | 'z' | 'prob';
 
 interface SVGProp {
@@ -58,10 +62,21 @@ function getSVGProp(data: Data[], keys: Key[]): SVGProp {
 
 const margin = { top: 15, bottom: 15, left: 10, right: 10 };
 
-const StackedBarChart = ({ title, svgProp }: { title: string; svgProp: SVGProp }) => {
+const StackedBarChart = ({
+  title,
+  svgProp,
+}: {
+  title: string;
+  svgProp: SVGProp;
+}) => {
   return (
     <>
-      <Flex flexDir={'row'} justifyContent={'space-between'} px={1} verticalAlign={'center'}>
+      <Flex
+        flexDir={'row'}
+        justifyContent={'space-between'}
+        px={1}
+        verticalAlign={'center'}
+      >
         <Text fontSize={12} fontWeight={500} color={'gray.500'} mb={1} mt={1}>
           {title}
         </Text>
@@ -159,13 +174,17 @@ const StackedBarChart = ({ title, svgProp }: { title: string; svgProp: SVGProp }
 
 const SpaceDistView = (props: FlexProps) => {
   const chartTypeProp = getSVGProp(chartTypeDistSignal.value, ['prob']);
-  const aggregationProp = getSVGProp(aggregationDistSignal.value, ['prob']);
+  const transformationProp = getSVGProp(transformationDistSignal.value, [
+    'x',
+    'y',
+    'z',
+  ]);
   const attributeProp = getSVGProp(attributeDistSignal.value, ['x', 'y', 'z']);
 
   return (
     <Flex {...props} flexDir={'column'}>
       <StackedBarChart title="Chart Types" svgProp={chartTypeProp} />
-      <StackedBarChart title="Aggregations" svgProp={aggregationProp} />
+      <StackedBarChart title="Transformations" svgProp={transformationProp} />
       <StackedBarChart title="Attributes" svgProp={attributeProp} />
     </Flex>
   );
