@@ -1,20 +1,19 @@
 import altair as alt
-from gleaner.model import GleanerChart
-from gleaner.oracle import OracleResult
+from gleaner.model import BaseChart
 from dataclasses import dataclass
 
 
 @dataclass
 class GleanerDashboard:
-    charts: list[GleanerChart]
+    charts: list[BaseChart]
 
     def __len__(self):
         return len(self.charts)
 
-    def append(self, chart: GleanerChart):
+    def append(self, chart: BaseChart):
         self.charts.append(chart)
 
-    def extend(self, charts: list[GleanerChart]):
+    def extend(self, charts: list[BaseChart]):
         self.charts = charts + self.charts
 
     def display(self, width: int = 150, height: int = 150, num_cols: int = 4):

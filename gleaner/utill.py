@@ -1,16 +1,16 @@
 # type: ignore
-
+from gleaner.explorer import TrainResult
 import pandas as pd
 from IPython.display import clear_output, display
 import altair as alt
 
 
-def display_function(epoch, train_results):
+def display_function(epoch, train_results: list[TrainResult]):
     data = pd.DataFrame(
         {
             "epoch": range(epoch + 1),
-            "scores": [r.scores.mean() for r in train_results],
-            "maxs": [r.scores.max() for r in train_results],
+            "scores": [r.score.mean() for r in train_results],
+            "maxs": [r.score.max() for r in train_results],
             "specificity": [r.specificity.mean() for r in train_results],
             "interestingness": [r.interestingness.mean() for r in train_results],
             "coverage": [r.coverage.mean() for r in train_results],

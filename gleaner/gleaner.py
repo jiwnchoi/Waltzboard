@@ -4,7 +4,7 @@ import pandas as pd
 
 from gleaner.explorer import Explorer, TrainResult
 from gleaner.generator import Generator
-from gleaner.model import GleanerDashboard, GleanerChart
+from gleaner.model import GleanerDashboard, BaseChart, ChartTokens
 from gleaner.config import GleanerConfig
 from gleaner.oracle import Oracle
 from gleaner.utill import display_function
@@ -42,10 +42,7 @@ class Gleaner:
         self.preferences = preferences
         return self.explorer.train(self.generator, self.oracle, preferences)
 
-    def infer(self, n_chart: int | None = None, fixed_charts: list[list[str | None]] = []) -> GleanerDashboard:
-        return self.explorer.infer(self.generator, self.oracle, self.preferences, n_chart, fixed_charts)
-
-    def recommend(self, dashboard: GleanerDashboard, n_results: int = 5) -> list[GleanerChart]:
+    def recommend(self, dashboard: GleanerDashboard, n_results: int = 5) -> list[BaseChart]:
         inferred_charts = self.explorer._infer(
             self.generator,
             self.oracle,

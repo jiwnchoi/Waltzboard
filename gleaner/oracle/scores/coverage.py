@@ -1,9 +1,8 @@
 import pandas as pd
-from gleaner.model import GleanerChart
+from gleaner.model import BaseChart
 
 
-def get_coverage_from_nodes(nodes: list["GleanerChart"], attr_names: list[str]) -> float:
-    n = len(nodes)
+def get_coverage_from_nodes(nodes: list["BaseChart"], attr_names: list[str]) -> float:
     coverages = [node.get_coverage() for node in nodes]
     full_coverage = {key: 0.0 for key in attr_names}
     for coverage in coverages:

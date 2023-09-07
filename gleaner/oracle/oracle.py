@@ -13,7 +13,7 @@ from gleaner.oracle.scores import (
 )
 
 if TYPE_CHECKING:
-    from gleaner.model import GleanerDashboard, GleanerChart
+    from gleaner.model import GleanerDashboard, BaseChart
     from gleaner.config import GleanerConfig
 
 
@@ -36,5 +36,5 @@ class Oracle:
             parsimony=get_parsimony_from_nodes(nodes, self.config.attr_names),
         )
 
-    def get_statistics_from_chart(self, chart: "GleanerChart") -> dict[str, list[str | None]]:
+    def get_statistics_from_chart(self, chart: "BaseChart") -> dict[str, list[str | None]]:
         return get_statistic_features(chart)

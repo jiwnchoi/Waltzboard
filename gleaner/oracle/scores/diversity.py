@@ -1,5 +1,5 @@
 import numpy as np
-from gleaner.model import GleanerChart
+from gleaner.model import BaseChart
 
 
 def jcd_index(sets: list[set], preferences: set[str]) -> float:
@@ -15,7 +15,7 @@ def jcd_index(sets: list[set], preferences: set[str]) -> float:
     return jaccard_matrix[np.triu_indices(n, 1)].sum() - n
 
 
-def get_diversity_from_nodes(nodes: list["GleanerChart"], preferences: set[str]) -> float:
-    bovs = [node.get_bov() for node in nodes]
-    n = len(bovs)
-    return jcd_index(bovs, preferences) / (n * (n - 1) / 2)
+def get_diversity_from_nodes(nodes: list["BaseChart"], preferences: set[str]) -> float:
+    bots = [node.get_bot() for node in nodes]
+    n = len(bots)
+    return jcd_index(bots, preferences) / (n * (n - 1) / 2)

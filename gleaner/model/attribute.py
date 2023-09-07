@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from typing import Literal
+from gleaner.model import AttrTypes
 
 
 @dataclass
 class Attribute:
-    name: str
-    type: Literal["Q", "C", "T", "O", "N"]
+    name: str | None
+    type: AttrTypes
 
     def __str__(self):
         return self.name
@@ -13,11 +14,10 @@ class Attribute:
     def to_dict(self):
         return {"name": self.name, "type": self.type}
 
-    def long_type(self):
+    def long_type(self) -> Literal["quantitative", "nominal", "temporal", None]:
         return {
             "Q": "quantitative",
-            "C": "nominal",
+            "N": "nominal",
             "T": "temporal",
-            "O": "ordinal",
-            "N": "name",
+            None: None,
         }[self.type]

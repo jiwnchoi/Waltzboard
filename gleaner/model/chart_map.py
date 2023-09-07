@@ -1,0 +1,91 @@
+from .charts import *
+from gleaner.model import ChartKeyTokens
+
+ChartMapType = dict[ChartKeyTokens, type]
+
+ChartMap: ChartMapType = {
+    # Bar Chart (Single)
+    ("bar", "Q", None, None, "bin", "count", None): SingleBarChart,
+    ("bar", "T", None, None, "year", "count", None): SingleBarChart,
+    ("bar", "T", None, None, "month", "count", None): SingleBarChart,
+    ("bar", "T", None, None, "day", "count", None): SingleBarChart,
+    ("bar", "N", "Q", None, None, "mean", None): SingleBarChart,
+    ("bar", "N", "Q", None, None, "sum", None): SingleBarChart,
+    ("bar", "N", "Q", None, None, "max", None): SingleBarChart,
+    ("bar", "N", "Q", None, None, "min", None): SingleBarChart,
+    ("bar", "T", "Q", None, "year", "mean", None): SingleBarChart,
+    ("bar", "T", "Q", None, "month", "mean", None): SingleBarChart,
+    ("bar", "T", "Q", None, "day", "mean", None): SingleBarChart,
+    # Bar Chart (Stacked)
+    ("bar", "N", "Q", "N", None, "sum", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "year", "sum", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "month", "sum", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "day", "sum", None): MultipleBarChart,
+    # Bar Chart (Grouped)
+    ("bar", "N", "Q", "N", None, "mean", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "year", "mean", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "month", "mean", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "day", "mean", None): MultipleBarChart,
+    ("bar", "N", "Q", "N", None, "max", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "year", "max", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "month", "max", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "day", "max", None): MultipleBarChart,
+    ("bar", "N", "Q", "N", None, "min", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "year", "min", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "month", "min", None): MultipleBarChart,
+    ("bar", "T", "Q", "N", "day", "min", None): MultipleBarChart,
+    # Single Line Chart
+    ("line", "T", None, None, "year", "count", None): LineChart,
+    ("line", "T", None, None, "month", "count", None): LineChart,
+    ("line", "T", None, None, "day", "count", None): LineChart,
+    ("line", "T", "Q", None, "year", "mean", None): LineChart,
+    ("line", "T", "Q", None, "month", "mean", None): LineChart,
+    ("line", "T", "Q", None, "day", "mean", None): LineChart,
+    ("line", "T", "Q", None, "year", "sum", None): LineChart,
+    ("line", "T", "Q", None, "month", "sum", None): LineChart,
+    ("line", "T", "Q", None, "day", "sum", None): LineChart,
+    ("line", "T", "Q", None, "year", "max", None): LineChart,
+    ("line", "T", "Q", None, "month", "max", None): LineChart,
+    ("line", "T", "Q", None, "day", "max", None): LineChart,
+    ("line", "T", "Q", None, "year", "min", None): LineChart,
+    ("line", "T", "Q", None, "month", "min", None): LineChart,
+    ("line", "T", "Q", None, "day", "min", None): LineChart,
+    # Multiple Line Chart
+    ("line", "T", "Q", "N", "year", "mean", None): LineChart,
+    ("line", "T", "Q", "N", "month", "mean", None): LineChart,
+    ("line", "T", "Q", "N", "day", "mean", None): LineChart,
+    ("line", "T", "Q", "N", "year", "sum", None): LineChart,
+    ("line", "T", "Q", "N", "month", "sum", None): LineChart,
+    ("line", "T", "Q", "N", "day", "sum", None): LineChart,
+    ("line", "T", "Q", "N", "year", "max", None): LineChart,
+    ("line", "T", "Q", "N", "month", "max", None): LineChart,
+    ("line", "T", "Q", "N", "day", "max", None): LineChart,
+    ("line", "T", "Q", "N", "year", "min", None): LineChart,
+    ("line", "T", "Q", "N", "month", "min", None): LineChart,
+    ("line", "T", "Q", "N", "day", "min", None): LineChart,
+    # Stripplot
+    ("tick", "Q", None, None, None, None, None): StripPlot,
+    ("tick", "N", "Q", None, None, None, None): StripPlot,
+    # Boxplot
+    ("boxplot", "Q", None, None, None, None, None): BoxPlot,
+    ("boxplot", "N", "Q", None, None, None, None): BoxPlot,
+    # Pie Chart
+    ("arc", "N", None, None, None, "count", None): PieChart,
+    ("arc", "N", "Q", None, None, "sum", None): PieChart,
+    ("arc", "N", "Q", None, None, "mean", None): PieChart,
+    ("arc", "N", "Q", None, None, "max", None): PieChart,
+    ("arc", "N", "Q", None, None, "min", None): PieChart,
+    # Scatter Plot
+    ("point", "Q", "Q", None, None, None, None): ScatterPlot,
+    ("point", "Q", "Q", "N", None, None, None): ScatterPlot,
+    ("point", "Q", "Q", "Q", None, None, None): ScatterPlot,
+    # Heatmap
+    ("rect", "Q", "Q", None, "bin", "bin", "count"): Heatmap,
+    ("rect", "N", "N", None, None, None, "count"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "mean"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "max"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "min"): Heatmap,
+    ("rect", "Q", "Q", "Q", "bin", "bin", "sum"): Heatmap,
+    ("rect", "N", "N", "Q", None, None, "mean"): Heatmap,
+    ("rect", "N", "N", "Q", None, None, "max"): Heatmap,
+}
