@@ -3,8 +3,8 @@ from typing import Literal
 
 AttrTypes = Literal["Q", "N", "T"] | None
 MarkTypes = Literal["bar", "arc", "tick", "point", "rect", "line", "boxplot"]
-AggTypes = Literal["count", "sum", "mean", "max", "min", None]
-AggXTypes = AggTypes | Literal["year", "month", "dayofweek"]
+AggTypes = Literal["bin", "count", "sum", "mean", "max", "min", None]
+AggXTypes = AggTypes | Literal["year", "month", "day", "bin"]
 ChartTokens = tuple[MarkTypes, str, str | None, str | None, AggXTypes, AggTypes, AggTypes]
 ChartKeyTokens = tuple[MarkTypes, AttrTypes, AttrTypes, AttrTypes, AggXTypes, AggTypes, AggTypes]
 from .attribute import Attribute
