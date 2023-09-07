@@ -80,7 +80,7 @@ const StackedBarChart = ({
         <Text fontSize={12} fontWeight={500} color={'gray.500'} mb={1} mt={1}>
           {title}
         </Text>
-        {title == 'Attributes' && (
+        {title != 'Chart Types' && (
           <LegendOrdinal
             scale={svgProp.colorScale}
             direction="row"

@@ -18,7 +18,7 @@ class ScatterPlot(BaseChart):
                 alt.Color(
                     self.altair_token.z.name,
                     type=self.altair_token.z.type,
-                    bin=True if self.altair_token.z.trsregate == "bin" else False,
+                    bin=True if self.altair_token.z.aggregate == "bin" else False,
                 ),
             )
         )

@@ -85,7 +85,7 @@ class GleanerChartModel(BaseModel):
     @staticmethod
     def from_gleaner_chart(chart: BaseChart, statistics: dict[str, list[str | None]] = {}):
         return GleanerChartModel(
-            key=str(chart.tokens),
+            key=json.dumps(chart.tokens),
             spec=chart.get_vegalite(),
             title=chart.title_tokens,
             statistics=statistics,

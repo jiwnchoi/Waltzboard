@@ -102,15 +102,15 @@ class BaseChart:
 class AltairAttribute:
     name: str | UndefinedType
     type: str | UndefinedType
-    trsregate: str | UndefinedType
+    aggregate: str | UndefinedType
 
-    def __init__(self, name, type, trsregate) -> None:
+    def __init__(self, name, type, aggregate) -> None:
         self.name = name if name else Undefined
         self.type = type if type else Undefined
-        self.trsregate = trsregate if trsregate else Undefined
+        self.aggregate = aggregate if aggregate else Undefined
 
     def __repr__(self) -> str:
-        return f"{self.name} {self.type} {self.trsregate}"
+        return f"{self.name} {self.type} {self.aggregate}"
 
 
 @dataclass

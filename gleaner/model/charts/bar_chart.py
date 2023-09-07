@@ -9,13 +9,13 @@ class SingleBarChart(BaseChart):
         x = alt.X(
             self.altair_token.x.name,
             type=self.altair_token.x.type,
-            timeUnit=self.altair_token.x.trsregate if self.altair_token.x.trsregate != "bin" else Undefined,
-            bin=True if self.altair_token.x.trsregate == "bin" else False,
+            timeUnit=self.altair_token.x.aggregate if self.altair_token.x.aggregate != "bin" else Undefined,
+            bin=True if self.altair_token.x.aggregate == "bin" else False,
         )
         y = alt.Y(
             self.altair_token.y.name,
             type=self.altair_token.y.type,
-            trsregate=self.altair_token.y.trsregate,
+            aggregate=self.altair_token.y.aggregate,
         )
         return alt.Chart(self.df, title=self.title).mark_bar().encode(x, y)
 
@@ -29,19 +29,19 @@ class MultipleBarChart(BaseChart):
                 alt.X(
                     self.altair_token.x.name,
                     type=self.altair_token.x.type,
-                    timeUnit=self.altair_token.x.trsregate,
-                    bin=True if self.altair_token.x.trsregate == "bin" else False,
+                    timeUnit=self.altair_token.x.aggregate,
+                    bin=True if self.altair_token.x.aggregate == "bin" else False,
                 ),
                 alt.Y(
                     self.altair_token.y.name,
                     type=self.altair_token.y.type,
-                    trsregate=self.altair_token.y.trsregate,
+                    aggregate=self.altair_token.y.aggregate,
                 ),
                 alt.Color(self.altair_token.z.name, type=self.altair_token.z.type),
             )
         )
 
-        if self.altair_token.y.trsregate != "sum":
+        if self.altair_token.y.aggregate != "sum":
             c = c.encode(alt.XOffset(self.altair_token.z.name, type=self.altair_token.z.type))
 
         return c

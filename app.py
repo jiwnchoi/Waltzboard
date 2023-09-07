@@ -25,6 +25,10 @@ app.add_middleware(
 )
 
 
+def string_to_tuple(str: str):
+    return tuple(map(int, str.split(",")))
+
+
 # app.mount("/", StaticFiles(directory="dist", html=True), name="GleanerInterface")
 
 
@@ -43,7 +47,6 @@ async def init() -> InitResponse:
 
 @app.post("/train")
 async def train(train: TrainBody) -> TrainResponse:
-    print(train)
     gl.config.update_constraints(train.constraints)
     gl.config.update_weight(
         specificity=train.weight.specificity,
@@ -65,7 +68,6 @@ async def train(train: TrainBody) -> TrainResponse:
 
 @app.post("/infer")
 async def infer(body: InferBody) -> InferResponse:
-    print(f"infer: {body}")
     dashboard, result = gl.explorer.search(gl.generator, gl.oracle, gl.preferences)
     charts = [GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in dashboard.charts]
 
@@ -77,8 +79,11 @@ async def infer(body: InferBody) -> InferResponse:
 
 @app.post("/recommend")
 async def recommend(body: RecommendBody) -> RecommendResponse:
-    charts = [get_chart_from_tokens(c, df) for c in [tuple(c) for c in body.chartKeys]]  # type: ignore
+    charts = [get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]]  # type: ignore
+    print(charts)
+    print(GleanerDashboard(charts))
     results = gl.recommend(GleanerDashboard(charts), body.nResults)
+    print(results)
     return RecommendResponse(
         charts=[GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in results]
     )
@@ -86,7 +91,7 @@ async def recommend(body: RecommendBody) -> RecommendResponse:
 
 @app.post("/score")
 async def score(body: ScoreBody) -> ScoreResponse:
-    dashboard = GleanerDashboard([get_chart_from_tokens(c, df) for c in [tuple(c) for c in body.chartKeys]])  # type: ignore
+    dashboard = GleanerDashboard([get_chart_from_tokens(c, gl.config) for c in [tuple(c) for c in body.chartKeys]])  # type: ignore
     results = gl.oracle.get_result(dashboard, set(gl.preferences))
     return ScoreResponse(
         result=OracleResultModel.from_oracle_result(results),
