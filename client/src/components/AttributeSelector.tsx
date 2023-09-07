@@ -19,10 +19,8 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
         as={
           attribute.type === 'Q'
             ? RiHashtag
-            : attribute.type === 'C'
-            ? RiFontSize
             : attribute.type === 'N'
-            ? RiKey2Line
+            ? RiFontSize
             : attribute.type === 'T'
             ? RiCalendar2Line
             : undefined
