@@ -42,13 +42,11 @@ class Gleaner:
         self.preferences = preferences
         return self.explorer.train(self.generator, self.oracle, preferences)
 
-    def recommend(self, dashboard: GleanerDashboard, n_results: int = 5) -> list[BaseChart]:
-        inferred_charts = self.explorer._infer(
-            self.generator,
-            self.oracle,
-            self.preferences,
-            n_chart=len(dashboard) + 1,
-            fixed_charts=dashboard.charts,
-        )[0][:n_results]
-
-        return [d[1].charts[-1] for d in inferred_charts]
+    def recommend(self, dashboard: GleanerDashboard, preferences: list[str], n_results: int = 5) -> list[BaseChart]:
+        charts = self.generator.sample_n(200)
+        filtered_charts = [c for c in charts if c.tokens not in [c.tokens for c in dashboard.charts]]
+        candidate_dashboards = [GleanerDashboard(dashboard.charts + [c]) for c in filtered_charts]
+        results = [self.oracle.get_result(d, set(preferences)) for d in candidate_dashboards]
+        result_and_dashboards = [[r, d] for r, d in zip(results, candidate_dashboards)]
+        result_and_dashboards.sort(key=lambda x: x[0].get_score(), reverse=True)
+        return [d.charts for _, d in result_and_dashboards[:n_results]]
