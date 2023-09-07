@@ -6,8 +6,7 @@ from vega_datasets import data
 from api.config import config
 from api.models import *
 
-from gleaner import Gleaner, GleanerChart, GleanerDashboard
-from gleaner.config import GleanerConfig
+from gleaner import Gleaner, GleanerDashboard
 from gleaner.model import get_chart_from_tokens
 
 df = data.movies()

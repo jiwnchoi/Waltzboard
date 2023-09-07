@@ -1,7 +1,7 @@
 import json
 import altair as alt
 from pydantic import BaseModel
-from gleaner.model import GleanerChart
+from gleaner.model import BaseChart
 from gleaner.oracle import OracleResult
 
 # Atoms
@@ -80,9 +80,9 @@ class GleanerChartModel(BaseModel):
     statistics: dict[str, list[str | None]]
 
     @staticmethod
-    def from_gleaner_chart(chart: GleanerChart, statistics: dict[str, list[str | None]] = {}):
+    def from_gleaner_chart(chart: BaseChart, statistics: dict[str, list[str | None]] = {}):
         return GleanerChartModel(
-            key=chart.key,
+            key=chart.tokens,
             spec=chart.get_vegalite(),
             title=chart.title_tokens,
             statistics=statistics,

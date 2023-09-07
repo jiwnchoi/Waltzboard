@@ -65,7 +65,7 @@ ChartMap: ChartMapType = {
     ("line", "T", "Q", "N", "day", "min", None): LineChart,
     # Stripplot
     ("tick", "Q", None, None, None, None, None): StripPlot,
-    ("tick", "Q", "N", None, None, None, None): StripPlot,
+    ("tick", "N", "Q", None, None, None, None): StripPlot,
     # Boxplot
     ("boxplot", "Q", None, None, None, None, None): BoxPlot,
     ("boxplot", "N", "Q", None, None, None, None): BoxPlot,

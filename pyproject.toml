@@ -10,9 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 keywords = []
-authors = [
-  { name = "Jason Choi", email = "jasonchoi3@g.skku.edu" },
-]
+authors = [{ name = "Jason Choi", email = "jiwnchoi@skku.edu" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
@@ -22,14 +20,14 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-    "pandas",
-    "numpy",
-    "altair",
-    "scikit-learn",
-    "ipython",
-    "fastapi",
-    "uvicorn",
-    "pydantic-settings",
+  "pandas",
+  "numpy",
+  "altair",
+  "scikit-learn",
+  "ipython",
+  "fastapi",
+  "uvicorn",
+  "pydantic-settings",
 ]
 
 [project.urls]
@@ -41,47 +39,24 @@ Source = "https://github.com/jason-choi/gleaner"
 path = "gleaner/__about__.py"
 
 [tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-]
+dependencies = ["coverage[toml]>=6.5", "pytest"]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
+cov-report = ["- coverage combine", "coverage report"]
+cov = ["test-cov", "cov-report"]
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.10", "3.11"]
 
 [tool.hatch.envs.lint]
 detached = true
-dependencies = [
-  "black>=23.1.0",
-  "mypy>=1.0.0",
-  "ruff>=0.0.243",
-]
+dependencies = ["black>=23.1.0", "mypy>=1.0.0", "ruff>=0.0.243"]
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args:gleaner tests}"
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
-]
-fmt = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
+style = ["ruff {args:.}", "black --check --diff {args:.}"]
+fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
+all = ["style", "typing"]
 
 [tool.black]
 target-version = ["py37"]
@@ -124,9 +99,15 @@ ignore = [
   # Allow boolean positional values in function calls, like `dict.get(... True)`
   "FBT003",
   # Ignore checks for possible passwords
-  "S105", "S106", "S107",
+  "S105",
+  "S106",
+  "S107",
   # Ignore complexity
-  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+  "C901",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
 ]
 unfixable = [
   # Don't touch unused imports
@@ -147,20 +128,14 @@ ban-relative-imports = "all"
 source_pkgs = ["gleaner", "tests"]
 branch = true
 parallel = true
-omit = [
-  "gleaner/__about__.py",
-]
+omit = ["gleaner/__about__.py"]
 
 [tool.coverage.paths]
 gleaner = ["gleaner", "*/gleaner/gleaner"]
 tests = ["tests", "*/gleaner/tests"]
 
 [tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -169,7 +144,7 @@ exclude = [
   "/.ipynb_checkpoints",
   "/docs",
   "/*.ipynb",
-  "/client"
+  "/client",
 ]
 
 [tool.hatch.build.targets.wheel]

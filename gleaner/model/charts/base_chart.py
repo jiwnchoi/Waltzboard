@@ -42,15 +42,21 @@ class BaseChart:
         self.altair_token = self.get_altair_token()
 
     def get_title(self) -> tuple[str, list[str]]:
-        value_field_name = self.attrs[self.num_attrs - 1].name if self.num_attrs else None
-        value_agg = self.agg_types[self.num_aggs - 1] if self.num_aggs else None
+        quantitatives = [a for a in self.attrs if a.type == "Q"]
+        value_field_name = quantitatives[-1].name if len(quantitatives) else self.attrs[self.num_attrs - 1].name
+        rest_field_names = [a.name for a in self.attrs if a.name != value_field_name]
+        value_agg = [a for a in self.agg_types if a][-1] if self.num_aggs else None
 
         tokens: list[list[str | None]] = [
             [f"{value_agg[0].upper()}{value_agg[1:]}"] if value_agg else [],
             ["of"] if value_agg else [],
             [f"{value_field_name}"],
-            ["by", self.attrs[0].name, "and", self.attrs[1].name] if self.num_attrs == 3 else [],
-            ["by", self.attrs[0].name] if self.num_attrs == 2 else [],
+            ["by"] if self.num_attrs > 1 else [],
+            [rest_field_names[0], "and", rest_field_names[1]]
+            if self.num_attrs > 2
+            else [rest_field_names[0]]
+            if self.num_attrs > 1
+            else [],
         ]
         tokens_words = [str(w) for t in tokens for w in t]
         return " ".join(tokens_words), tokens_words
