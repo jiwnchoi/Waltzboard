@@ -234,33 +234,33 @@ export const ScoreDistView = ({ width, height }: ScoreDistViewProps) => {
     diversity: sortedScoreDist.diversity[Math.floor((sortedScoreDist.diversity.length * 3) / 4)],
     parsimony: sortedScoreDist.parsimony[Math.floor((sortedScoreDist.parsimony.length * 3) / 4)],
   };
-  const medianScores = {
-    score: sortedScoreDist.score[Math.floor(sortedScoreDist.score.length / 2)],
-    specificity: sortedScoreDist.specificity[Math.floor(sortedScoreDist.specificity.length / 2)],
-    interestingness:
-      sortedScoreDist.interestingness[Math.floor(sortedScoreDist.interestingness.length / 2)],
-    coverage: sortedScoreDist.coverage[Math.floor(sortedScoreDist.coverage.length / 2)],
-    diversity: sortedScoreDist.diversity[Math.floor(sortedScoreDist.diversity.length / 2)],
-    parsimony: sortedScoreDist.parsimony[Math.floor(sortedScoreDist.parsimony.length / 2)],
-  };
+  // const medianScores = {
+  //   score: sortedScoreDist.score[Math.floor(sortedScoreDist.score.length / 2)],
+  //   specificity: sortedScoreDist.specificity[Math.floor(sortedScoreDist.specificity.length / 2)],
+  //   interestingness:
+  //     sortedScoreDist.interestingness[Math.floor(sortedScoreDist.interestingness.length / 2)],
+  //   coverage: sortedScoreDist.coverage[Math.floor(sortedScoreDist.coverage.length / 2)],
+  //   diversity: sortedScoreDist.diversity[Math.floor(sortedScoreDist.diversity.length / 2)],
+  //   parsimony: sortedScoreDist.parsimony[Math.floor(sortedScoreDist.parsimony.length / 2)],
+  // };
 
-  const minScores = {
-    score: sortedScoreDist.score[0],
-    specificity: sortedScoreDist.specificity[0],
-    interestingness: sortedScoreDist.interestingness[0],
-    coverage: sortedScoreDist.coverage[0],
-    diversity: sortedScoreDist.diversity[0],
-    parsimony: sortedScoreDist.parsimony[0],
-  };
+  // const minScores = {
+  //   score: sortedScoreDist.score[0],
+  //   specificity: sortedScoreDist.specificity[0],
+  //   interestingness: sortedScoreDist.interestingness[0],
+  //   coverage: sortedScoreDist.coverage[0],
+  //   diversity: sortedScoreDist.diversity[0],
+  //   parsimony: sortedScoreDist.parsimony[0],
+  // };
 
-  const maxScores = {
-    score: sortedScoreDist.score[sortedScoreDist.score.length - 1],
-    specificity: sortedScoreDist.specificity[sortedScoreDist.specificity.length - 1],
-    interestingness: sortedScoreDist.interestingness[sortedScoreDist.interestingness.length - 1],
-    coverage: sortedScoreDist.coverage[sortedScoreDist.coverage.length - 1],
-    diversity: sortedScoreDist.diversity[sortedScoreDist.diversity.length - 1],
-    parsimony: sortedScoreDist.parsimony[sortedScoreDist.parsimony.length - 1],
-  };
+  // const maxScores = {
+  //   score: sortedScoreDist.score[sortedScoreDist.score.length - 1],
+  //   specificity: sortedScoreDist.specificity[sortedScoreDist.specificity.length - 1],
+  //   interestingness: sortedScoreDist.interestingness[sortedScoreDist.interestingness.length - 1],
+  //   coverage: sortedScoreDist.coverage[sortedScoreDist.coverage.length - 1],
+  //   diversity: sortedScoreDist.diversity[sortedScoreDist.diversity.length - 1],
+  //   parsimony: sortedScoreDist.parsimony[sortedScoreDist.parsimony.length - 1],
+  // };
   const currentScore = inferResponseSignal.value.result;
 
   return (

@@ -85,7 +85,7 @@ def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
         return features
     for comb in attr_combinations:
         target_attrs: list[str] = [attr.name for attr in comb if attr.name]
-        key = "/".join(target_attrs)
+        key = " & ".join(target_attrs)
 
         try:
             if key not in hashmap:

@@ -54,8 +54,8 @@ export const Main = () => {
         >
           {'Train'}
         </Button>
-        <Section title="Analytic Task" gap={1.5} w="full">
-          <Select
+        <Section title="Score Weight" gap={1.5} w="full">
+          {/* <Select
             placeholder="User Task"
             size="xs"
             value={selectedTaskTypeSignal.value.name}
@@ -68,7 +68,7 @@ export const Main = () => {
             {taskTypesSignal.value.map((taskType, i) => (
               <option key={`taskType-${i}`}>{taskType.name}</option>
             ))}
-          </Select>
+          </Select> */}
 
           <WeightSlider title="specificity" />
           <WeightSlider title="interestingness" />

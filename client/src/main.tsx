@@ -33,7 +33,7 @@ const theme = extendTheme({
           color: 'gray.500',
         },
         section: {
-          fontSize: 'sm',
+          fontSize: 'md',
           fontWeight: 700,
           color: 'gray.700',
         },

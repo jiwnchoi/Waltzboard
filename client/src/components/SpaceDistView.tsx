@@ -77,7 +77,7 @@ const StackedBarChart = ({
         px={1}
         verticalAlign={'center'}
       >
-        <Text fontSize={12} fontWeight={500} color={'gray.500'} mb={1} mt={1}>
+        <Text fontSize={'sm'} fontWeight={500} color={'gray.500'} mb={1} mt={1}>
           {title}
         </Text>
         {title != 'Chart Types' && (
@@ -103,7 +103,7 @@ const StackedBarChart = ({
                       border={'1px solid'}
                       borderColor={'gray.300'}
                     />
-                    <Text fontSize={11} color={'gray.500'}>
+                    <Text fontSize={'xs'} color={'gray.500'}>
                       {label.text}
                     </Text>
                   </Flex>
@@ -141,11 +141,11 @@ const StackedBarChart = ({
                   barStack.bars.map((bar, j) => (
                     <SVGText
                       key={`${title}-${i}-${j}`}
-                      x={bar.x + bar.width + 10}
+                      x={bar.x + bar.width + 6}
                       y={bar.y + bar.height / 2}
                       verticalAnchor="middle"
                       fill="gray"
-                      fontSize={9}
+                      fontSize={10}
                       textAnchor="start"
                     >
                       {bar.bar.data.name}

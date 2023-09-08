@@ -164,7 +164,7 @@ class ScoreResponse(BaseModel):
 chart_types: dict[str, ChartTypeModel] = {
     "bar": ChartTypeModel(name="Bar Chart", mark="bar"),
     "line": ChartTypeModel(name="Line Chart", mark="line"),
-    "pie": ChartTypeModel(name="Pie Chart", mark="pie"),
+    "pie": ChartTypeModel(name="Pie Chart", mark="arc"),
     "scatter": ChartTypeModel(name="Scatterplot", mark="point"),
     "area": ChartTypeModel(name="Area Chart", mark="area"),
     "heatmap": ChartTypeModel(name="Heatmap", mark="rect"),
