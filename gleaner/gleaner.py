@@ -45,8 +45,9 @@ class Gleaner:
     def recommend(self, dashboard: GleanerDashboard, preferences: list[str], n_results: int = 5) -> list[BaseChart]:
         charts = self.generator.sample_n(200)
         filtered_charts = [c for c in charts if c.tokens not in [c.tokens for c in dashboard.charts]]
-        candidate_dashboards = [GleanerDashboard(dashboard.charts + [c]) for c in filtered_charts]
+        candidate_dashboards = [dashboard.extend([c]) for c in filtered_charts]
         results = [self.oracle.get_result(d, set(preferences)) for d in candidate_dashboards]
         result_and_charts = [[r, c] for r, c in zip(results, filtered_charts)]
         result_and_charts.sort(key=lambda x: x[0].get_score(), reverse=True)
+        print([r.get_score() for r, _ in result_and_charts[:n_results]])
         return [c for _, c in result_and_charts[:n_results]]

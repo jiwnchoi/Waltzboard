@@ -1,10 +1,10 @@
-import { computed, signal } from "@preact/signals-react"
+import { computed, signal, effect } from "@preact/signals-react"
 import axios from "axios"
 import { URI } from "../../config"
 import { RecommendBody, RecommendResponse } from "../types/API"
 import { ChartView, TitleToken } from "../types/ChartView"
 import { attributePreferedSignal } from "./attribute"
-import { chartKeysSignal } from "./dashboard"
+import { chartKeysSignal, dashboardSignal } from "./dashboard"
 import { transformationPreferredSignal } from "./transformation"
 
 const recommendBodySignal = computed<RecommendBody>(() => {
@@ -20,8 +20,8 @@ const recommendedChartsSignal = signal<ChartView[]>([])
 const isRecommendingSignal = signal<boolean>(false)
 
 const recommendChart = async () => {
-    console.log(recommendBodySignal.peek())
-    const response: RecommendResponse = (await axios.post(`${URI}/recommend`, recommendBodySignal.peek())).data
+    isRecommendingSignal.value = true
+    const response: RecommendResponse = (await axios.post(`${URI}/recommend`, recommendBodySignal.value)).data
     recommendedChartsSignal.value = response.charts.map((chart, i) => {
         const specObject = JSON.parse(chart.spec);
         specObject.title = null
@@ -29,7 +29,7 @@ const recommendChart = async () => {
         const titleToken: TitleToken[] = title.map((t) => {
             return {
                 text: t,
-                isPrefered: attributePreferedSignal.peek().includes(t) || transformationPreferredSignal.peek().includes(t),
+                isPrefered: attributePreferedSignal.value.includes(t) || transformationPreferredSignal.value.includes(t),
             };
         });
         specObject.autosize = { type: 'fit', contains: 'padding' };
@@ -47,6 +47,14 @@ const recommendChart = async () => {
     })
     isRecommendingSignal.value = false
 }
+
+effect(() => {
+    if (dashboardSignal.value.length > 0) {
+        isRecommendingSignal.value = true
+        recommendChart()
+        isRecommendingSignal.value = false
+    }
+})
 
 
 export { isRecommendingSignal, recommendChart, recommendedChartsSignal }

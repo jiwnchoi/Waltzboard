@@ -17,5 +17,5 @@ def jcd_index(sets: list[set], preferences: set[str]) -> float:
 
 def get_diversity_from_nodes(nodes: list["BaseChart"], preferences: set[str]) -> float:
     bots = [node.get_bot() for node in nodes]
-    n = len(bots)
+    n = len(nodes)
     return jcd_index(bots, preferences) / (n * (n - 1) / 2)

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { URI } from '../../config';
 import type { ChartView, TitleToken } from '../types/ChartView';
-import { computed } from '@preact/signals-react';
+import { computed, effect } from '@preact/signals-react';
 import { ScoreBody, ScoreResponse } from '../types/API';
 import { dashboardSignal, isProcessingSignal } from './dashboard';
 import { inferResponseSignal } from './infer';
@@ -15,5 +15,13 @@ const scoreDashboard = async () => {
     inferResponseSignal.value.result = response.result;
     isProcessingSignal.value = false;
 };
+
+effect(() => {
+    if (dashboardSignal.value.length > 1) {
+        isProcessingSignal.value = true;
+        scoreDashboard();
+        isProcessingSignal.value = false;
+    }
+});
 
 export { scoreDashboard }

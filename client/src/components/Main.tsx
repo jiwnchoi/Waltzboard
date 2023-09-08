@@ -26,6 +26,7 @@ import RecommendedChartView from './RecommendedChartView';
 import { ScoreDistView } from './ScoreDistView';
 import SpaceDistView from './SpaceDistView';
 import WeightSlider from './WeightSlider';
+import { scoreDashboard } from '../controller/score';
 
 export const Main = () => {
   return (
@@ -117,7 +118,7 @@ export const Main = () => {
             onClick={() => {
               isInferingSignal.value = true;
               inferDashboard();
-              recommendChart();
+              scoreDashboard();
             }}
           >
             {'Glean'}

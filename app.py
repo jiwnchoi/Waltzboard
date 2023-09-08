@@ -1,3 +1,5 @@
+import warnings
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,7 @@ from api.models import *
 from gleaner import Gleaner, GleanerDashboard
 from gleaner.model import get_chart_from_tokens
 
+warnings.filterwarnings("ignore")
 df = data.movies()
 
 gl = Gleaner(df)
@@ -81,7 +84,6 @@ async def infer(body: InferBody) -> InferResponse:
 async def recommend(body: RecommendBody) -> RecommendResponse:
     charts = [get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]]  # type: ignore
     results = gl.recommend(GleanerDashboard(charts), body.preferences, body.nResults)
-    print(results)
     return RecommendResponse(
         charts=[GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in results]
     )
@@ -89,8 +91,9 @@ async def recommend(body: RecommendBody) -> RecommendResponse:
 
 @app.post("/score")
 async def score(body: ScoreBody) -> ScoreResponse:
-    dashboard = GleanerDashboard([get_chart_from_tokens(c, gl.config) for c in [tuple(c) for c in body.chartKeys]])  # type: ignore
+    dashboard = GleanerDashboard([get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]])  # type: ignore
     results = gl.oracle.get_result(dashboard, set(gl.preferences))
+    print(results.get_score())
     return ScoreResponse(
         result=OracleResultModel.from_oracle_result(results),
     )

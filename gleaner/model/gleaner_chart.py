@@ -15,7 +15,6 @@ chart_hash: dict[ChartTokens, "BaseChart"] = {}
 
 def get_chart_from_tokens(key: ChartTokens, config: "GleanerConfig") -> "BaseChart":
     name_type_map = {a.name: a.type for a in config.attrs}
-    print(name_type_map)
     type_key = (
         key[0],
         name_type_map[key[1]],
@@ -25,8 +24,17 @@ def get_chart_from_tokens(key: ChartTokens, config: "GleanerConfig") -> "BaseCha
         key[5],
         key[6],
     )
+    sampled = (
+        key[0],
+        Attribute(key[1], name_type_map[key[1]]),
+        Attribute(key[2], name_type_map[key[2]]),
+        Attribute(key[3], name_type_map[key[3]]),
+        key[4],
+        key[5],
+        key[6],
+    )
     chart = chart_hash.get(key)
-    return chart if chart else ChartMap[key](type_key, config.df)
+    return chart if chart else ChartMap[type_key](sampled, config.df)
 
 
 def get_chart_from_sample(sample: ChartSampled, df: pd.DataFrame) -> "BaseChart":

@@ -84,7 +84,6 @@ class GleanerConfig:
             and get_type(Counter(key), "Q") <= attr_type_counter["Q"]
             and get_type(Counter(key), "T") <= attr_type_counter["T"]
         }
-        print(len(filtered_chart_map))
         return filtered_chart_map
 
     def update_constraints(self, constraints: list[str]):
