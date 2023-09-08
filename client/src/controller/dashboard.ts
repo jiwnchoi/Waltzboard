@@ -2,6 +2,7 @@ import { computed, signal } from '@preact/signals-react';
 import type { ChartView, TitleToken } from '../types/ChartView';
 import { attributePreferedSignal } from './attribute';
 import { inferResponseSignal } from './infer';
+import { transformationPreferredSignal } from './transformation';
 
 
 const dashboardSignal = computed<ChartView[]>(() =>
@@ -11,7 +12,7 @@ const dashboardSignal = computed<ChartView[]>(() =>
         const titleToken: TitleToken[] = title.map((t) => {
             return {
                 text: t,
-                isPrefered: attributePreferedSignal.value.includes(t),
+                isPrefered: attributePreferedSignal.peek().includes(t) || transformationPreferredSignal.peek().includes(t.toLowerCase()),
             };
         });
         specObject.autosize = { type: 'fit', contains: 'padding' };

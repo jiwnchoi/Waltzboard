@@ -5,6 +5,7 @@ import { RecommendBody, RecommendResponse } from "../types/API"
 import { ChartView, TitleToken } from "../types/ChartView"
 import { attributePreferedSignal } from "./attribute"
 import { chartKeysSignal } from "./dashboard"
+import { transformationPreferredSignal } from "./transformation"
 
 const recommendBodySignal = computed<RecommendBody>(() => {
     return {
@@ -24,12 +25,11 @@ const recommendChart = async () => {
     recommendedChartsSignal.value = response.charts.map((chart, i) => {
         const specObject = JSON.parse(chart.spec);
         specObject.title = null
-        // const title: string[] = JSON.parse(specObject.description!);
         const title: string[] = chart.title;
         const titleToken: TitleToken[] = title.map((t) => {
             return {
                 text: t,
-                isPrefered: attributePreferedSignal.value.includes(t),
+                isPrefered: attributePreferedSignal.peek().includes(t) || transformationPreferredSignal.peek().includes(t),
             };
         });
         specObject.autosize = { type: 'fit', contains: 'padding' };
@@ -45,7 +45,6 @@ const recommendChart = async () => {
             isPinned: false,
         };
     })
-    console.log(recommendedChartsSignal.peek())
     isRecommendingSignal.value = false
 }
 
