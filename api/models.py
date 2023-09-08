@@ -159,16 +159,17 @@ class RecommendResponse(BaseModel):
 
 class ScoreResponse(BaseModel):
     result: OracleResultModel
+    chartResults: list[OracleResultModel]
 
 
 chart_types: dict[str, ChartTypeModel] = {
     "bar": ChartTypeModel(name="Bar Chart", mark="bar"),
     "line": ChartTypeModel(name="Line Chart", mark="line"),
     "pie": ChartTypeModel(name="Pie Chart", mark="arc"),
-    "scatter": ChartTypeModel(name="Scatterplot", mark="point"),
+    "scatter": ChartTypeModel(name="Scatter Plot", mark="point"),
     "area": ChartTypeModel(name="Area Chart", mark="area"),
     "heatmap": ChartTypeModel(name="Heatmap", mark="rect"),
-    "boxplot": ChartTypeModel(name="Boxplot", mark="boxplot"),
+    "boxplot": ChartTypeModel(name="Box Plot", mark="boxplot"),
     "stripplot": ChartTypeModel(name="Strip Plot", mark="tick"),
 }
 

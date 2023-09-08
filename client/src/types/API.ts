@@ -61,6 +61,7 @@ interface InitResponse {
 interface InferResponse {
     charts: GleanerChartModel[];
     result: OracleResult;
+    chartResults: OracleResult[];
 }
 
 interface RecommendResponse {
@@ -80,6 +81,7 @@ interface ScoreBody {
 
 interface ScoreResponse {
     result: OracleResult;
+    chartResults: OracleResult[];
 }
 
 export type {

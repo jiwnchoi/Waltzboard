@@ -1,7 +1,6 @@
+import { batch, computed, effect } from '@preact/signals-react';
 import axios from 'axios';
 import { URI } from '../../config';
-import type { ChartView, TitleToken } from '../types/ChartView';
-import { computed, effect } from '@preact/signals-react';
 import { ScoreBody, ScoreResponse } from '../types/API';
 import { dashboardSignal, isProcessingSignal } from './dashboard';
 import { inferResponseSignal } from './infer';
@@ -12,7 +11,13 @@ const scoreBodySignal = computed<ScoreBody>(() => {
 
 const scoreDashboard = async () => {
     const response: ScoreResponse = (await axios.post(`${URI}/score`, scoreBodySignal.peek())).data;
-    inferResponseSignal.value.result = response.result;
+    batch(() => {
+        inferResponseSignal.value.result = response.result;
+        response.chartResults.forEach((chartResult, i) => {
+            dashboardSignal.value[i].chartResults = chartResult;
+        }
+        );
+    });
     isProcessingSignal.value = false;
 };
 
@@ -24,4 +29,4 @@ effect(() => {
     }
 });
 
-export { scoreDashboard }
+export { scoreDashboard };

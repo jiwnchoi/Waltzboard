@@ -95,9 +95,13 @@ async def recommend(body: RecommendBody) -> RecommendResponse:
 async def score(body: ScoreBody) -> ScoreResponse:
     dashboard = GleanerDashboard([get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]])  # type: ignore
     results = gl.oracle.get_result(dashboard, set(gl.preferences))
-    print(results.get_score())
+    ablated_dashboard = [
+        GleanerDashboard([c for j, c in enumerate(dashboard.charts) if i != j]) for i in range((len(dashboard)))
+    ]
+    ablated_result = [gl.oracle.get_result(d, set(gl.preferences)) for d in ablated_dashboard]
     return ScoreResponse(
         result=OracleResultModel.from_oracle_result(results),
+        chartResults=[OracleResultModel.from_oracle_result(r) for r in ablated_result],
     )
 
 

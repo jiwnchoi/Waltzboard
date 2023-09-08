@@ -1,5 +1,6 @@
 import type { TopLevelSpec } from "vega-lite";
 import { GleanerChartModel } from "../types/API";
+import { OracleResult } from "./OracleResult";
 
 interface StatisticFeature {
     [key: string]: (string | null)[]
@@ -17,6 +18,7 @@ interface ChartView extends GleanerChartModel {
 
     isPinned: boolean;
     titleToken: TitleToken[];
+    chartResults: OracleResult | undefined;
 }
 
 

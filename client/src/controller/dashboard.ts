@@ -3,6 +3,7 @@ import type { ChartView, TitleToken } from '../types/ChartView';
 import { attributePreferedSignal } from './attribute';
 import { inferResponseSignal } from './infer';
 import { transformationPreferredSignal } from './transformation';
+import { OracleResult } from '../types/OracleResult';
 
 
 const dashboardSignal = computed<ChartView[]>(() =>
@@ -27,6 +28,7 @@ const dashboardSignal = computed<ChartView[]>(() =>
             spec: specObject,
             statistics: chart.statistics,
             isPinned: pinnedKeysSignal.value.includes(chart.key),
+            chartResults: undefined,
             title,
             titleToken,
         };
@@ -34,6 +36,7 @@ const dashboardSignal = computed<ChartView[]>(() =>
 );
 
 const chartKeysSignal = computed<string[]>(() => dashboardSignal.value.map((chart) => chart.key));
+
 
 const isProcessingSignal = signal<boolean>(false);
 

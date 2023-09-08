@@ -15,6 +15,7 @@ const inferResponseSignal = signal<InferResponse>({
     interestingness: 0,
     parsimony: 0,
   },
+  chartResults: [],
 });
 
 const inferBodySignal = computed<InferBody>(() => {

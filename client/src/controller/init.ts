@@ -7,13 +7,16 @@ import { attributesSignal } from './attribute'
 import { chartTypesSignal } from './chartType'
 import { selectedTaskTypeSignal, taskTypesSignal } from './taskType'
 import { transformationsSignal } from './transformation'
+import { trainGleaner } from './train'
+import { inferDashboard } from './infer'
 
 const initializedSignal = signal<boolean>(false);
 
 const f = async () => {
     const response: InitResponse = (await axios.get(`${URI}/init`)).data
     batch(() => {
-        initializedSignal.value = true;
+        trainGleaner();
+        inferDashboard();
         attributesSignal.value = response.attributes.map((attribute) => {
             return {
                 ...attribute,
@@ -42,6 +45,7 @@ const f = async () => {
             };
         });
         selectedTaskTypeSignal.value = { ...selectedTaskTypeSignal.peek(), chartTypes: chartTypesSignal.peek() }
+        initializedSignal.value = true;
     });
     initializedSignal.value = true;
 }
