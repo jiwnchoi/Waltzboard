@@ -1,5 +1,6 @@
 import altair as alt
 from altair import Chart
+from altair.utils.schemapi import Undefined
 from .base_chart import BaseChart
 
 
@@ -15,7 +16,10 @@ class LineChart(BaseChart):
                     timeUnit=self.altair_token.x.aggregate,
                 ),
                 y=alt.Y(
-                    self.altair_token.y.name, type=self.altair_token.y.type, aggregate=self.altair_token.y.aggregate
+                    self.altair_token.y.name,
+                    type=self.altair_token.y.type,
+                    aggregate=self.altair_token.y.aggregate,
+                    axis=alt.Axis(format="~s" if self.altair_token.y.type == "quantitative" else Undefined),
                 ),
                 color=alt.Color(self.altair_token.z.name, type=self.altair_token.z.type),
             )

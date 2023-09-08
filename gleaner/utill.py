@@ -46,3 +46,15 @@ def display_function(epoch, train_results: list[TrainResult]):
                 ).resolve_scale(y="independent")
             )
         )
+
+
+import altair as alt
+
+
+def x_to_y(x: alt.X) -> alt.Y:
+    return 
+
+
+def y_to_x(y: alt.Y):
+    x = alt.X(field=y.field, type=y.type, bin=y.bin, timeUnit=y.timeUnit, axis=y.axis, aggregate=y.aggregate)
+    return x

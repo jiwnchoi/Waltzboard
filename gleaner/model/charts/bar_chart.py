@@ -16,6 +16,7 @@ class SingleBarChart(BaseChart):
             self.altair_token.y.name,
             type=self.altair_token.y.type,
             aggregate=self.altair_token.y.aggregate,
+            axis=alt.Axis(format="~s" if self.altair_token.y.type == "quantitative" else Undefined),
         )
         return alt.Chart(self.df, title=self.title).mark_bar().encode(x, y)
 
