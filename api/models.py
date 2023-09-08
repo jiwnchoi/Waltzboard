@@ -180,6 +180,10 @@ trs_types: dict[str, TrsTypeModel] = {
     "sum": TrsTypeModel(name="Sum", type="sum"),
     "min": TrsTypeModel(name="Min", type="min"),
     "max": TrsTypeModel(name="Max", type="max"),
+    "bin": TrsTypeModel(name="Bin", type="bin"),
+    "year": TrsTypeModel(name="Year", type="year"),
+    "month": TrsTypeModel(name="Month", type="month"),
+    "day": TrsTypeModel(name="Day", type="day"),
 }
 
 task_types: dict[str, TaskTypeModel] = {

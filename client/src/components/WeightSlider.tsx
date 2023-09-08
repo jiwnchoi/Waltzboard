@@ -18,10 +18,10 @@ const WeightSlider = (props: WeightSliderProps) => {
   return (
     <Flex flexDir="column">
       <Flex flexDir={'row'} justifyContent={'space-between'}>
-        <Text fontSize={'xs'} color={'gray.500'} fontWeight={500}>
+        <Text fontSize={'sm'} color={'gray.500'} fontWeight={500}>
           {props.title[0].toUpperCase() + props.title.slice(1)}
         </Text>
-        <Text fontSize={'xs'} fontWeight={600}>
+        <Text fontSize={'sm'} fontWeight={600}>
           {weightSignal.value[props.title]}
         </Text>
       </Flex>

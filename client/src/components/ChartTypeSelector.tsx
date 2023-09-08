@@ -14,7 +14,7 @@ export const ChartTypeSelector = ({ chartType }: { chartType: ChartType }) => {
   return (
     <Flex flexDir={'column'}>
       <Flex flexDir={'row'} align="center" bgColor="gray.50" py={1} px={2} borderTopRadius="md">
-        <Text fontSize={'xs'} color="gray.700" fontWeight={400}>
+        <Text fontSize={'sm'} color="gray.700" fontWeight={400}>
           {chartType.name}
         </Text>
         <Icon

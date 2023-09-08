@@ -25,7 +25,7 @@ export const TransformationSelector = ({
       px={2}
       borderRadius="md"
     >
-      <Text fontSize={'xs'} color="gray.700" fontWeight={400}>
+      <Text fontSize={'sm'} color="gray.700" fontWeight={400}>
         {transformation.name}
       </Text>
       <Icon

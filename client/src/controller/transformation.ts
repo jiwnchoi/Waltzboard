@@ -4,6 +4,14 @@ import { Transformation } from '../types/Transformation';
 
 const transformationsSignal = signal<Transformation[]>([]);
 
+const notDayTransformationsSignal = computed(() =>
+    transformationsSignal.value.filter((transformation) => !["year", "day", "month", "bin"].includes(transformation.type))
+);
+
+const dayTransformationsSignal = computed(() =>
+    transformationsSignal.value.filter((transformation) => ["year", "day", "month"].includes(transformation.type))
+);
+
 const targetTransformationSignal = computed(() =>
     transformationsSignal.value.filter((transformation) => !transformation.ignore).map((transformation) => transformation.type)
 );
@@ -53,4 +61,6 @@ export {
     transformationPreferredSignal,
     toggleTransformationPrefer,
     toggleTransformationIgnore,
+    notDayTransformationsSignal,
+    dayTransformationsSignal,
 };

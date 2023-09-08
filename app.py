@@ -50,6 +50,7 @@ async def init() -> InitResponse:
 
 @app.post("/train")
 async def train(train: TrainBody) -> TrainResponse:
+    print(train)
     gl.preferences = train.preferences
     gl.config.update_constraints(train.constraints)
     gl.config.update_weight(

@@ -39,7 +39,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
           }}
           _hover={{ cursor: 'pointer' }}
         />
-        <Text w="full" fontSize={'xs'} textAlign="center">
+        <Text w="full" fontSize={'sm'} textAlign="center">
           {chart.titleToken.map((t, index) =>
             t.isPrefered ? (
               <Text key={index} as="span" fontWeight={800} color="pink.400">
@@ -73,7 +73,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
       </Center>
       <Divider mb={2} />
       <Flex flexDir={'row'} justifyContent={'space-between'} align="center">
-        <Text fontSize={'xs'} textAlign="center" fontWeight={400} mr="auto">
+        <Text fontSize={'sm'} textAlign="center" fontWeight={400} mr="auto">
           Statistics
         </Text>
         {showStatistics.value ? (
@@ -89,7 +89,7 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
             if (chart.statistics[key].filter((f) => f !== null).length === 0) return null;
             return (
               <Flex gap={1} key={`stat-${i}`}>
-                <Text fontSize={'xs'} textAlign="center" fontWeight={400} mr="auto">
+                <Text fontSize={'sm'} textAlign="center" fontWeight={400} mr="auto">
                   {key.replace("['", '').replace("']", '').replace("', '", ' & ')}
                 </Text>
                 {chart.statistics[key].map((feature) => (

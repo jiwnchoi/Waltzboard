@@ -91,7 +91,10 @@ class GleanerConfig:
         self.attr_names = [m for m in self.attr_names if m not in constraints]
         self.attrs = self.get_attrs()
         self.chart_type = [m for m in self.chart_type if m not in constraints]
-        self.trs_type = [m for m in self.trs_type if m not in constraints]
+        self.txs = [m for m in self.txs if m not in constraints]
+        self.tys = [m for m in self.tys if m not in constraints]
+        self.tzs = [m for m in self.tzs if m not in constraints]
+        self.trs_type = list(set(self.txs + self.tys + self.tzs))
         self.chart_map = self.get_chart_map()
 
     def update_weight(

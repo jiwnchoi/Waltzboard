@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Select, SimpleGrid } from '@chakra-ui/react';
-import { transformationsSignal } from '../controller/transformation';
+import { notDayTransformationsSignal, transformationsSignal } from '../controller/transformation';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
 import { dashboardSignal } from '../controller/dashboard';
@@ -38,7 +38,7 @@ export const Main = () => {
       px={4}
       gap={4}
     >
-      <Flex flexDir={'column'} w={150} gap={2} h="fit-content">
+      <Flex flexDir={'column'} w={200} gap={2} h="fit-content">
         <Button
           boxShadow={'sm'}
           colorScheme="blue"
@@ -83,7 +83,7 @@ export const Main = () => {
           <Box minH={10}></Box>
         </Section>
         <Section title="Transformations" gap={1.5} maxH={120} w="full">
-          {transformationsSignal.value.map((transformation, i) => (
+          {notDayTransformationsSignal.value.map((transformation, i) => (
             <TransformationSelector
               transformation={transformation}
               key={`attribute-${i}`}
