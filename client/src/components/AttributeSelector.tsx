@@ -13,8 +13,7 @@ import {
   toggleAttributePrefer,
 } from '../controller/attribute';
 import type { Attribute } from '../types/Attribute';
-import { toggleTransformationIgnore, toggleTransformationPrefer, transformationsSignal } from '../controller/transformation';
-const DATE_TRS = ['year', 'month', 'day']
+import { dayTransformationsSignal, toggleTransformationIgnore, toggleTransformationPrefer, transformationsSignal } from '../controller/transformation';
 const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
   return (
     <Flex
@@ -70,7 +69,7 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
       {attribute.type === 'T' && (
         <>
           <Divider />
-          {transformationsSignal.value.filter(t => DATE_TRS.includes(t.type)).map((t, i) => (
+          {dayTransformationsSignal.value.map((t, i) => (
             <Flex flexDir={'row'} align="center">
               <Text
                 fontSize={'sm'}

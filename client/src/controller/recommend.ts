@@ -43,6 +43,7 @@ const recommendChart = async () => {
             statistics: chart.statistics,
             titleToken,
             title,
+            chartResults: undefined,
             isPinned: false,
         };
     })

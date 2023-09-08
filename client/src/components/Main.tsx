@@ -1,5 +1,8 @@
 import { Box, Button, Flex, Select, SimpleGrid } from '@chakra-ui/react';
-import { notDayTransformationsSignal, transformationsSignal } from '../controller/transformation';
+import {
+  notDayTransformationsSignal,
+  transformationsSignal,
+} from '../controller/transformation';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
 import { dashboardSignal } from '../controller/dashboard';
@@ -137,8 +140,8 @@ export const Main = () => {
             <RecommendedChartView
               chart={chart}
               key={`chart-rec-${i}`}
-              width={250}
-              height={100}
+              width={300}
+              height={150}
             />
           ))}
         </HSection>

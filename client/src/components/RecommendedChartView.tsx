@@ -33,10 +33,9 @@ const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
       gap={1}
       onClick={() => appendChartToDashboard(chart)}
       _hover={{backgroundColor: 'gray.100', cursor: 'pointer', borderRadius: 'md'}}
-      minH={"124px"}
     >
       <Flex flexDir={'row'} justifyContent={'space-between'} align="top">
-        <Text w="full" fontSize={1} lineHeight={'3'} textAlign="center">
+        <Text w="full" fontSize={'sm'} lineHeight={'3'} textAlign="center">
           {chart.titleToken.map((t, i) =>
             t.isPrefered ? (
               <Text key={`rec-chart-${i}`} as="span" fontWeight={800} color="pink.400">

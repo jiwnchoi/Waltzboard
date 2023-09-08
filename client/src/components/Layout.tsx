@@ -1,4 +1,13 @@
-import { Button, Collapse, Flex, FlexProps, Heading, Icon, Link, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Collapse,
+  Flex,
+  FlexProps,
+  Heading,
+  Icon,
+  Link,
+  Text,
+} from '@chakra-ui/react';
 import { useSignal } from '@preact/signals-react';
 import { AiFillGithub } from 'react-icons/ai';
 import { GiWheat } from 'react-icons/gi';
@@ -36,7 +45,12 @@ const Footer = () => {
     >
       <Link href="https://idclab.skku.edu" isExternal>
         <Flex>
-          <Text variant={'layout'} fontFamily="Rajdhani" fontWeight={900} fontSize="xl">
+          <Text
+            variant={'layout'}
+            fontFamily="Rajdhani"
+            fontWeight={900}
+            fontSize="xl"
+          >
             IDC
           </Text>
           <Text variant={'layout'} fontFamily="Rajdhani" fontSize="xl">
@@ -83,7 +97,11 @@ const Section = (props: SectionProps) => {
       borderRadius="md"
       boxShadow="sm"
     >
-      <Flex flexDir={'row'} justifyContent={'space-between'} alignItems={'center'}>
+      <Flex
+        flexDir={'row'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+      >
         <Heading variant={'section'}>{props.title}</Heading>
         {show.value ? (
           <Icon as={RiArrowDownSLine} boxSize={4} onClick={toggleShow} />
@@ -128,12 +146,17 @@ const HSection = (props: SectionProps) => {
       h={props.height}
       minH={props.minH}
       gap={props.gap}
+      overflow={'auto'}
       p={2}
       bgColor="white"
       borderRadius="md"
       boxShadow="sm"
     >
-      <Flex flexDir={'row'} justifyContent={'space-between'} alignItems={'center'}>
+      <Flex
+        flexDir={'row'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+      >
         <Heading variant={'section'}>{props.title}</Heading>
         {show.value ? (
           <Icon as={RiArrowDownSLine} boxSize={4} onClick={toggleShow} />
