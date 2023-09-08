@@ -1,7 +1,7 @@
 import altair as alt
 from gleaner.model import BaseChart
 from dataclasses import dataclass
-
+from copy import deepcopy
 
 @dataclass
 class GleanerDashboard:
@@ -12,9 +12,10 @@ class GleanerDashboard:
 
     def append(self, chart: BaseChart):
         self.charts.append(chart)
+        return self
 
     def extend(self, charts: list[BaseChart]):
-        self.charts = charts + self.charts
+        return GleanerDashboard(self.charts + charts)
 
     def display(self, width: int = 150, height: int = 150, num_cols: int = 4):
         if self.charts is None:
