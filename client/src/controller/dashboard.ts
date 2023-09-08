@@ -20,6 +20,8 @@ const dashboardSignal = computed<ChartView[]>(() =>
         if (specObject.encoding && specObject.encoding.color) {
             specObject.encoding.color.legend = { title: null };
         }
+        specObject.background = null;
+
         return {
             key: chart.key,
             spec: specObject,

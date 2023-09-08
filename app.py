@@ -50,6 +50,7 @@ async def init() -> InitResponse:
 
 @app.post("/train")
 async def train(train: TrainBody) -> TrainResponse:
+    gl.preferences = train.preferences
     gl.config.update_constraints(train.constraints)
     gl.config.update_weight(
         specificity=train.weight.specificity,
@@ -83,7 +84,7 @@ async def infer(body: InferBody) -> InferResponse:
 @app.post("/recommend")
 async def recommend(body: RecommendBody) -> RecommendResponse:
     charts = [get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]]  # type: ignore
-    results = gl.recommend(GleanerDashboard(charts), body.preferences, body.nResults)
+    results = gl.recommend(GleanerDashboard(charts), gl.preferences, body.nResults)
     return RecommendResponse(
         charts=[GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in results]
     )

@@ -6,11 +6,11 @@ import { ChartView, TitleToken } from "../types/ChartView"
 import { attributePreferedSignal } from "./attribute"
 import { chartKeysSignal, dashboardSignal } from "./dashboard"
 import { transformationPreferredSignal } from "./transformation"
+import { inferResponseSignal } from "./infer"
 
 const recommendBodySignal = computed<RecommendBody>(() => {
     return {
         chartKeys: chartKeysSignal.value,
-        preferences: attributePreferedSignal.value,
         nResults: 5,
     }
 })
@@ -33,6 +33,7 @@ const recommendChart = async () => {
             };
         });
         specObject.autosize = { type: 'fit', contains: 'padding' };
+        specObject.background = null;
         if (specObject.encoding && specObject.encoding.color) {
             specObject.encoding.color.legend = { title: null };
         }
@@ -48,6 +49,22 @@ const recommendChart = async () => {
     isRecommendingSignal.value = false
 }
 
+const appendChartToDashboard = (chart: ChartView) => {
+    console.log(chart)
+    inferResponseSignal.value = {
+        ... inferResponseSignal.peek(),
+        charts : [
+            ...inferResponseSignal.peek().charts,
+            {
+                key: chart.key,
+                spec: JSON.stringify(chart.spec),
+                title: chart.title,
+                statistics: chart.statistics,
+            }
+        ]
+    }
+}
+
 effect(() => {
     if (dashboardSignal.value.length > 0) {
         isRecommendingSignal.value = true
@@ -57,4 +74,4 @@ effect(() => {
 })
 
 
-export { isRecommendingSignal, recommendChart, recommendedChartsSignal }
+export { isRecommendingSignal, recommendChart, recommendedChartsSignal, appendChartToDashboard }

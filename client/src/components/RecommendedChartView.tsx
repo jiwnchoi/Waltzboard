@@ -5,6 +5,7 @@ import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
 import type { ChartView } from '../types/ChartView';
 import { removeChart, togglePinChart } from '../controller/dashboard';
+import { appendChartToDashboard } from '../controller/recommend';
 
 const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
   if (feature === null) return null;
@@ -28,8 +29,11 @@ const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
       flexDir={'column'}
       w={'full'}
       h="fit-content"
-      p={0}
+      p={1}
       gap={1}
+      onClick={() => appendChartToDashboard(chart)}
+      _hover={{backgroundColor: 'gray.100', cursor: 'pointer', borderRadius: 'md'}}
+      minH={"124px"}
     >
       <Flex flexDir={'row'} justifyContent={'space-between'} align="top">
         <Text w="full" fontSize={1} lineHeight={'3'} textAlign="center">

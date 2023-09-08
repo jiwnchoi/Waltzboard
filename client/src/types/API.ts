@@ -41,7 +41,6 @@ interface TrainBody {
 
 interface RecommendBody {
     chartKeys: string[];
-    preferences: string[];
     nResults: number;
 }
 
