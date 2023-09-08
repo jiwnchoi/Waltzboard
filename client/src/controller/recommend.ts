@@ -9,6 +9,7 @@ import { chartKeysSignal } from "./dashboard"
 const recommendBodySignal = computed<RecommendBody>(() => {
     return {
         chartKeys: chartKeysSignal.value,
+        preferences: attributePreferedSignal.value,
         nResults: 5,
     }
 })

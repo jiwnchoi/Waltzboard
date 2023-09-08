@@ -47,6 +47,6 @@ class Gleaner:
         filtered_charts = [c for c in charts if c.tokens not in [c.tokens for c in dashboard.charts]]
         candidate_dashboards = [GleanerDashboard(dashboard.charts + [c]) for c in filtered_charts]
         results = [self.oracle.get_result(d, set(preferences)) for d in candidate_dashboards]
-        result_and_dashboards = [[r, d] for r, d in zip(results, candidate_dashboards)]
-        result_and_dashboards.sort(key=lambda x: x[0].get_score(), reverse=True)
-        return [d.charts for _, d in result_and_dashboards[:n_results]]
+        result_and_charts = [[r, c] for r, c in zip(results, filtered_charts)]
+        result_and_charts.sort(key=lambda x: x[0].get_score(), reverse=True)
+        return [c for _, c in result_and_charts[:n_results]]

@@ -117,6 +117,7 @@ class TrainBody(BaseModel):
 
 class RecommendBody(BaseModel):
     chartKeys: list[str]
+    preferences: list[str]
     nResults: int
 
 

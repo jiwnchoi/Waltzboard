@@ -80,9 +80,7 @@ async def infer(body: InferBody) -> InferResponse:
 @app.post("/recommend")
 async def recommend(body: RecommendBody) -> RecommendResponse:
     charts = [get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]]  # type: ignore
-    print(charts)
-    print(GleanerDashboard(charts))
-    results = gl.recommend(GleanerDashboard(charts), body.nResults)
+    results = gl.recommend(GleanerDashboard(charts), body.preferences, body.nResults)
     print(results)
     return RecommendResponse(
         charts=[GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in results]
