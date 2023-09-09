@@ -1,21 +1,23 @@
-import { Center, Flex, Spinner } from '@chakra-ui/react';
+import { Box, Center, Flex, Spinner } from '@chakra-ui/react';
 import { Footer, Header } from './components/Layout';
 import { Main } from './components/Main';
 import { initializedSignal } from './controller/init';
 
 const App = () => (
-  <Flex flexDir={'column'}>
+  <Center flexDir={'column'} w="full">
     <Header />
-    {initializedSignal.value ? (
-      <Main />
-    ) : (
-      <Center minH={'80vh'} flexDir="column" gap={10}>
-        Loading ...
-        <Spinner size="xl" />
-      </Center>
-    )}
+    <Center w="100vw" justifyContent="center" alignItems={'center'}>
+      {initializedSignal.value ? (
+        <Main />
+      ) : (
+        <Center minH={'80vh'} w="full">
+          Loading ...
+          <Spinner size="xl" />
+        </Center>
+      )}
+    </Center>
     <Footer />
-  </Flex>
+  </Center>
 );
 
 export default App;

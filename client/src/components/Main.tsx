@@ -1,26 +1,19 @@
-import { Box, Button, Flex, Select, SimpleGrid } from '@chakra-ui/react';
 import {
-  notDayTransformationsSignal,
-  transformationsSignal,
-} from '../controller/transformation';
+  Box,
+  Button,
+  Center,
+  Flex,
+  SimpleGrid,
+  Spinner,
+} from '@chakra-ui/react';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
 import { dashboardSignal } from '../controller/dashboard';
-import { inferDashboard, isInferingSignal } from '../controller/infer';
-import {
-  recommendChart,
-  recommendedChartsSignal,
-} from '../controller/recommend';
-import {
-  selectedTaskTypeSignal,
-  taskTypesSignal,
-} from '../controller/taskType';
-import {
-  isTrainedSignal,
-  isTrainingSignal,
-  trainGleaner,
-} from '../controller/train';
-import { TransformationSelector } from './TransformationSelector';
+import { inferDashboard } from '../controller/infer';
+import { recommendedChartsSignal } from '../controller/recommend';
+import { scoreDashboard } from '../controller/score';
+import { isTrainingSignal, trainGleaner } from '../controller/train';
+import { notDayTransformationsSignal } from '../controller/transformation';
 import AttributeSelector from './AttributeSelector';
 import { ChartTypeSelector } from './ChartTypeSelector';
 import ChartView from './ChartView';
@@ -28,34 +21,28 @@ import { HSection, Section } from './Layout';
 import RecommendedChartView from './RecommendedChartView';
 import { ScoreDistView } from './ScoreDistView';
 import SpaceDistView from './SpaceDistView';
+import { TransformationSelector } from './TransformationSelector';
 import WeightSlider from './WeightSlider';
-import { scoreDashboard } from '../controller/score';
 
 export const Main = () => {
   return (
-    <Flex
-      w="full"
-      minH="80vh"
-      flexDir={'row'}
-      justifyContent="space-between"
-      px={4}
-      gap={4}
-    >
+    <Flex w="95vw" minH="80vh" flexDir={'row'} px={4} gap={4}>
       <Flex flexDir={'column'} w={200} gap={2} h="fit-content">
         <Button
           boxShadow={'sm'}
           colorScheme="blue"
           color="white"
-          loadingText="Training..."
+          loadingText="Searching Dashboard..."
           size="xs"
           w="full"
           isLoading={isTrainingSignal.value}
           onClick={() => {
-            isTrainingSignal.value = true;
             trainGleaner();
+            inferDashboard();
+            scoreDashboard();
           }}
         >
-          {'Train'}
+          {'Search Dashboard'}
         </Button>
         <Section title="Score Weight" gap={1.5} w="full">
           {/* <Select
@@ -102,56 +89,42 @@ export const Main = () => {
           <Box minH={8}></Box>
         </Section>
       </Flex>
-      <Flex flexDir={'column'} w={300} h="fit-content" gap={2}>
-        <Flex
-          flexDir={'row'}
-          justifyContent={'space-between'}
-          align="center"
-          gap={2}
-        >
-          <Button
-            boxShadow={'sm'}
-            colorScheme="orange"
-            color="white"
-            loadingText="Gleaning..."
-            size="xs"
-            w="full"
-            isLoading={isInferingSignal.value}
-            isDisabled={!isTrainedSignal.value}
-            onClick={() => {
-              isInferingSignal.value = true;
-              inferDashboard();
-              scoreDashboard();
-            }}
-          >
-            {'Glean'}
-          </Button>
-        </Flex>
-        <Section title="Space Distributions" width={300}>
+      <Flex flexDir={'column'} minW={200} h="fit-content" gap={2}>
+        <Section title="Score Distributions" width={250}>
+          <ScoreDistView width={250} height={250} />
+        </Section>
+        <Section title="Space Distributions" width={250}>
           <SpaceDistView width={'full'} />
         </Section>
-        <Section title="Score Distributions" width={300}>
-          <ScoreDistView width={300} height={300} />
-        </Section>
       </Flex>
-      <Flex flexDir={'column'} w={'full'} h="fit-content" gap={2}>
-        <HSection title="Recommendation" gap={1.5}>
-          {recommendedChartsSignal.value.map((chart, i) => (
-            <RecommendedChartView
-              chart={chart}
-              key={`chart-rec-${i}`}
-              width={300}
-              height={150}
-            />
-          ))}
+      <Flex flexDir={'column'} flexGrow={1} minW={0} h="fit-content" gap={2}>
+        <HSection title="Recommendation" gap={1.5} w="full">
+          {recommendedChartsSignal.value.length ? (
+            recommendedChartsSignal.value.map((chart, i) => (
+              <RecommendedChartView
+                chart={chart}
+                key={`chart-rec-${i}`}
+                overflowX={'scroll'}
+                minW={320}
+                p={2}
+                chartWidth={300}
+                chartHeight={150}
+              />
+            ))
+          ) : (
+            <Center w="full" minH={180}>
+              <Spinner size="xl" />
+            </Center>
+          )}
         </HSection>
         <HSection
           title="Dashboard"
           gap={2}
           bgColor={'white'}
-          w="full"
+          flexGrow={1}
+          minW={0}
           h="fit-content"
-          maxH={'100vh'}
+          showScroll={false}
         >
           {dashboardSignal.value.length ? (
             <SimpleGrid
@@ -170,7 +143,9 @@ export const Main = () => {
               ))}
             </SimpleGrid>
           ) : (
-            <Box>No Dashboard</Box>
+            <Center w="full" minH={180}>
+              <Spinner size="xl" />
+            </Center>
           )}
         </HSection>
       </Flex>

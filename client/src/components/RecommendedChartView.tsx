@@ -1,44 +1,41 @@
-import { Badge, Center, Divider, Flex, Icon, Text } from '@chakra-ui/react';
-import { RiDeleteBinLine, RiPushpinFill, RiPushpinLine } from 'react-icons/ri';
-import { TbExchange } from 'react-icons/tb';
+import { Badge, Center, Flex, FlexProps, Text } from '@chakra-ui/react';
 import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
-import type { ChartView } from '../types/ChartView';
-import { removeChart, togglePinChart } from '../controller/dashboard';
 import { appendChartToDashboard } from '../controller/recommend';
+import type { ChartView } from '../types/ChartView';
 
-const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
-  if (feature === null) return null;
-  return <Badge>{feature.replace('has_', '')}</Badge>;
-};
-interface ChartViewProps {
+interface ChartViewProps extends FlexProps {
   chart: ChartView;
-  width: number;
-  height: number;
+  chartWidth: number;
+  chartHeight: number;
 }
-const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
-  const spec = chart.spec;
-  spec.config = {
-    axis: {
-      labelFontSize: 6,
-      titleFontSize: 6,
-    },
-  };
+const RecommendedChartView = (props: ChartViewProps) => {
   return (
     <Flex
       flexDir={'column'}
-      w={'full'}
-      h="fit-content"
-      p={1}
-      gap={1}
-      onClick={() => appendChartToDashboard(chart)}
-      _hover={{backgroundColor: 'gray.100', cursor: 'pointer', borderRadius: 'md'}}
+      {...props}
+      onClick={() => appendChartToDashboard(props.chart)}
+      _hover={{
+        backgroundColor: 'gray.100',
+        cursor: 'pointer',
+        borderRadius: 'md',
+      }}
     >
-      <Flex flexDir={'row'} justifyContent={'space-between'} align="top">
-        <Text w="full" fontSize={'sm'} lineHeight={'3'} textAlign="center">
-          {chart.titleToken.map((t, i) =>
+      <Flex
+        flexDir={'row'}
+        justifyContent={'space-between'}
+        align="top"
+        w={'full'}
+      >
+        <Text w="full" fontSize={'sm'} textAlign="center">
+          {props.chart.titleToken.map((t, i) =>
             t.isPrefered ? (
-              <Text key={`rec-chart-${i}`} as="span" fontWeight={800} color="pink.400">
+              <Text
+                key={`rec-chart-${i}`}
+                as="span"
+                fontWeight={800}
+                color="pink.400"
+              >
                 {`${t.text} `}
               </Text>
             ) : (
@@ -51,9 +48,9 @@ const RecommendedChartView = ({ chart, width, height }: ChartViewProps) => {
       </Flex>
       <Center height="full" px={4}>
         <VegaLite
-          height={height}
-          width={width}
-          spec={chart.spec}
+          height={props.chartHeight}
+          width={props.chartWidth}
+          spec={props.chart.spec}
           actions={false}
           tooltip={new Handler().call}
         />

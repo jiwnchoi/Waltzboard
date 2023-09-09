@@ -15,7 +15,7 @@ import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 
 const Header = () => {
   return (
-    <Flex align="center" justifyContent="space-between" px={4} py={2}>
+    <Flex align="center" justifyContent="space-between" px={4} py={2} w="95vw">
       <Flex alignItems={'center'}>
         <Icon as={GiWheat} mr={1} boxSize={6} color="gray.500" />
         <Heading size="md" variant={'layout'} alignItems="center">
@@ -23,7 +23,7 @@ const Header = () => {
         </Heading>
       </Flex>
       <Link href="https://github.com/jason-choi/gleaner" isExternal>
-        <Button variant={'layout'} leftIcon={<AiFillGithub />}>
+        <Button variant={'layout'} leftIcon={<AiFillGithub />} p={0} m={0}>
           GitHub
         </Button>
       </Link>
@@ -42,6 +42,7 @@ const Footer = () => {
       alignItems="start"
       position={'relative'}
       bottom={0}
+      w="95vw"
     >
       <Link href="https://idclab.skku.edu" isExternal>
         <Flex>
@@ -76,6 +77,7 @@ const Footer = () => {
 interface SectionProps extends FlexProps {
   title: string;
   collapsed?: boolean;
+  showScroll?: boolean;
 }
 const Section = (props: SectionProps) => {
   const show = useSignal<boolean | undefined>(!props.collapsed);
@@ -142,11 +144,8 @@ const HSection = (props: SectionProps) => {
   return (
     <Flex
       flexDir={'column'}
-      w="full"
-      h={props.height}
-      minH={props.minH}
       gap={props.gap}
-      overflow={'auto'}
+      {...props}
       p={2}
       bgColor="white"
       borderRadius="md"
@@ -172,6 +171,7 @@ const HSection = (props: SectionProps) => {
           bgColor="white"
           borderRadius="md"
           boxShadow="sm"
+          overflowX={'scroll'}
         >
           {props.children}
         </Flex>

@@ -1,5 +1,5 @@
 import { Box, Flex, FlexProps, Text } from '@chakra-ui/react';
-import { AxisBottom } from '@visx/axis';
+import { AxisBottom, AxisTop } from '@visx/axis';
 import { ScaleSVG } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
 import { BarStackHorizontal, Stack } from '@visx/shape';
@@ -17,8 +17,8 @@ import {
 } from '../types/Space';
 import { LegendOrdinal } from '@visx/legend';
 
-const BAR_HEIGHT = 15;
-const SVG_WIDTH = 200;
+const BAR_HEIGHT = 20;
+const SVG_WIDTH = 180;
 
 type Data = ChartTypeDist | TransformationDist | AttributeDist;
 type Key = 'x' | 'y' | 'z' | 'prob';
@@ -60,7 +60,7 @@ function getSVGProp(data: Data[], keys: Key[]): SVGProp {
   };
 }
 
-const margin = { top: 15, bottom: 15, left: 10, right: 10 };
+const margin = { top: 20, bottom: 15, left: 15, right: 5 };
 
 const StackedBarChart = ({
   title,
@@ -113,53 +113,13 @@ const StackedBarChart = ({
           </LegendOrdinal>
         )}
       </Flex>
-
-      <ScaleSVG width={svgProp.width} height={svgProp.height}>
-        <BarStackHorizontal<Data, Key>
-          data={svgProp.data}
-          keys={svgProp.keys}
-          height={svgProp.yMax}
-          y={(d: Data) => d.name}
-          xScale={svgProp.xScale}
-          yScale={svgProp.yScale}
-          color={svgProp.colorScale}
-        >
-          {(barStacks) =>
-            barStacks.map((barStack, i) => (
-              <>
-                {barStack.bars.map((bar) => (
-                  <rect
-                    key={`${title}-${barStack.index}-${bar.index}`}
-                    x={bar.x}
-                    y={bar.y}
-                    width={bar.width}
-                    height={bar.height}
-                    fill={bar.color}
-                  />
-                ))}
-                {i == barStacks.length - 1 &&
-                  barStack.bars.map((bar, j) => (
-                    <SVGText
-                      key={`${title}-${i}-${j}`}
-                      x={bar.x + bar.width + 6}
-                      y={bar.y + bar.height / 2}
-                      verticalAnchor="middle"
-                      fill="gray"
-                      fontSize={10}
-                      textAnchor="start"
-                    >
-                      {bar.bar.data.name}
-                    </SVGText>
-                  ))}
-              </>
-            ))
-          }
-        </BarStackHorizontal>
-        <AxisBottom
-          top={svgProp.yMax}
+      <ScaleSVG width={svgProp.width} height={22}>
+        <AxisTop
+          top={margin.top}
           scale={svgProp.xScale}
-          stroke={'#E2E2E2'}
-          tickStroke="#E2E2E2"
+          stroke={'gray'}
+          tickStroke="gray"
+          strokeWidth={1}
           tickLabelProps={() => ({
             fill: 'gray',
             fontSize: 11,
@@ -168,6 +128,50 @@ const StackedBarChart = ({
           numTicks={6}
         />
       </ScaleSVG>
+      <Box w="full" h={120} overflowY={'scroll'}>
+        <ScaleSVG width={svgProp.width} height={svgProp.height}>
+          <BarStackHorizontal<Data, Key>
+            data={svgProp.data}
+            keys={svgProp.keys}
+            height={svgProp.yMax}
+            y={(d: Data) => d.name}
+            xScale={svgProp.xScale}
+            yScale={svgProp.yScale}
+            color={svgProp.colorScale}
+          >
+            {(barStacks) =>
+              barStacks.map((barStack, i) => (
+                <>
+                  {barStack.bars.map((bar) => (
+                    <rect
+                      key={`${title}-${barStack.index}-${bar.index}`}
+                      x={bar.x}
+                      y={bar.y}
+                      width={bar.width}
+                      height={bar.height}
+                      fill={bar.color}
+                    />
+                  ))}
+                  {i == barStacks.length - 1 &&
+                    barStack.bars.map((bar, j) => (
+                      <SVGText
+                        key={`${title}-${i}-${j}`}
+                        x={bar.x + bar.width + 6}
+                        y={bar.y + bar.height / 2}
+                        verticalAnchor="middle"
+                        fill="gray"
+                        fontSize={12}
+                        textAnchor="start"
+                      >
+                        {bar.bar.data.name}
+                      </SVGText>
+                    ))}
+                </>
+              ))
+            }
+          </BarStackHorizontal>
+        </ScaleSVG>
+      </Box>
     </>
   );
 };

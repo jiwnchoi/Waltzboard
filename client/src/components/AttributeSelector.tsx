@@ -13,7 +13,12 @@ import {
   toggleAttributePrefer,
 } from '../controller/attribute';
 import type { Attribute } from '../types/Attribute';
-import { dayTransformationsSignal, toggleTransformationIgnore, toggleTransformationPrefer, transformationsSignal } from '../controller/transformation';
+import {
+  dayTransformationsSignal,
+  toggleTransformationIgnore,
+  toggleTransformationPrefer,
+  transformationsSignal,
+} from '../controller/transformation';
 const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
   return (
     <Flex
@@ -44,7 +49,7 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
           color="gray.700"
           fontWeight={400}
           textOverflow="ellipsis"
-          overflow={'hidden'}
+          overflow={'scroll'}
           whiteSpace="nowrap"
         >
           {attribute.name}
@@ -76,15 +81,13 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
                 color="gray.700"
                 fontWeight={400}
                 textOverflow="ellipsis"
-                overflow={'hidden'}
+                overflow={'scroll'}
                 whiteSpace="nowrap"
               >
                 {t.name}
               </Text>
               <Icon
-                as={
-                  t.ignore ? RiCheckboxCircleLine : RiCheckboxCircleFill
-                }
+                as={t.ignore ? RiCheckboxCircleLine : RiCheckboxCircleFill}
                 boxSize={3.5}
                 color="blue.400"
                 ml={'auto'}
