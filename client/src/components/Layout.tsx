@@ -10,26 +10,47 @@ import {
 } from '@chakra-ui/react';
 import { useSignal } from '@preact/signals-react';
 import { AiFillGithub } from 'react-icons/ai';
+import { FiExternalLink } from 'react-icons/fi';
 import { GiWheat } from 'react-icons/gi';
 import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 
-const Header = () => {
-  return (
-    <Flex align="center" justifyContent="space-between" px={4} py={2} w="95vw">
-      <Flex alignItems={'center'}>
-        <Icon as={GiWheat} mr={1} boxSize={6} color="gray.500" />
-        <Heading size="md" variant={'layout'} alignItems="center">
-          Gleaner
-        </Heading>
-      </Flex>
+const Header = () => (
+  <Flex align="center" justifyContent="space-between" px={4} py={2} w="full">
+    <Flex alignItems={'center'}>
+      <Icon as={GiWheat} mr={1} boxSize={6} color="gray.500" />
+      <Heading size="md" variant={'layout'} alignItems="center">
+        Gleaner
+      </Heading>
+    </Flex>
+    <Flex alignItems={'center'} gap={4}>
       <Link href="https://github.com/jason-choi/gleaner" isExternal>
         <Button variant={'layout'} leftIcon={<AiFillGithub />} p={0} m={0}>
           GitHub
         </Button>
       </Link>
+      <Link href="https://idclab.skku.edu" isExternal>
+        <Button variant={'layout'} leftIcon={<FiExternalLink />} p={0} m={0}>
+          <Text
+            variant={'layout'}
+            fontFamily="Rajdhani"
+            fontWeight={900}
+            fontSize="lg"
+          >
+            IDC
+          </Text>
+          <Text
+            variant={'layout'}
+            fontFamily="Rajdhani"
+            fontSize="lg"
+            fontWeight={500}
+          >
+            Lab
+          </Text>
+        </Button>
+      </Link>
     </Flex>
-  );
-};
+  </Flex>
+);
 
 const Footer = () => {
   return (
@@ -42,7 +63,7 @@ const Footer = () => {
       alignItems="start"
       position={'relative'}
       bottom={0}
-      w="95vw"
+      w="full"
     >
       <Link href="https://idclab.skku.edu" isExternal>
         <Flex>
@@ -77,7 +98,6 @@ const Footer = () => {
 interface SectionProps extends FlexProps {
   title: string;
   collapsed?: boolean;
-  showScroll?: boolean;
 }
 const Section = (props: SectionProps) => {
   const show = useSignal<boolean | undefined>(!props.collapsed);
@@ -88,12 +108,9 @@ const Section = (props: SectionProps) => {
 
   return (
     <Flex
-      maxH={props.maxH}
+      {...props}
       flexDir={'column'}
       w="full"
-      h={props.height}
-      minH={props.minH}
-      gap={props.gap}
       p={2}
       bgColor="white"
       borderRadius="md"
@@ -180,4 +197,4 @@ const HSection = (props: SectionProps) => {
   );
 };
 
-export { Header, Footer, Section, HSection };
+export { Footer, HSection, Header, Section };

@@ -1,21 +1,21 @@
 import { Box, Flex, FlexProps, Text } from '@chakra-ui/react';
-import { AxisBottom, AxisTop } from '@visx/axis';
+import { AxisTop } from '@visx/axis';
+import { LegendOrdinal } from '@visx/legend';
 import { ScaleSVG } from '@visx/responsive';
 import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale';
-import { BarStackHorizontal, Stack } from '@visx/shape';
+import { BarStackHorizontal } from '@visx/shape';
 import { Text as SVGText } from '@visx/text';
 import { schemeCategory10 } from 'd3-scale-chromatic';
 import {
-  transformationDistSignal,
   attributeDistSignal,
   chartTypeDistSignal,
+  transformationDistSignal,
 } from '../controller/train';
 import {
-  TransformationDist,
   AttributeDist,
   ChartTypeDist,
+  TransformationDist,
 } from '../types/Space';
-import { LegendOrdinal } from '@visx/legend';
 
 const BAR_HEIGHT = 20;
 const SVG_WIDTH = 180;
@@ -70,7 +70,7 @@ const StackedBarChart = ({
   svgProp: SVGProp;
 }) => {
   return (
-    <>
+    <Box>
       <Flex
         flexDir={'row'}
         justifyContent={'space-between'}
@@ -172,7 +172,7 @@ const StackedBarChart = ({
           </BarStackHorizontal>
         </ScaleSVG>
       </Box>
-    </>
+    </Box>
   );
 };
 

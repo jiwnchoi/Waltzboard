@@ -4,19 +4,16 @@ import { Main } from './components/Main';
 import { initializedSignal } from './controller/init';
 
 const App = () => (
-  <Center flexDir={'column'} w="full">
+  <Center w="full" minH={'90vh'} flexDir={'column'}>
     <Header />
-    <Center w="100vw" justifyContent="center" alignItems={'center'}>
-      {initializedSignal.value ? (
-        <Main />
-      ) : (
-        <Center minH={'80vh'} w="full">
-          Loading ...
-          <Spinner size="xl" />
-        </Center>
-      )}
-    </Center>
-    <Footer />
+    {initializedSignal.value ? (
+      <Main />
+    ) : (
+      <Center minH={'80vh'} w="full" flexDir={'column'}>
+        Loading ...
+        <Spinner size="xl" />
+      </Center>
+    )}
   </Center>
 );
 

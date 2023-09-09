@@ -1,4 +1,4 @@
-import { Badge, Center, Flex, FlexProps, Text } from '@chakra-ui/react';
+import { Center, Flex, FlexProps, Text } from '@chakra-ui/react';
 import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
 import { appendChartToDashboard } from '../controller/recommend';

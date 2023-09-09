@@ -5,15 +5,24 @@ import {
   RiHeartAddFill,
   RiHeartAddLine,
 } from 'react-icons/ri';
-import { toggleChartTypeIgnore, toggleChartTypePrefer } from '../controller/chartType';
+import {
+  toggleChartTypeIgnore,
+  toggleChartTypePrefer,
+} from '../controller/chartType';
 
 import type { ChartType } from '../types/ChartType';
-import { schemeCategory10 } from 'd3-scale-chromatic';
 
 export const ChartTypeSelector = ({ chartType }: { chartType: ChartType }) => {
   return (
     <Flex flexDir={'column'}>
-      <Flex flexDir={'row'} align="center" bgColor="gray.50" py={1} px={2} borderTopRadius="md">
+      <Flex
+        flexDir={'row'}
+        align="center"
+        bgColor="gray.50"
+        py={1}
+        px={2}
+        borderTopRadius="md"
+      >
         <Text fontSize={'sm'} color="gray.700" fontWeight={400}>
           {chartType.name}
         </Text>

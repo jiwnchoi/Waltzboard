@@ -12,13 +12,12 @@ import {
   toggleAttributeIgnore,
   toggleAttributePrefer,
 } from '../controller/attribute';
-import type { Attribute } from '../types/Attribute';
 import {
   dayTransformationsSignal,
   toggleTransformationIgnore,
   toggleTransformationPrefer,
-  transformationsSignal,
 } from '../controller/transformation';
+import type { Attribute } from '../types/Attribute';
 const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
   return (
     <Flex

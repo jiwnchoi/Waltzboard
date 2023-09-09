@@ -57,14 +57,16 @@ const genPolygonPoints = (data: number[], scale: (n: number) => number) => {
     x: 0,
     y: 0,
   });
-  const pointString: string = new Array(data.length + 1).fill('').reduce((res, _, i) => {
-    if (i > data.length) return res;
-    const xVal = scale(data[i - 1]) * Math.sin(i * step);
-    const yVal = scale(data[i - 1]) * Math.cos(i * step);
-    points[i - 1] = { x: xVal, y: yVal };
-    res += `${xVal},${yVal} `;
-    return res;
-  });
+  const pointString: string = new Array(data.length + 1)
+    .fill('')
+    .reduce((res, _, i) => {
+      if (i > data.length) return res;
+      const xVal = scale(data[i - 1]) * Math.sin(i * step);
+      const yVal = scale(data[i - 1]) * Math.cos(i * step);
+      points[i - 1] = { x: xVal, y: yVal };
+      res += `${xVal},${yVal} `;
+      return res;
+    });
 
   return { points, pointString };
 };
@@ -103,7 +105,12 @@ export const RadarAxis = (props: RadarAxisProps & { data: number[] }) => {
         />
       ))}
       {[...new Array(5)].map((_, i) => (
-        <Line key={`radar-line-${i}`} from={zeroPoint} to={points[i]} stroke={'#E2E2E2'} />
+        <Line
+          key={`radar-line-${i}`}
+          from={zeroPoint}
+          to={points[i]}
+          stroke={'#E2E2E2'}
+        />
       ))}
       {labelPoints.map((value, i) => (
         <>
@@ -156,7 +163,13 @@ export const RadarRangeMark = (props: RadarRangeMarkProps) => {
   return (
     <>
       <mask id="radar-mask">
-        <rect x={-radius} y={-radius} width={radius * 2} height={radius * 2} fill="white" />
+        <rect
+          x={-radius}
+          y={-radius}
+          width={radius * 2}
+          height={radius * 2}
+          fill="white"
+        />
         <polygon points={minPoints.pointString} fill="black" />
       </mask>
       <polygon
@@ -199,7 +212,13 @@ export const RadarMark = (props: RadarMarkProps) => {
         strokeWidth={1.5}
       />
       {polygonPoints.points.map((point, i) => (
-        <circle key={`radar-point-${i}`} cx={point.x} cy={point.y} r={1} fill={color} />
+        <circle
+          key={`radar-point-${i}`}
+          cx={point.x}
+          cy={point.y}
+          r={1}
+          fill={color}
+        />
       ))}
     </>
   );
@@ -217,22 +236,48 @@ export const ScoreDistView = ({ width, height }: ScoreDistViewProps) => {
 
   const q1Scores = {
     score: sortedScoreDist.score[Math.floor(sortedScoreDist.score.length / 4)],
-    specificity: sortedScoreDist.specificity[Math.floor(sortedScoreDist.specificity.length / 4)],
+    specificity:
+      sortedScoreDist.specificity[
+        Math.floor(sortedScoreDist.specificity.length / 4)
+      ],
     interestingness:
-      sortedScoreDist.interestingness[Math.floor(sortedScoreDist.interestingness.length / 4)],
-    coverage: sortedScoreDist.coverage[Math.floor(sortedScoreDist.coverage.length / 4)],
-    diversity: sortedScoreDist.diversity[Math.floor(sortedScoreDist.diversity.length / 4)],
-    parsimony: sortedScoreDist.parsimony[Math.floor(sortedScoreDist.parsimony.length / 4)],
+      sortedScoreDist.interestingness[
+        Math.floor(sortedScoreDist.interestingness.length / 4)
+      ],
+    coverage:
+      sortedScoreDist.coverage[Math.floor(sortedScoreDist.coverage.length / 4)],
+    diversity:
+      sortedScoreDist.diversity[
+        Math.floor(sortedScoreDist.diversity.length / 4)
+      ],
+    parsimony:
+      sortedScoreDist.parsimony[
+        Math.floor(sortedScoreDist.parsimony.length / 4)
+      ],
   };
   const q3Scores = {
-    score: sortedScoreDist.score[Math.floor((sortedScoreDist.score.length * 3) / 4)],
+    score:
+      sortedScoreDist.score[Math.floor((sortedScoreDist.score.length * 3) / 4)],
     specificity:
-      sortedScoreDist.specificity[Math.floor((sortedScoreDist.specificity.length * 3) / 4)],
+      sortedScoreDist.specificity[
+        Math.floor((sortedScoreDist.specificity.length * 3) / 4)
+      ],
     interestingness:
-      sortedScoreDist.interestingness[Math.floor((sortedScoreDist.interestingness.length * 3) / 4)],
-    coverage: sortedScoreDist.coverage[Math.floor((sortedScoreDist.coverage.length * 3) / 4)],
-    diversity: sortedScoreDist.diversity[Math.floor((sortedScoreDist.diversity.length * 3) / 4)],
-    parsimony: sortedScoreDist.parsimony[Math.floor((sortedScoreDist.parsimony.length * 3) / 4)],
+      sortedScoreDist.interestingness[
+        Math.floor((sortedScoreDist.interestingness.length * 3) / 4)
+      ],
+    coverage:
+      sortedScoreDist.coverage[
+        Math.floor((sortedScoreDist.coverage.length * 3) / 4)
+      ],
+    diversity:
+      sortedScoreDist.diversity[
+        Math.floor((sortedScoreDist.diversity.length * 3) / 4)
+      ],
+    parsimony:
+      sortedScoreDist.parsimony[
+        Math.floor((sortedScoreDist.parsimony.length * 3) / 4)
+      ],
   };
   // const medianScores = {
   //   score: sortedScoreDist.score[Math.floor(sortedScoreDist.score.length / 2)],

@@ -7,6 +7,7 @@ import {
   Icon,
   Text,
 } from '@chakra-ui/react';
+import { useSignal } from '@preact/signals-react';
 import {
   RiArrowDownSLine,
   RiArrowUpSLine,
@@ -14,13 +15,11 @@ import {
   RiPushpinFill,
   RiPushpinLine,
 } from 'react-icons/ri';
-import { TbExchange } from 'react-icons/tb';
 import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
-import type { ChartView } from '../types/ChartView';
 import { removeChart, togglePinChart } from '../controller/dashboard';
-import { useSignal } from '@preact/signals-react';
 import { inferResponseSignal } from '../controller/infer';
+import type { ChartView } from '../types/ChartView';
 
 const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
   if (feature === null) return null;
@@ -103,71 +102,84 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
 
       <Collapse in={showStatistics.value} animateOpacity>
         <Flex flexDir={'column'} gap={2} mt={2}>
-          <Text>
-            This chart contributes to{' '}
-          </Text>
+          <Text>This chart contributes to </Text>
           {/* specificity interestingnenss coverage diversity parsimony */}
-          {
-            chart.chartResults && Math.abs(inferResponseSignal.value.result.specificity - chart.chartResults.specificity) > 0.05 ? (
-              <Text as="p">
-                <Text as="span">
-                Specificity as 
-                </Text>
-                <Text as="span" fontWeight={800} color="pink.400">
-                  {` ${(inferResponseSignal.value.result.specificity - chart.chartResults.specificity).toFixed(2)} `}
-                </Text>
+          {chart.chartResults &&
+          Math.abs(
+            inferResponseSignal.value.result.specificity -
+              chart.chartResults.specificity
+          ) > 0.05 ? (
+            <Text as="p">
+              <Text as="span">Specificity as</Text>
+              <Text as="span" fontWeight={800} color="pink.400">
+                {` ${(
+                  inferResponseSignal.value.result.specificity -
+                  chart.chartResults.specificity
+                ).toFixed(2)} `}
               </Text>
-            ) : null
-          }
-          {
-            chart.chartResults && Math.abs(inferResponseSignal.value.result.interestingness - chart.chartResults.interestingness) > 0.05 ? (
-              <Text as="p">
-                <Text as="span">
-                Interestingness as 
-                </Text>
-                <Text as="span" fontWeight={800} color="pink.400">
-                  {` ${(inferResponseSignal.value.result.interestingness - chart.chartResults.interestingness).toFixed(2)} `}
-                </Text>
+            </Text>
+          ) : null}
+          {chart.chartResults &&
+          Math.abs(
+            inferResponseSignal.value.result.interestingness -
+              chart.chartResults.interestingness
+          ) > 0.05 ? (
+            <Text as="p">
+              <Text as="span">Interestingness as</Text>
+              <Text as="span" fontWeight={800} color="pink.400">
+                {` ${(
+                  inferResponseSignal.value.result.interestingness -
+                  chart.chartResults.interestingness
+                ).toFixed(2)} `}
               </Text>
-            ) : null
-          }
-          {
-            chart.chartResults && Math.abs(inferResponseSignal.value.result.coverage - chart.chartResults.coverage) > 0.05 ? (
-              <Text as="p">
-                <Text as="span">
-                Coverage as 
-                </Text>
-                <Text as="span" fontWeight={800} color="pink.400">
-                  {` ${(inferResponseSignal.value.result.coverage - chart.chartResults.coverage).toFixed(2)} `}
-                </Text>
+            </Text>
+          ) : null}
+          {chart.chartResults &&
+          Math.abs(
+            inferResponseSignal.value.result.coverage -
+              chart.chartResults.coverage
+          ) > 0.05 ? (
+            <Text as="p">
+              <Text as="span">Coverage as</Text>
+              <Text as="span" fontWeight={800} color="pink.400">
+                {` ${(
+                  inferResponseSignal.value.result.coverage -
+                  chart.chartResults.coverage
+                ).toFixed(2)} `}
               </Text>
-            ) : null
-          }
-          {
-            chart.chartResults && Math.abs(inferResponseSignal.value.result.diversity - chart.chartResults.diversity) > 0.05 ? (
-              <Text as="p">
-                <Text as="span">
-                Diversity as 
-                </Text>
-                <Text as="span" fontWeight={800} color="pink.400">
-                  {` ${(inferResponseSignal.value.result.diversity - chart.chartResults.diversity).toFixed(2)} `}
-                </Text>
+            </Text>
+          ) : null}
+          {chart.chartResults &&
+          Math.abs(
+            inferResponseSignal.value.result.diversity -
+              chart.chartResults.diversity
+          ) > 0.05 ? (
+            <Text as="p">
+              <Text as="span">Diversity as</Text>
+              <Text as="span" fontWeight={800} color="pink.400">
+                {` ${(
+                  inferResponseSignal.value.result.diversity -
+                  chart.chartResults.diversity
+                ).toFixed(2)} `}
               </Text>
-            ) : null
-          }
-          {
-            chart.chartResults && Math.abs(inferResponseSignal.value.result.parsimony - chart.chartResults.parsimony) > 0.05 ? (
-              <Text as="p">
-                <Text as="span">
-                Parsimony as 
-                </Text>
-                <Text as="span" fontWeight={800} color="pink.400">
-                  {` ${(inferResponseSignal.value.result.parsimony - chart.chartResults.parsimony).toFixed(2)} `}
-                </Text>
+            </Text>
+          ) : null}
+          {chart.chartResults &&
+          Math.abs(
+            inferResponseSignal.value.result.parsimony -
+              chart.chartResults.parsimony
+          ) > 0.05 ? (
+            <Text as="p">
+              <Text as="span">Parsimony as</Text>
+              <Text as="span" fontWeight={800} color="pink.400">
+                {` ${(
+                  inferResponseSignal.value.result.parsimony -
+                  chart.chartResults.parsimony
+                ).toFixed(2)} `}
               </Text>
-            ) : null
-          }
-         
+            </Text>
+          ) : null}
+
           {Object.keys(chart.statistics).map((key, i) => {
             if (chart.statistics[key].filter((f) => f !== null).length === 0)
               return null;
