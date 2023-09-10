@@ -48,7 +48,7 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
           color="gray.700"
           fontWeight={400}
           textOverflow="ellipsis"
-          overflow={'scroll'}
+          overflow={'hidden'}
           whiteSpace="nowrap"
         >
           {attribute.name}
@@ -80,7 +80,6 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
                 color="gray.700"
                 fontWeight={400}
                 textOverflow="ellipsis"
-                overflow={'scroll'}
                 whiteSpace="nowrap"
               >
                 {t.name}

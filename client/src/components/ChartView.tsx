@@ -4,6 +4,8 @@ import {
   Collapse,
   Divider,
   Flex,
+  Grid,
+  GridItem,
   Icon,
   Text,
 } from '@chakra-ui/react';
@@ -23,7 +25,11 @@ import type { ChartView } from '../types/ChartView';
 
 const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
   if (feature === null) return null;
-  return <Badge>{feature.replace('has_', '')}</Badge>;
+  return (
+    <GridItem>
+      <Badge>{feature.replace('has_', '')}</Badge>
+    </GridItem>
+  );
 };
 interface ChartViewProps {
   chart: ChartView;
@@ -184,21 +190,27 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
             if (chart.statistics[key].filter((f) => f !== null).length === 0)
               return null;
             return (
-              <Flex gap={1} key={`stat-${i}`}>
+              <Flex gap={1} key={`stat-${i}`} align={'center'}>
                 <Text
                   fontSize={'sm'}
-                  textAlign="center"
+                  textAlign="start"
                   fontWeight={400}
                   mr="auto"
+                  textOverflow="ellipsis"
+                  overflow={'hidden'}
+                  whiteSpace="nowrap"
+                  w={'50%'}
                 >
                   {key
                     .replace("['", '')
                     .replace("']", '')
                     .replace("', '", ' & ')}
                 </Text>
-                {chart.statistics[key].map((feature) => (
-                  <StatisticFeatureBadge feature={feature} />
-                ))}
+                <Grid templateColumns={'repeat(2, 1fr)'} gap={1} w={'50%'}>
+                  {chart.statistics[key].map((feature) => (
+                    <StatisticFeatureBadge feature={feature} />
+                  ))}
+                </Grid>
               </Flex>
             );
           })}

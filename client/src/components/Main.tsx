@@ -91,23 +91,35 @@ export const Main = () => {
               <WeightSlider title="diversity" />
               <WeightSlider title="parsimony" />
             </Section>
-            <Section title="Chart Types" gap={1.5} maxH={160} w="full">
+            <Section
+              title="Chart Types"
+              gap={1.5}
+              maxH={160}
+              w="full"
+              innerOverflowY={'scroll'}
+            >
               {chartTypesSignal.value.map((chartType, i) => (
                 <ChartTypeSelector
                   chartType={chartType}
                   key={`chartType-${i}`}
                 />
               ))}
-              <Box minH={10}></Box>
+              <Box bgColor={'white'} minH={41} />
             </Section>
-            <Section title="Transformations" gap={1.5} maxH={160} w="full">
+            <Section
+              title="Transformations"
+              gap={1.5}
+              maxH={160}
+              w="full"
+              innerOverflowY={'scroll'}
+            >
               {notDayTransformationsSignal.value.map((transformation, i) => (
                 <TransformationSelector
                   transformation={transformation}
                   key={`attribute-${i}`}
                 />
               ))}
-              <Box minH={8}></Box>
+              <Box bgColor={'white'} minH={41} />
             </Section>
 
             <Section
@@ -115,8 +127,9 @@ export const Main = () => {
               gap={1.5}
               minH={'36px'}
               maxH={'calc(100vh - 700px)'}
+              pb={4}
               w="full"
-              overflowY={'scroll'}
+              innerOverflowY={'scroll'}
             >
               {attributesSignal.value.map((attribute, i) => (
                 <AttributeSelector
@@ -124,7 +137,7 @@ export const Main = () => {
                   key={`attribute-${i}`}
                 />
               ))}
-              <Box minH={8}></Box>
+              <Box bgColor={'white'} minH={41} />
             </Section>
           </Flex>
           <Flex flexDir={'column'} minW={200} h="fit-content" gap={2}>
@@ -142,13 +155,17 @@ export const Main = () => {
         </Flex>
       </Flex>
       <Flex flexDir={'column'} flexGrow={1} minW={0} h="full" gap={2}>
-        <HSection title="Recommendation" gap={1.5} w="full">
+        <HSection
+          title="Recommendation"
+          gap={1.5}
+          w="full"
+          innerOverflowX="scroll"
+        >
           {recommendedChartsSignal.value.length ? (
             recommendedChartsSignal.value.map((chart, i) => (
               <RecommendedChartView
                 chart={chart}
                 key={`chart-rec-${i}`}
-                overflowX={'scroll'}
                 minW={300}
                 p={2}
                 chartWidth={300}
@@ -167,13 +184,13 @@ export const Main = () => {
           bgColor={'white'}
           flexGrow={1}
           minW={0}
-          h="full"
-          overflowY={'scroll'}
+          h={'calc(100vh - 319px)'}
+          innerOverflowY="auto"
         >
           {dashboardSignal.value.length ? (
             <SimpleGrid
               w="full"
-              maxH={'calc(100vh - 347px)'}
+              maxH={'calc(100vh - 362px)'}
               spacing={2}
               minChildWidth={300}
             >

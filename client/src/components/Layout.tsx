@@ -98,6 +98,22 @@ const Footer = () => {
 interface SectionProps extends FlexProps {
   title: string;
   collapsed?: boolean;
+  innerOverflowX?:
+    | 'scroll'
+    | 'hidden'
+    | 'visible'
+    | 'auto'
+    | 'initial'
+    | 'inherit'
+    | undefined;
+  innerOverflowY?:
+    | 'scroll'
+    | 'hidden'
+    | 'visible'
+    | 'auto'
+    | 'initial'
+    | 'inherit'
+    | undefined;
 }
 const Section = (props: SectionProps) => {
   const show = useSignal<boolean | undefined>(!props.collapsed);
@@ -133,16 +149,9 @@ const Section = (props: SectionProps) => {
           flexDir={'column'}
           w="full"
           gap={props.gap}
-          bgColor="white"
-          borderRadius="md"
-          boxShadow="sm"
           maxH={props.maxH}
-          overflow={'scroll'}
-          sx={{
-            '::-webkit-scrollbar': {
-              display: 'none',
-            },
-          }}
+          overflowX={props.innerOverflowX}
+          overflowY={props.innerOverflowY}
         >
           {props.children}
         </Flex>
@@ -188,7 +197,8 @@ const HSection = (props: SectionProps) => {
           bgColor="white"
           borderRadius="md"
           boxShadow="sm"
-          overflowX={'scroll'}
+          overflowY={props.innerOverflowY}
+          overflowX={props.innerOverflowX}
         >
           {props.children}
         </Flex>
