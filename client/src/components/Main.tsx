@@ -17,13 +17,14 @@ import { isTrainingSignal, trainGleaner } from '../controller/train';
 import { notDayTransformationsSignal } from '../controller/transformation';
 import AttributeSelector from './AttributeSelector';
 import { ChartTypeSelector } from './ChartTypeSelector';
-import ChartView from './ChartView';
+import { ChartAppendView, ChartView } from './ChartView';
 import { HSection, Section } from './Layout';
 import RecommendedChartView from './RecommendedChartView';
 import { ScoreDistView } from './ScoreDistView';
 import SpaceDistView from './SpaceDistView';
 import { TransformationSelector } from './TransformationSelector';
 import WeightSlider from './WeightSlider';
+import { init } from '../controller/init';
 
 export const Main = () => {
   return (
@@ -33,16 +34,20 @@ export const Main = () => {
           <Flex flexGrow={1}>
             <Select
               size={'sm'}
-              value={'Movies'}
+              defaultValue={'Movies'}
               w="full"
               bgColor={'white'}
               boxShadow={'sm'}
               borderRadius={'md'}
               borderWidth={0}
+              onChange={(e) => {
+                console.log(e.target.value);
+                init(e.target.value);
+              }}
             >
+              <option>Birdstrikes</option>
               <option>Movies</option>
-              <option>Cars</option>
-              <option>BirdStrike</option>
+              <option>Student Performance</option>
             </Select>
           </Flex>
           <Flex>
@@ -194,6 +199,7 @@ export const Main = () => {
               spacing={2}
               minChildWidth={300}
             >
+              <ChartAppendView />
               {dashboardSignal.value.map((chart, i) => (
                 <ChartView
                   chart={chart}
