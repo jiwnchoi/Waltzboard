@@ -12,8 +12,8 @@ import { inferDashboard } from './infer'
 
 const initializedSignal = signal<boolean>(false);
 
-const f = async () => {
-    const response: InitResponse = (await axios.get(`${URI}/init`)).data
+const init = async (datasetName: string = "Movies") => {
+    const response: InitResponse = (await axios.get(`${URI}/init?name=${datasetName}`)).data
     batch(() => {
         trainGleaner();
         inferDashboard();
@@ -38,13 +38,13 @@ const f = async () => {
                 ignore: false,
             };
         });
-        taskTypesSignal.value = response.taskTypes.map((taskType) => {
-            return {
-                ...taskType,
-                chartTypes: taskType.chartTypes.map((chartType) => chartTypesSignal.peek().find((ct) => ct.name === chartType.name) as ChartType),
-            };
-        });
-        selectedTaskTypeSignal.value = { ...selectedTaskTypeSignal.peek(), chartTypes: chartTypesSignal.peek() }
+        // taskTypesSignal.value = response.taskTypes.map((taskType) => {
+        //     return {
+        //         ...taskType,
+        //         chartTypes: taskType.chartTypes.map((chartType) => chartTypesSignal.peek().find((ct) => ct.name === chartType.name) as ChartType),
+        //     };
+        // });
+        // selectedTaskTypeSignal.value = { ...selectedTaskTypeSignal.peek(), chartTypes: chartTypesSignal.peek() }
         initializedSignal.value = true;
     });
     initializedSignal.value = true;
@@ -52,8 +52,8 @@ const f = async () => {
 
 
 (effect(() => {
-    f();
+    init();
 }))();
 
 
-export { initializedSignal }
+export { initializedSignal, init }

@@ -1,5 +1,5 @@
 import warnings
-
+import pandas as pd
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,12 +12,17 @@ from gleaner import Gleaner, GleanerDashboard
 from gleaner.model import get_chart_from_tokens
 
 warnings.filterwarnings("ignore")
-df = data.movies()
 
-gl = Gleaner(df)
-gl.config.n_epoch = 5
 app = FastAPI()
 
+datasets = {
+    "Birdstrikes": pd.read_csv("data/birdstrikes.csv").sample(1000),
+    "Movies": pd.read_json("data/movies.json"),
+    "Student Performance": pd.read_csv("data/student_performance.csv"),
+}
+
+df = datasets["Movies"]
+gl = Gleaner(df)
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,18 +37,16 @@ def string_to_tuple(str: str):
     return tuple(map(int, str.split(",")))
 
 
-# app.mount("/", StaticFiles(directory="dist", html=True), name="GleanerInterface")
-
-
 @app.get("/init")
-async def init() -> InitResponse:
-    gl.__init__(df)
-    gl.config.n_epoch = 5
+async def init(name: str = "Movies") -> InitResponse:
+    gl.__init__(datasets[name])
+    gl.config.n_epoch = 20
     gl.update_config()
     return InitResponse(
+        datasets=list(datasets.keys()),
         chartTypes=list(chart_types.values()),
         transformations=list(trs_types.values()),
-        taskTypes=list(task_types.values()),
+        # taskTypes=list(task_types.values()),
         attributes=[AttributeModel(name=a.name, type=a.type) for a in gl.config.attrs[1:]],  # type: ignore
     )
 
