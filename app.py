@@ -25,7 +25,8 @@ app.include_router(init.router)
 app.include_router(infer.router)
 app.include_router(score.router)
 app.include_router(variants.router)
-
+app.include_router(is_valid.router)
+app.include_router(inspect.router)
 
 if __name__ == "__main__":
     uvicorn.run(

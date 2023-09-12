@@ -4,11 +4,11 @@ import { toChartView } from '../utils/toChartView';
 import { inferResponseSignal } from './infer';
 
 const dashboardSignal = computed<ChartView[]>(() =>
-  inferResponseSignal.value.charts.map((chart => toChartView(chart))
-))
+  inferResponseSignal.value.charts.map((chart) => toChartView(chart)),
+);
 
 const chartKeysSignal = computed<string[]>(() =>
-  dashboardSignal.value.map((chart) => chart.key)
+  dashboardSignal.value.map((chart) => chart.key),
 );
 
 const isProcessingSignal = signal<boolean>(false);
@@ -33,9 +33,10 @@ const togglePinChart = (key: string) => {
 };
 
 export {
-    chartKeysSignal, dashboardSignal,
-    isProcessingSignal,
-    pinnedKeysSignal, removeChart,
-    togglePinChart
+  chartKeysSignal,
+  dashboardSignal,
+  isProcessingSignal,
+  pinnedKeysSignal,
+  removeChart,
+  togglePinChart,
 };
-

@@ -2,7 +2,7 @@ import json
 import altair as alt
 from pydantic import BaseModel
 from gleaner.model import BaseChart, ChartTokens
-from gleaner.oracle import OracleResult
+from gleaner.oracle import OracleResult, OracleSingleResult, Statistics
 
 
 # Atoms
@@ -33,6 +33,24 @@ class OracleResultModel(BaseModel):
             diversity=res.diversity,
             coverage=res.coverage,
             parsimony=res.parsimony,
+        )
+
+
+class OracleSingleResultModel(BaseModel):
+    score: float
+    specificity: float
+    interestingness: float
+    diversity: float
+    coverage: float
+
+    @staticmethod
+    def from_oracle_result(res: OracleSingleResult):
+        return OracleSingleResultModel(
+            score=res.get_score(),
+            specificity=res.specificity,
+            interestingness=res.interestingness,
+            diversity=res.diversity,
+            coverage=res.coverage,
         )
 
 
@@ -80,15 +98,17 @@ class GleanerChartModel(BaseModel):
     key: str
     spec: str
     title: list[str]
-    statistics: dict[str, list[str | None]]
+    statistics: list[dict[str, str | list[str | None]]]
 
     @staticmethod
-    def from_gleaner_chart(chart: BaseChart, statistics: dict[str, list[str | None]] = {}):
+    def from_gleaner_chart(
+        chart: BaseChart, statistics: list[Statistics] = []
+    ):
         return GleanerChartModel(
             key=json.dumps(chart.tokens),
             spec=chart.get_vegalite(),
             title=chart.title_tokens,
-            statistics=statistics,
+            statistics=[s.to_dict() for s in statistics],
         )
 
 

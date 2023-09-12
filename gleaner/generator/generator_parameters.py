@@ -39,7 +39,9 @@ class NormalPrior:
         self.history = [mean]
 
     def update(self, n, observed_mean, observed_var):
-        self.mean = (self.mean / self.var + observed_mean * n / observed_var) / (1 / self.var + n / observed_var)
+        self.mean = (
+            self.mean / self.var + observed_mean * n / observed_var
+        ) / (1 / self.var + n / observed_var)
         # self.var = 1 / (1 / self.var + n / observed_var)
         self.history.append(self.mean)
 
@@ -65,13 +67,27 @@ class PriorParameters:
         config: GleanerConfig,
     ) -> None:
         self.config = config
-        self.ct = DirichletPrior(np.ones(len(self.config.chart_type)) * self.config.robustness)
-        self.x = DirichletPrior(np.ones(len(self.config.attrs)) * self.config.robustness)
-        self.y = DirichletPrior(np.ones(len(self.config.attrs)) * self.config.robustness)
-        self.z = DirichletPrior(np.ones(len(self.config.attrs)) * self.config.robustness)
-        self.tx = DirichletPrior(np.ones(len(self.config.txs)) * self.config.robustness)
-        self.ty = DirichletPrior(np.ones(len(self.config.tys)) * self.config.robustness)
-        self.tz = DirichletPrior(np.ones(len(self.config.tzs)) * self.config.robustness)
+        self.ct = DirichletPrior(
+            np.ones(len(self.config.chart_type)) * self.config.robustness
+        )
+        self.x = DirichletPrior(
+            np.ones(len(self.config.attrs)) * self.config.robustness
+        )
+        self.y = DirichletPrior(
+            np.ones(len(self.config.attrs)) * self.config.robustness
+        )
+        self.z = DirichletPrior(
+            np.ones(len(self.config.attrs)) * self.config.robustness
+        )
+        self.tx = DirichletPrior(
+            np.ones(len(self.config.txs)) * self.config.robustness
+        )
+        self.ty = DirichletPrior(
+            np.ones(len(self.config.tys)) * self.config.robustness
+        )
+        self.tz = DirichletPrior(
+            np.ones(len(self.config.tzs)) * self.config.robustness
+        )
         self.n_charts = NormalPrior(len(self.config.attrs) - 1)
 
     def display(self):
@@ -84,7 +100,8 @@ class PriorParameters:
             index=[a.name for a in self.config.attrs],
         ).transpose()
         chart_type_data = pd.DataFrame(
-            {"ct": self.ct.count / np.sum(self.ct.count)}, index=self.config.chart_type
+            {"ct": self.ct.count / np.sum(self.ct.count)},
+            index=self.config.chart_type,
         ).transpose()
         trs_type_data = pd.DataFrame(
             {
@@ -118,9 +135,18 @@ class PriorParameters:
         ags = [
             {
                 "name": str(at),
-                "x": self.tx.count[self.config.txs.index(at)] / np.sum(self.tx.count) if at in self.config.txs else 0,
-                "y": self.ty.count[self.config.tys.index(at)] / np.sum(self.ty.count) if at in self.config.tys else 0,
-                "z": self.tz.count[self.config.tzs.index(at)] / np.sum(self.tz.count) if at in self.config.tzs else 0,
+                "x": self.tx.count[self.config.txs.index(at)]
+                / np.sum(self.tx.count)
+                if at in self.config.txs
+                else 0,
+                "y": self.ty.count[self.config.tys.index(at)]
+                / np.sum(self.ty.count)
+                if at in self.config.tys
+                else 0,
+                "z": self.tz.count[self.config.tzs.index(at)]
+                / np.sum(self.tz.count)
+                if at in self.config.tzs
+                else 0,
             }
             for at in self.config.trs_type
         ]

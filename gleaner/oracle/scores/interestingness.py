@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import pandas as pd
 import numpy as np
 from sklearn.neighbors import LocalOutlierFactor
@@ -25,11 +26,20 @@ def has_outliers_q(df: pd.DataFrame, attr: str) -> str | None:
 
 
 def has_skewness_q(df: pd.DataFrame, attr: str) -> str | None:
-    return "has_skewness" if abs(pd.to_numeric(df[attr].skew(skipna=True), errors="coerce")) > 2 else None
+    return (
+        "has_skewness"
+        if abs(pd.to_numeric(df[attr].skew(skipna=True), errors="coerce")) > 2
+        else None
+    )
 
 
 def has_kurtosis(df: pd.DataFrame, attr: str) -> str | None:
-    return "has_kurtosis" if abs(pd.to_numeric(df[attr].kurtosis(skipna=True), errors="coerce")) > 7 else None
+    return (
+        "has_kurtosis"
+        if abs(pd.to_numeric(df[attr].kurtosis(skipna=True), errors="coerce"))
+        > 7
+        else None
+    )
 
 
 ## NN
@@ -43,7 +53,12 @@ def has_outliers_nn(df: pd.DataFrame, attr1: str, attr2: str) -> str | None:
     contingency_table = pd.crosstab(df[attr1], df[attr2])
     chi2, p_value, _, expected = chi2_contingency(contingency_table)
     return (
-        "has_outliers" if (p_value < 0.05 and np.count_nonzero(np.abs(contingency_table - expected) > 2) > 0) else None
+        "has_outliers"
+        if (
+            p_value < 0.05
+            and np.count_nonzero(np.abs(contingency_table - expected) > 2) > 0
+        )
+        else None
     )
 
 
@@ -59,7 +74,9 @@ def has_outliers_qq(df: pd.DataFrame, attr1: str, attr2: str) -> str | None:
 
 
 ## QN
-def has_significance_qn(df: pd.DataFrame, attr_q: str, attr_n: str) -> str | None:
+def has_significance_qn(
+    df: pd.DataFrame, attr_q: str, attr_n: str
+) -> str | None:
     n = df[attr_n].to_numpy()
     q = df[attr_q].to_numpy()
     f, p = f_oneway(n, q)
@@ -74,8 +91,23 @@ def mean(l):
     return sum(l) / len(l) if len(l) > 0 else 0
 
 
+from typing import List, Union
+
+@dataclass
+class Statistics:
+    key: str
+    features: List[str | None]
+    
+    def to_dict(self) -> list[dict[str, str | list[str | None]]]:
+        return {
+            "key": self.key,
+            "features": self.features,
+        }
+
 def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
-    attr_notnull = [attr for attr in node.attrs if attr.type != None and attr.type != "T"]
+    attr_notnull = [
+        attr for attr in node.attrs if attr.type != None and attr.type != "T"
+    ]
     attr_combinations: list[tuple[Attribute, ...]] = [
         *list(combinations(attr_notnull, 1)),
         *list(combinations(attr_notnull, 2)),
@@ -89,7 +121,9 @@ def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
 
         try:
             if key not in hashmap:
-                df_notnull = df_hash_map[key] if key in df_hash_map else node.df.dropna()
+                df_notnull = (
+                    df_hash_map[key] if key in df_hash_map else node.df.dropna()
+                )
                 if len(comb) == 1 and comb[0].type == "Q":
                     hashmap[key] = [
                         has_outliers_q(df_notnull, comb[0].name),
@@ -98,18 +132,46 @@ def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
                     ]
                 elif len(comb) == 1 and comb[0].type == "N":
                     hashmap[key] = [has_outliers_n(df_notnull, comb[0].name)]
-                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "N":
-                    hashmap[key] = [has_significance_qn(df_notnull, comb[0].name, comb[1].name)]
-                elif len(comb) == 2 and comb[1].type == "Q" and comb[0].type == "N":
-                    hashmap[key] = [has_significance_qn(df_notnull, comb[1].name, comb[0].name)]
-                elif len(comb) == 2 and comb[0].type == "Q" and comb[1].type == "Q":
+                elif (
+                    len(comb) == 2
+                    and comb[0].type == "Q"
+                    and comb[1].type == "N"
+                ):
                     hashmap[key] = [
-                        has_correlation_qq(df_notnull, comb[0].name, comb[1].name),
+                        has_significance_qn(
+                            df_notnull, comb[0].name, comb[1].name
+                        )
+                    ]
+                elif (
+                    len(comb) == 2
+                    and comb[1].type == "Q"
+                    and comb[0].type == "N"
+                ):
+                    hashmap[key] = [
+                        has_significance_qn(
+                            df_notnull, comb[1].name, comb[0].name
+                        )
+                    ]
+                elif (
+                    len(comb) == 2
+                    and comb[0].type == "Q"
+                    and comb[1].type == "Q"
+                ):
+                    hashmap[key] = [
+                        has_correlation_qq(
+                            df_notnull, comb[0].name, comb[1].name
+                        ),
                         has_outliers_qq(df_notnull, comb[0].name, comb[1].name),
                     ]
-                elif len(comb) == 2 and comb[0].type == "N" and comb[1].type == "N":
+                elif (
+                    len(comb) == 2
+                    and comb[0].type == "N"
+                    and comb[1].type == "N"
+                ):
                     hashmap[key] = [
-                        has_correlation_nn(df_notnull, comb[0].name, comb[1].name),
+                        has_correlation_nn(
+                            df_notnull, comb[0].name, comb[1].name
+                        ),
                         has_outliers_nn(df_notnull, comb[0].name, comb[1].name),
                     ]
             features[key] = hashmap[key]
@@ -119,6 +181,11 @@ def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
 
     return features
 
+def get_statistics(node: "BaseChart") -> list[Statistics]:
+    features = get_statistic_features(node)
+    stats = [Statistics(key, value) for key, value in features.items()]
+    print(stats)
+    return stats
 
 def feature_to_interestingness(features: list[list[str | None]]) -> float:
     values = [bool(value) for feature in features for value in feature]
@@ -130,4 +197,9 @@ def get_interestingness(
 ) -> float:
     node_features = [get_statistic_features(node) for node in nodes]
 
-    return mean([feature_to_interestingness(list(feature.values())) for feature in node_features])
+    return mean(
+        [
+            feature_to_interestingness(list(feature.values()))
+            for feature in node_features
+        ]
+    )

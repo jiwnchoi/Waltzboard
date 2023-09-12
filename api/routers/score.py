@@ -15,7 +15,11 @@ class ScoreResponse(BaseModel):
     chartResults: list[OracleResultModel]
 
 
-router = APIRouter(prefix="/score", tags=["score"], responses={404: {"description": "Not found"}})
+router = APIRouter(
+    prefix="/score",
+    tags=["score"],
+    responses={404: {"description": "Not found"}},
+)
 
 
 @router.post("/")
@@ -23,10 +27,15 @@ async def score(body: ScoreBody) -> ScoreResponse:
     dashboard = GleanerDashboard([gl.get_chart_from_tokens(c) for c in [tokenize(c) for c in body.chartKeys]])  # type: ignore
     results = gl.oracle.get_result(dashboard, set(gl.preferences))
     ablated_dashboard = [
-        GleanerDashboard([c for j, c in enumerate(dashboard.charts) if i != j]) for i in range((len(dashboard)))
+        GleanerDashboard([c for j, c in enumerate(dashboard.charts) if i != j])
+        for i in range((len(dashboard)))
     ]
-    ablated_result = [gl.oracle.get_result(d, set(gl.preferences)) for d in ablated_dashboard]
+    ablated_result = [
+        gl.oracle.get_result(d, set(gl.preferences)) for d in ablated_dashboard
+    ]
     return ScoreResponse(
         result=OracleResultModel.from_oracle_result(results),
-        chartResults=[OracleResultModel.from_oracle_result(r) for r in ablated_result],
+        chartResults=[
+            OracleResultModel.from_oracle_result(r) for r in ablated_result
+        ],
     )

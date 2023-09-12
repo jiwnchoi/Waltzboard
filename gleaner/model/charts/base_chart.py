@@ -43,9 +43,17 @@ class BaseChart:
 
     def get_title(self) -> tuple[str, list[str]]:
         quantitatives = [a for a in self.attrs if a.type == "Q"]
-        value_field_name = quantitatives[-1].name if len(quantitatives) else self.attrs[self.num_attrs - 1].name
-        rest_field_names = [a.name for a in self.attrs if a.name != value_field_name]
-        value_trs = [a for a in self.trs_types if a][-1] if self.num_trss else None
+        value_field_name = (
+            quantitatives[-1].name
+            if len(quantitatives)
+            else self.attrs[self.num_attrs - 1].name
+        )
+        rest_field_names = [
+            a.name for a in self.attrs if a.name != value_field_name
+        ]
+        value_trs = (
+            [a for a in self.trs_types if a][-1] if self.num_trss else None
+        )
 
         tokens: list[list[str | None]] = [
             [f"{value_trs[0].upper()}{value_trs[1:]}"] if value_trs else [],
@@ -89,9 +97,15 @@ class BaseChart:
     def get_altair_token(self):
         return AltairToken(
             mark=self.tokens[0],
-            x=AltairAttribute(self.attrs[0].name, self.attrs[0].long_type(), self.tokens[4]),
-            y=AltairAttribute(self.attrs[1].name, self.attrs[1].long_type(), self.tokens[5]),
-            z=AltairAttribute(self.attrs[2].name, self.attrs[2].long_type(), self.tokens[6]),
+            x=AltairAttribute(
+                self.attrs[0].name, self.attrs[0].long_type(), self.tokens[4]
+            ),
+            y=AltairAttribute(
+                self.attrs[1].name, self.attrs[1].long_type(), self.tokens[5]
+            ),
+            z=AltairAttribute(
+                self.attrs[2].name, self.attrs[2].long_type(), self.tokens[6]
+            ),
         )
 
     @abstractmethod

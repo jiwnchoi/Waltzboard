@@ -59,7 +59,14 @@ class GleanerConfig:
 
     def get_attrs(self) -> list[Attribute]:
         return [Attribute(None, None)] + [
-            Attribute(col, "T" if "date" in col.lower() else "N" if self.df[col].dtype == "object" else "Q")
+            Attribute(
+                col,
+                "T"
+                if "date" in col.lower()
+                else "N"
+                if self.df[col].dtype == "object"
+                else "Q",
+            )
             for col in self.attr_names
         ]
 

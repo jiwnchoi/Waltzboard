@@ -10,28 +10,47 @@ class Heatmap(BaseChart):
         dict_x = {
             "field": self.altair_token.x.name,
             "type": self.altair_token.x.type,
-            "bin": True if self.altair_token.x.type == "quantitative" else False,
-            "axis": alt.Axis(format="~s" if self.altair_token.y.type == "quantitative" else Undefined),
+            "bin": True
+            if self.altair_token.x.type == "quantitative"
+            else False,
+            "axis": alt.Axis(
+                format="~s"
+                if self.altair_token.y.type == "quantitative"
+                else Undefined
+            ),
         }
 
         dict_y = {
             "field": self.altair_token.y.name,
             "type": self.altair_token.y.type,
-            "bin": True if self.altair_token.y.type == "quantitative" else False,
-            "axis": alt.Axis(format="~s" if self.altair_token.y.type == "quantitative" else Undefined),
+            "bin": True
+            if self.altair_token.y.type == "quantitative"
+            else False,
+            "axis": alt.Axis(
+                format="~s"
+                if self.altair_token.y.type == "quantitative"
+                else Undefined
+            ),
         }
 
         color = alt.Color(
             self.altair_token.z.name,
             type=self.altair_token.z.type,
             aggregate=self.altair_token.z.aggregate,
-            legend=alt.Legend(format="~s" if self.altair_token.z.type == "quantitative" else Undefined),
+            legend=alt.Legend(
+                format="~s"
+                if self.altair_token.z.type == "quantitative"
+                else Undefined
+            ),
         )
 
         x = alt.X(**dict_x)
         y = alt.Y(**dict_y)
 
-        if self.altair_token.x.type == "nominal" and self.altair_token.y.type == "nominal":
+        if (
+            self.altair_token.x.type == "nominal"
+            and self.altair_token.y.type == "nominal"
+        ):
             max_len_x = self.df[self.altair_token.x.name].str.len().max()
             max_len_y = self.df[self.altair_token.y.name].str.len().max()
             if max_len_x > max_len_y:
@@ -42,4 +61,6 @@ class Heatmap(BaseChart):
             x = alt.Y(**dict_x)
             y = alt.X(**dict_y)
 
-        return alt.Chart(self.df, title=self.title).mark_rect().encode(x, y, color)
+        return (
+            alt.Chart(self.df, title=self.title).mark_rect().encode(x, y, color)
+        )

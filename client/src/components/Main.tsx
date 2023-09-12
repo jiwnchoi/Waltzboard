@@ -3,11 +3,13 @@ import {
   Button,
   Center,
   Collapse,
+  Divider,
   Flex,
   Grid,
   GridItem,
   Select,
   Spinner,
+  Text,
 } from '@chakra-ui/react';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
@@ -15,8 +17,10 @@ import { dashboardSignal } from '../controller/dashboard';
 import { inferDashboard } from '../controller/infer';
 import { init } from '../controller/init';
 import {
-  isDetailExpanded, variantChartsSignal,
-} from '../controller/variants';
+  isDetailExpanded,
+  isVariantsLoadingSignal,
+  variantChartsSignal,
+} from '../controller/details';
 import { scoreDashboard } from '../controller/score';
 import { isTrainingSignal, trainGleaner } from '../controller/train';
 import { notDayTransformationsSignal } from '../controller/transformation';
@@ -24,57 +28,41 @@ import AttributeSelector from './AttributeSelector';
 import { ChartTypeSelector } from './ChartTypeSelector';
 import { ChartAppendView, ChartView } from './ChartView';
 import { HSection, Section } from './Layout';
-import  { VariantChartView } from './ReasoningView';
+import {
+  InsightsView,
+  InspectionView,
+  VariantChartView,
+} from './ReasoningView';
 import { ScoreDistView } from './ScoreDistView';
 import SpaceDistView from './SpaceDistView';
 import { TransformationSelector } from './TransformationSelector';
 import WeightSlider from './WeightSlider';
 
+export const NUM_DASHBOARD_COLUMN = 3;
+
 export const Main = () => {
+  console.log('main');
   return (
     <Flex w="full" flexDir={'row'} px={4} gap={4}>
       <Flex flexDir={'column'} gap={4}>
-        <Flex flexDir={'row'} justifyContent={'space-between'} w="full" gap={2}>
-          <Flex flexGrow={1}>
-            <Select
-              size={'sm'}
-              defaultValue={'Movies'}
-              w="full"
-              bgColor={'white'}
-              boxShadow={'sm'}
-              borderRadius={'md'}
-              borderWidth={0}
-              onChange={(e) => {
-                console.log(e.target.value);
-                init(e.target.value);
-              }}
-            >
-              <option>Birdstrikes</option>
-              <option>Movies</option>
-              <option>Student Performance</option>
-            </Select>
-          </Flex>
-          <Flex>
-            <Button
-              w={'full'}
-              boxShadow={'sm'}
-              borderRadius={'md'}
-              colorScheme="blue"
-              color="white"
-              loadingText="Designing..."
-              size="sm"
-              p={4}
-              isLoading={isTrainingSignal.value}
-              onClick={() => {
-                trainGleaner();
-                inferDashboard();
-                scoreDashboard();
-              }}
-            >
-              <Box>Design Dashboard</Box>
-            </Button>
-          </Flex>
-        </Flex>
+        <Button
+          w={'full'}
+          boxShadow={'sm'}
+          borderRadius={'md'}
+          colorScheme="blue"
+          color="white"
+          loadingText="Designing..."
+          size="sm"
+          p={4}
+          isLoading={isTrainingSignal.value}
+          onClick={() => {
+            trainGleaner();
+            inferDashboard();
+            scoreDashboard();
+          }}
+        >
+          <Box>Design Dashboard</Box>
+        </Button>
 
         <Flex flexDir={'row'} gap={4} h="fit-content">
           <Flex flexDir={'column'} w={200} gap={2} h="fit-content">
@@ -149,57 +137,24 @@ export const Main = () => {
               <Box bgColor={'white'} minH={41} />
             </Section>
           </Flex>
-          <Flex flexDir={'column'} minW={200} h="fit-content" gap={2}>
-            <Section title="Score Distributions" width={250}>
-              <ScoreDistView width={250} height={250} />
-            </Section>
-            <Section title="Space Distributions" width={250}>
-              <SpaceDistView
-                width={'full'}
-                gap={4}
-                minH={'calc(100vh - 378px)'}
-              />
-            </Section>
-          </Flex>
         </Flex>
       </Flex>
       <Flex flexDir={'column'} flexGrow={1} minW={0} h="full" gap={2}>
-        {/* <HSection
-          title="Recommendation"
-          gap={1.5}
-          w="full"
-          innerOverflowX="scroll"
-        >
-          {recommendedChartsSignal.value.length ? (
-            recommendedChartsSignal.value.map((chart, i) => (
-              <RecommendedChartView
-                chart={chart}
-                key={`chart-rec-${i}`}
-                minW={300}
-                p={2}
-                chartWidth={300}
-                chartHeight={150}
-              />
-            ))
-          ) : (
-            <Center w="full" minH={180}>
-              <Spinner size="xl" />
-            </Center>
-          )}
-        </HSection> */}
         <HSection
-          title="Best Dashboard Design (N Charts)"
+          title={`Best Dashboard Design (${dashboardSignal.value.length} Charts)`}
           gap={2}
           bgColor={'white'}
           flexGrow={1}
           minW={0}
-          h={'calc(100vh - 66px)'}
+          //   maxH={'calc(100vh - 66px)'}
           innerOverflowY="scroll"
+          innerOverflowX="hidden"
         >
           {dashboardSignal.value.length ? (
             <Grid
-              templateColumns={{ xl: 'repeat(4, minmax(300px, 1fr))' }}
-              maxH={'calc(100vh - 66px)'}
+              templateColumns={{
+                xl: `repeat(${NUM_DASHBOARD_COLUMN}, minmax(280px, 1fr))`,
+              }}
               w="full"
             >
               {dashboardSignal.value.map((chart, i) => {
@@ -209,62 +164,117 @@ export const Main = () => {
                       idx={i}
                       chart={chart}
                       key={`chart-${i}`}
-                      width={300}
-                      height={150}
+                      width={280}
+                      height={140}
                     />
-                    {i % 4 == 3 && (
-                      <GridItem colSpan={4}>
-                        <Collapse in={isDetailExpanded(i)} animateOpacity unmountOnExit>
+
+                    {i % NUM_DASHBOARD_COLUMN == NUM_DASHBOARD_COLUMN - 1 && (
+                      <GridItem colSpan={NUM_DASHBOARD_COLUMN}>
+                        <Collapse
+                          in={isDetailExpanded(i)}
+                          animateOpacity
+                          unmountOnExit
+                        >
                           <Flex
                             flexDir={'row'}
-                            bgColor={'gray.100'}
-                            minH={'200px'}
+                            bgColor={'gray.50'}
+                            h={'280px'}
                             mb={2}
-                            borderBottomRadius={4}
-                            borderTopRightRadius={4}
-                            py={2}
-                            
+                            borderRadius={'md'}
+                            px={2}
+                            gap={4}
                           >
-                            <Box w={'400px'} />
-                            <Flex w={'full'} overflowY={'scroll'}>
+                            <InspectionView />
+                            <InsightsView />
+                            <Flex
+                              minW={'200px'}
+                              w={'full'}
+                              flexDir={'column'}
+                              bgColor={'white'}
+                              borderRadius="md"
+                              p={2}
+                              my={2}
+                            >
+                              <Text fontSize={'md'} fontWeight={600}>
+                                Chart Variants
+                              </Text>
+                              <Divider my={1} />
+                              {isVariantsLoadingSignal.value && (
+                                <Center w="full" minH={180}>
+                                  <Spinner size="md" />
+                                </Center>
+                              )}
+                              {variantChartsSignal.value.length == 0 && (
+                                <Center w="full" minH={180}>
+                                  <Text fontSize={'md'} fontWeight={600}>
+                                    No variants
+                                  </Text>
+                                </Center>
+                              )}
 
-                            {variantChartsSignal.value.map((variantChart, j) => (
-                              <VariantChartView chart={variantChart} key={`variant-${j}`} chartHeight={125} chartWidth={250} />
-                              ))}
+                              <Flex
+                                w={'full'}
+                                overflowX={'scroll'}
+                                gap={3}
+                                px={4}
+                                hidden={isVariantsLoadingSignal.value}
+                              >
+                                {variantChartsSignal.value.map(
+                                  (variantChart, j) => (
+                                    <VariantChartView
+                                      chart={variantChart}
+                                      key={`variant-${j}`}
+                                      chartHeight={125}
+                                      chartWidth={250}
+                                    />
+                                  )
+                                )}
                               </Flex>
+                            </Flex>
                           </Flex>
                         </Collapse>
+                      </GridItem>
+                    )}
+                    {i == dashboardSignal.value.length - 1 && (
+                      <GridItem>
+                        <ChartAppendView />
                       </GridItem>
                     )}
                   </>
                 );
               })}
-              <ChartAppendView />
             </Grid>
           ) : (
-            // <SimpleGrid
-            // w="full"
-            // maxH={'calc(100vh - 362px)'}
-            // spacing={2}
-            // minChildWidth={300}
-            // >
-
-            //    {dashboardSignal.value.map((chart, i) => (
-            //      <ChartView
-            //      chart={chart}
-            //      key={`chart-${i}`}
-            //      width={300}
-            //      height={150}
-            //      />
-            //      ))}
-            //
-
-            //    </SimpleGrid>
             <Center w="full" minH={180}>
               <Spinner size="xl" />
             </Center>
           )}
         </HSection>
+      </Flex>
+      <Flex flexDir={'column'} minW={200} h="fit-content" gap={2}>
+        <Select
+          size={'sm'}
+          defaultValue={'Movies'}
+          w="full"
+          bgColor={'white'}
+          boxShadow={'sm'}
+          borderRadius={'md'}
+          borderWidth={0}
+          onChange={(e) => {
+            console.log(e.target.value);
+            init(e.target.value);
+          }}
+        >
+          <option>Birdstrikes</option>
+          <option>Movies</option>
+          <option>Student Performance</option>
+        </Select>
+        <Section title="Score Distributions" width={250}>
+          <ScoreDistView width={250} height={250} />
+        </Section>
+        <Section title="Space Distributions" width={250}>
+          <SpaceDistView width={'full'} gap={4} minH={'calc(100vh - 378px)'} />
+        </Section>
       </Flex>
     </Flex>
   );

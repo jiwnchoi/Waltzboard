@@ -9,7 +9,9 @@ class SingleBarChart(BaseChart):
         dict_x = {
             'field': self.altair_token.x.name,
             'type': self.altair_token.x.type,
-            'timeUnit': self.altair_token.x.aggregate if self.altair_token.x.aggregate != "bin" else Undefined,
+            'timeUnit': self.altair_token.x.aggregate
+            if self.altair_token.x.aggregate != "bin"
+            else Undefined,
             'bin': True if self.altair_token.x.aggregate == "bin" else False,
         }
 
@@ -17,13 +19,20 @@ class SingleBarChart(BaseChart):
             'field': self.altair_token.y.name,
             'type': self.altair_token.y.type,
             'aggregate': self.altair_token.y.aggregate,
-            'axis': alt.Axis(format="~s" if self.altair_token.y.type == "quantitative" else Undefined),
+            'axis': alt.Axis(
+                format="~s"
+                if self.altair_token.y.type == "quantitative"
+                else Undefined
+            ),
         }
 
         x = alt.X(**dict_x)
         y = alt.Y(**dict_y)
 
-        if self.altair_token.x.type == "nominal" and self.altair_token.y.type == "nominal":
+        if (
+            self.altair_token.x.type == "nominal"
+            and self.altair_token.y.type == "nominal"
+        ):
             max_len_x = self.df[self.altair_token.x.name].str.len().max()
             max_len_y = self.df[self.altair_token.y.name].str.len().max()
             if max_len_x > max_len_y:
@@ -42,7 +51,9 @@ class MultipleBarChart(BaseChart):
         dict_x = {
             'field': self.altair_token.x.name,
             'type': self.altair_token.x.type,
-            'timeUnit': self.altair_token.x.aggregate if self.altair_token.x.aggregate != "bin" else Undefined,
+            'timeUnit': self.altair_token.x.aggregate
+            if self.altair_token.x.aggregate != "bin"
+            else Undefined,
             'bin': True if self.altair_token.x.aggregate == "bin" else False,
         }
 
@@ -50,13 +61,20 @@ class MultipleBarChart(BaseChart):
             'field': self.altair_token.y.name,
             'type': self.altair_token.y.type,
             'aggregate': self.altair_token.y.aggregate,
-            'axis': alt.Axis(format="~s" if self.altair_token.y.type == "quantitative" else Undefined),
+            'axis': alt.Axis(
+                format="~s"
+                if self.altair_token.y.type == "quantitative"
+                else Undefined
+            ),
         }
 
         x = alt.X(**dict_x)
         y = alt.Y(**dict_y)
 
-        if self.altair_token.x.type == "nominal" and self.altair_token.y.type == "nominal":
+        if (
+            self.altair_token.x.type == "nominal"
+            and self.altair_token.y.type == "nominal"
+        ):
             max_len_x = self.df[self.altair_token.x.name].str.len().max()
             max_len_y = self.df[self.altair_token.y.name].str.len().max()
             if max_len_x > max_len_y:

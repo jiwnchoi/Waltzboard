@@ -11,7 +11,9 @@ class InitResponse(BaseModel):
     attributes: list[AttributeModel]
 
 
-router = APIRouter(prefix="/init", tags=["init"], responses={404: {"description": "Not found"}})
+router = APIRouter(
+    prefix="/init", tags=["init"], responses={404: {"description": "Not found"}}
+)
 
 
 @router.get("/")

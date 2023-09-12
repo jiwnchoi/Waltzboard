@@ -23,7 +23,11 @@ class TrainResponse(BaseModel):
     result: ScoreDistModel
 
 
-router = APIRouter(prefix="/train", tags=["train"], responses={404: {"description": "Not found"}})
+router = APIRouter(
+    prefix="/train",
+    tags=["train"],
+    responses={404: {"description": "Not found"}},
+)
 
 
 @router.post("/")
@@ -43,6 +47,8 @@ async def train(train: TrainBody) -> TrainResponse:
     return TrainResponse(
         attribute=[AttributeDistModel.model_validate(attr) for attr in attrs],
         chartType=[ChartTypeDistModel.model_validate(ct) for ct in cts],
-        transformation=[TransformationDistModel.model_validate(ag) for ag in ags],
+        transformation=[
+            TransformationDistModel.model_validate(ag) for ag in ags
+        ],
         result=ScoreDistModel.model_validate(train_result.to_dict()),
     )

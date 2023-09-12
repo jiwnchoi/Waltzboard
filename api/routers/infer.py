@@ -14,13 +14,24 @@ class InferResponse(BaseModel):
     result: OracleResultModel
 
 
-router = APIRouter(prefix="/infer", tags=["infer"], responses={404: {"description": "Not found"}})
+router = APIRouter(
+    prefix="/infer",
+    tags=["infer"],
+    responses={404: {"description": "Not found"}},
+)
 
 
 @router.post("/")
 async def infer(body: InferBody) -> InferResponse:
-    dashboard, result = gl.explorer.search(gl.generator, gl.oracle, gl.preferences)
-    charts = [GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in dashboard.charts]
+    dashboard, result = gl.explorer.search(
+        gl.generator, gl.oracle, gl.preferences
+    )
+    charts = [
+        GleanerChartModel.from_gleaner_chart(
+            c, gl.oracle.get_statistics_from_chart(c)
+        )
+        for c in dashboard.charts
+    ]
 
     return InferResponse(
         charts=charts,

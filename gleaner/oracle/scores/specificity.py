@@ -5,7 +5,7 @@ def includeness(bovs: set, preferences: set) -> float:
     return len(bovs.intersection(preferences)) / len(preferences)
 
 
-def get_specificity_from_nodes(nodes: list["BaseChart"], preferences: set[str]) -> float:
+def get_specificity(nodes: list["BaseChart"], preferences: set[str]) -> float:
     if len(preferences) == 0:
         return 0.0
 

@@ -32,4 +32,38 @@ class OracleResult:
         }
 
     def display(self) -> pd.DataFrame:
-        return pd.DataFrame.from_dict(self.to_dict(), orient="index", columns=["value"])
+        return pd.DataFrame.from_dict(
+            self.to_dict(), orient="index", columns=["value"]
+        )
+
+
+@dataclass
+class OracleSingleResult:
+    weight: OracleWeight
+    coverage: float
+    diversity: float
+    specificity: float
+    interestingness: float
+
+    def get_score(self) -> float:
+        return (
+            self.weight.coverage * self.coverage
+            + self.weight.diversity * self.diversity
+            + self.weight.interestingness * self.interestingness
+            + self.weight.specificity * self.specificity
+        )
+
+    def to_dict(self) -> dict[str, float]:
+        return {
+            "score": self.get_score(),
+            "coverage": self.coverage,
+            "diversity": self.diversity,
+            "specificity": self.specificity,
+            "interestingness": self.interestingness,
+            "parsimony": self.parsimony,
+        }
+
+    def display(self) -> pd.DataFrame:
+        return pd.DataFrame.from_dict(
+            self.to_dict(), orient="index", columns=["value"]
+        )

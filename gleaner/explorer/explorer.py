@@ -65,21 +65,29 @@ class Explorer:
         fixed_charts: list[BaseChart] = [],
     ):
         if n_chart and n_chart < len(fixed_charts):
-            raise ValueError("Number of fixed_charts should be smaller than n_chart")
+            raise ValueError(
+                "Number of fixed_charts should be smaller than n_chart"
+            )
 
         n_charts: list[float] = [
-            gen.prior.n_charts.sample() if n_chart is None else n_chart for _ in range(self.config.n_candidates)
+            gen.prior.n_charts.sample() if n_chart is None else n_chart
+            for _ in range(self.config.n_candidates)
         ]
 
         if len(fixed_charts):
             n_charts = [max(1, n - len(fixed_charts)) for n in n_charts]
-        candidates: list[GleanerDashboard] = [gen.sample_dashboard(round(n_chart)) for n_chart in n_charts]
+        candidates: list[GleanerDashboard] = [
+            gen.sample_dashboard(round(n_chart)) for n_chart in n_charts
+        ]
 
         if len(fixed_charts):
             for candidate in candidates:
                 candidate.extend(fixed_charts)
 
-        results: list[OracleResult] = [oracle.get_result(dashboard, set(preferences)) for dashboard in candidates]
+        results: list[OracleResult] = [
+            oracle.get_result(dashboard, set(preferences))
+            for dashboard in candidates
+        ]
 
         specificity = np.array([r.specificity for r in results])
         interestingness = np.array([r.interestingness for r in results])
@@ -99,16 +107,29 @@ class Explorer:
             (
                 0
                 if len(preferences) == 0
-                else (specificity - specificity.mean()) / specificity.std() * oracle.weight.specificity
+                else (specificity - specificity.mean())
+                / specificity.std()
+                * oracle.weight.specificity
             )
-            + (interestingness - interestingness.mean()) / interestingness.std() * oracle.weight.interestingness
-            + (coverage - coverage.mean()) / coverage.std() * oracle.weight.coverage
-            + (diversity - diversity.mean()) / diversity.std() * oracle.weight.diversity
-            + (parsimony - parsimony.mean()) / parsimony.std() * oracle.weight.parsimony
+            + (interestingness - interestingness.mean())
+            / interestingness.std()
+            * oracle.weight.interestingness
+            + (coverage - coverage.mean())
+            / coverage.std()
+            * oracle.weight.coverage
+            + (diversity - diversity.mean())
+            / diversity.std()
+            * oracle.weight.diversity
+            + (parsimony - parsimony.mean())
+            / parsimony.std()
+            * oracle.weight.parsimony
         )
 
-        result_n_scores: list[tuple[OracleResult, GleanerDashboard, float, float]] = [
-            (result, candidates[i], raw_scores[i], normalized_scores[i]) for i, result in enumerate(results)
+        result_n_scores: list[
+            tuple[OracleResult, GleanerDashboard, float, float]
+        ] = [
+            (result, candidates[i], raw_scores[i], normalized_scores[i])
+            for i, result in enumerate(results)
         ]
 
         result_n_scores.sort(key=lambda x: x[-1], reverse=True)
@@ -124,7 +145,9 @@ class Explorer:
             parsimony,
         )
 
-    def _train(self, gen: Generator, oracle: Oracle, preferences: list[str]) -> TrainResult:
+    def _train(
+        self, gen: Generator, oracle: Oracle, preferences: list[str]
+    ) -> TrainResult:
         (
             result_n_scores,
             raw_scores,
@@ -137,13 +160,20 @@ class Explorer:
         ) = self._infer(gen, oracle, preferences)
 
         expl_idx = np.argmax(normalized_scores)
-        if self.result is None or raw_scores[expl_idx] < self.result.get_score():
+        if (
+            self.result is None
+            or raw_scores[expl_idx] < self.result.get_score()
+        ):
             self.dashboard = result_n_scores[expl_idx][1]
             self.result = result_n_scores[expl_idx][0]
 
-        result_n_scores = sorted(result_n_scores, key=lambda x: x[-1], reverse=True)
+        result_n_scores = sorted(
+            result_n_scores, key=lambda x: x[-1], reverse=True
+        )
 
-        halved_results = result_n_scores[0 : int(self.config.n_candidates * self.config.halving_ratio)]
+        halved_results = result_n_scores[
+            0 : int(self.config.n_candidates * self.config.halving_ratio)
+        ]
         halved_n_charts = np.array([len(r[1]) for r in halved_results])
 
         counters = Counters(self.config)
@@ -159,7 +189,9 @@ class Explorer:
         gen.prior.tx.update(counters.tx.get_posteriors())
         gen.prior.ty.update(counters.ty.get_posteriors())
         gen.prior.tz.update(counters.tz.get_posteriors())
-        gen.prior.n_charts.update(len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std())
+        gen.prior.n_charts.update(
+            len(halved_n_charts), halved_n_charts.mean(), halved_n_charts.std()
+        )
 
         return TrainResult(
             raw_scores,
@@ -171,25 +203,46 @@ class Explorer:
             np.array([len(d[1]) for d in result_n_scores]),
         )
 
-    def train(self, gen: Generator, oracle: Oracle, preferences: list[str]) -> list[TrainResult]:
+    def train(
+        self, gen: Generator, oracle: Oracle, preferences: list[str]
+    ) -> list[TrainResult]:
         results = []
         for _ in range(self.config.n_epoch):
             results.append(self._train(gen, oracle, preferences))
         return results
 
     def search(self, gen: Generator, oracle: Oracle, preferences: list[str]):
-        def _beam_search(current: list[list[BaseChart]], space: list[BaseChart]):
+        def _beam_search(
+            current: list[list[BaseChart]], space: list[BaseChart]
+        ):
             leaves = [c + [s] for c in current for s in space if s not in c]
-            scores = [oracle.get_result(GleanerDashboard(leaf), set(preferences)).get_score() for leaf in leaves]
+            scores = [
+                oracle.get_result(
+                    GleanerDashboard(leaf), set(preferences)
+                ).get_score()
+                for leaf in leaves
+            ]
             next_indices = np.argsort(scores)[-self.config.n_beam :]
-            next_leaves, next_scores = [leaves[i] for i in next_indices], [scores[i] for i in next_indices]
+            next_leaves, next_scores = [leaves[i] for i in next_indices], [
+                scores[i] for i in next_indices
+            ]
             return next_leaves, next_scores
 
         search_space = gen.sample_n(self.config.n_search_space)
-        pairs = [[search_space[i], search_space[j]] for i, j in combinations(range(len(search_space)), 2)]
-        pairs_scores = [oracle.get_result(GleanerDashboard(pair), set(preferences)).get_score() for pair in pairs]
+        pairs = [
+            [search_space[i], search_space[j]]
+            for i, j in combinations(range(len(search_space)), 2)
+        ]
+        pairs_scores = [
+            oracle.get_result(
+                GleanerDashboard(pair), set(preferences)
+            ).get_score()
+            for pair in pairs
+        ]
         root_indices = np.argsort(pairs_scores)[-self.config.n_beam :]
-        leaves, scores = [pairs[i] for i in root_indices], [pairs_scores[i] for i in root_indices]
+        leaves, scores = [pairs[i] for i in root_indices], [
+            pairs_scores[i] for i in root_indices
+        ]
 
         while True:
             next_leaves, next_scores = _beam_search(leaves, search_space)
@@ -197,4 +250,6 @@ class Explorer:
                 break
             leaves, scores = next_leaves, next_scores
 
-        return GleanerDashboard(leaves[-1]), oracle.get_result(GleanerDashboard(leaves[-1]), set(preferences))
+        return GleanerDashboard(leaves[-1]), oracle.get_result(
+            GleanerDashboard(leaves[-1]), set(preferences)
+        )
