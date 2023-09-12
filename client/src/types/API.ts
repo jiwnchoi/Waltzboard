@@ -1,18 +1,18 @@
 import { TransformationFetched } from './Transformation';
 import type { AttributeFetched } from './Attribute';
 import type { ChartTypeFetched } from './ChartType';
-import { StatisticFeature } from './ChartView';
+import { ChartView, StatisticFeature } from './ChartView';
 import type { OracleResult } from './OracleResult';
 import { OracleWeight } from './OracleWeight';
 import { TransformationDist, AttributeDist, ChartTypeDist } from './Space';
 import { TaskTypeFetched } from './TaskType';
 
-interface AttributeModel {
+export interface AttributeModel {
     name: string;
     type: string;
 }
 
-interface ScoreDistModel {
+export interface ScoreDistModel {
     score: number[];
     specificity: number[];
     interestingness: number[];
@@ -21,80 +21,75 @@ interface ScoreDistModel {
     parsimony: number[];
 }
 
-interface GleanerChartModel {
+export interface GleanerChartModel {
     key: string;
     title: string[];
     spec: string;
     statistics: StatisticFeature;
+    
 }
 
-interface InferBody {
+export interface InferBody {
     nCharts: number | null;
     chartKeys: string[];
 }
 
-interface TrainBody {
+export interface TrainBody {
     weight: OracleWeight;
     preferences: string[];
     constraints: string[];
 }
 
-interface RecommendBody {
+export interface RecommendBody {
     chartKeys: string[];
     nResults: number;
 }
 
-interface SetConfigBody {
+export interface SetConfigBody {
     nCandidates: number;
     nFilters: number;
     robustness: number;
     halvingRatio: number;
 }
 
-interface InitResponse {
+export interface InitResponse {
     chartTypes: ChartTypeFetched[];
     taskTypes: TaskTypeFetched[];
     attributes: AttributeFetched[];
     transformations: TransformationFetched[];
 }
 
-interface InferResponse {
+export interface InferResponse {
     charts: GleanerChartModel[];
     result: OracleResult;
     chartResults: OracleResult[];
 }
 
-interface RecommendResponse {
+export interface RecommendResponse {
     charts: GleanerChartModel[];
 }
 
-interface TrainResponse {
+export interface TrainResponse {
     attribute: AttributeDist[];
     chartType: ChartTypeDist[];
     transformation: TransformationDist[];
     result: ScoreDistModel;
 }
 
-interface ScoreBody {
+export interface ScoreBody {
     chartKeys: string[];
 }
 
-interface ScoreResponse {
+export interface ScoreResponse {
     result: OracleResult;
     chartResults: OracleResult[];
 }
 
-export type {
-    AttributeModel,
-    GleanerChartModel,
-    InferBody,
-    InferResponse,
-    InitResponse,
-    RecommendBody,
-    RecommendResponse,
-    ScoreBody,
-    ScoreResponse,
-    SetConfigBody,
-    TrainBody,
-    TrainResponse,
-};
+export interface VariantsBody{
+    chartKeys: string[];
+    targetIndex: number;
+}
+
+export interface VariantsResponse{
+    variants: GleanerChartModel[];
+}

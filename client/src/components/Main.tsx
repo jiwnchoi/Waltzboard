@@ -2,16 +2,21 @@ import {
   Box,
   Button,
   Center,
+  Collapse,
   Flex,
+  Grid,
+  GridItem,
   Select,
-  SimpleGrid,
   Spinner,
 } from '@chakra-ui/react';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
 import { dashboardSignal } from '../controller/dashboard';
 import { inferDashboard } from '../controller/infer';
-import { recommendedChartsSignal } from '../controller/recommend';
+import { init } from '../controller/init';
+import {
+  isDetailExpanded, variantChartsSignal,
+} from '../controller/variants';
 import { scoreDashboard } from '../controller/score';
 import { isTrainingSignal, trainGleaner } from '../controller/train';
 import { notDayTransformationsSignal } from '../controller/transformation';
@@ -19,12 +24,11 @@ import AttributeSelector from './AttributeSelector';
 import { ChartTypeSelector } from './ChartTypeSelector';
 import { ChartAppendView, ChartView } from './ChartView';
 import { HSection, Section } from './Layout';
-import RecommendedChartView from './RecommendedChartView';
+import  { VariantChartView } from './ReasoningView';
 import { ScoreDistView } from './ScoreDistView';
 import SpaceDistView from './SpaceDistView';
 import { TransformationSelector } from './TransformationSelector';
 import WeightSlider from './WeightSlider';
-import { init } from '../controller/init';
 
 export const Main = () => {
   return (
@@ -160,7 +164,7 @@ export const Main = () => {
         </Flex>
       </Flex>
       <Flex flexDir={'column'} flexGrow={1} minW={0} h="full" gap={2}>
-        <HSection
+        {/* <HSection
           title="Recommendation"
           gap={1.5}
           w="full"
@@ -182,34 +186,80 @@ export const Main = () => {
               <Spinner size="xl" />
             </Center>
           )}
-        </HSection>
+        </HSection> */}
         <HSection
-          title="Dashboard"
+          title="Best Dashboard Design (N Charts)"
           gap={2}
           bgColor={'white'}
           flexGrow={1}
           minW={0}
-          h={'calc(100vh - 319px)'}
-          innerOverflowY="auto"
+          h={'calc(100vh - 66px)'}
+          innerOverflowY="scroll"
         >
           {dashboardSignal.value.length ? (
-            <SimpleGrid
+            <Grid
+              templateColumns={{ xl: 'repeat(4, minmax(300px, 1fr))' }}
+              maxH={'calc(100vh - 66px)'}
               w="full"
-              maxH={'calc(100vh - 362px)'}
-              spacing={2}
-              minChildWidth={300}
             >
+              {dashboardSignal.value.map((chart, i) => {
+                return (
+                  <>
+                    <ChartView
+                      idx={i}
+                      chart={chart}
+                      key={`chart-${i}`}
+                      width={300}
+                      height={150}
+                    />
+                    {i % 4 == 3 && (
+                      <GridItem colSpan={4}>
+                        <Collapse in={isDetailExpanded(i)} animateOpacity unmountOnExit>
+                          <Flex
+                            flexDir={'row'}
+                            bgColor={'gray.100'}
+                            minH={'200px'}
+                            mb={2}
+                            borderBottomRadius={4}
+                            borderTopRightRadius={4}
+                            py={2}
+                            
+                          >
+                            <Box w={'400px'} />
+                            <Flex w={'full'} overflowY={'scroll'}>
+
+                            {variantChartsSignal.value.map((variantChart, j) => (
+                              <VariantChartView chart={variantChart} key={`variant-${j}`} chartHeight={125} chartWidth={250} />
+                              ))}
+                              </Flex>
+                          </Flex>
+                        </Collapse>
+                      </GridItem>
+                    )}
+                  </>
+                );
+              })}
               <ChartAppendView />
-              {dashboardSignal.value.map((chart, i) => (
-                <ChartView
-                  chart={chart}
-                  key={`chart-${i}`}
-                  width={300}
-                  height={150}
-                />
-              ))}
-            </SimpleGrid>
+            </Grid>
           ) : (
+            // <SimpleGrid
+            // w="full"
+            // maxH={'calc(100vh - 362px)'}
+            // spacing={2}
+            // minChildWidth={300}
+            // >
+
+            //    {dashboardSignal.value.map((chart, i) => (
+            //      <ChartView
+            //      chart={chart}
+            //      key={`chart-${i}`}
+            //      width={300}
+            //      height={150}
+            //      />
+            //      ))}
+            //
+
+            //    </SimpleGrid>
             <Center w="full" minH={180}>
               <Spinner size="xl" />
             </Center>

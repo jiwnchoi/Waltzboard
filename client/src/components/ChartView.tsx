@@ -1,18 +1,17 @@
 import {
   Badge,
+  Box,
   Button,
   Center,
-  Collapse,
   Divider,
   Flex,
-  Grid,
   GridItem,
   Icon,
   Select,
   Spacer,
   Text,
 } from '@chakra-ui/react';
-import { useSignal, useSignalEffect } from '@preact/signals-react';
+import { useComputed, useSignal } from '@preact/signals-react';
 import {
   RiArrowDownSLine,
   RiArrowUpSLine,
@@ -25,7 +24,7 @@ import { Handler } from 'vega-tooltip';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
 import { removeChart, togglePinChart } from '../controller/dashboard';
-import { inferResponseSignal } from '../controller/infer';
+import { detailTargetSignal } from '../controller/variants';
 import { transformationsSignal } from '../controller/transformation';
 import type { ChartView } from '../types/ChartView';
 
@@ -39,6 +38,7 @@ const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
 };
 interface ChartViewProps {
   chart: ChartView;
+  idx: number;
   width: number;
   height: number;
 }
@@ -53,9 +53,9 @@ const ChartAppendView = () => {
     null,
     null,
   ]);
-  useSignalEffect(() => {
-    console.log(currentState.value);
-  });
+  // useSignalEffect(() => {
+  //   console.log(currentState.value);
+  // });
   return (
     <Flex
       flexDir={'column'}
@@ -247,87 +247,96 @@ const ChartAppendView = () => {
   );
 };
 
-const ChartView = ({ chart, width, height }: ChartViewProps) => {
-  const showStatistics = useSignal(false);
-  const toggleShowStatistics = () => {
-    showStatistics.value = !showStatistics.value;
-  };
+const ChartView = ({ idx, chart, width, height }: ChartViewProps) => {
+  const showDetail = useComputed(() => {
+    return (detailTargetSignal.value ?? -1) === idx;
+  });
+
   return (
-    <Flex flexDir={'column'} w={'full'} h="fit-content" p={2}>
-      <Flex
-        flexDir={'row'}
-        justifyContent={'space-between'}
-        align="center"
-        mb={2}
-      >
-        <Icon
-          mr={4}
-          as={chart.isPinned ? RiPushpinFill : RiPushpinLine}
-          boxSize={4}
-          onClick={() => {
-            togglePinChart(chart.key);
-          }}
-          _hover={{ cursor: 'pointer' }}
-        />
-        <Text w="full" fontSize={'sm'} textAlign="center">
-          {chart.titleToken.map((t, index) =>
-            t.isPrefered ? (
-              <Text key={index} as="span" fontWeight={800} color="pink.400">
-                {`${t.text} `}
-              </Text>
-            ) : (
-              <Text key={index} as="span" fontWeight={500}>
-                {`${t.text} `}
-              </Text>
-            )
+    <GridItem>
+      <Flex flexDir={'column'} w={'full'} h="fit-content">
+        <Flex flexDir={'row'} justifyContent={'space-between'} align="center">
+          <Icon
+            mr={4}
+            as={chart.isPinned ? RiPushpinFill : RiPushpinLine}
+            boxSize={4}
+            onClick={() => {
+              togglePinChart(chart.key);
+            }}
+            _hover={{ cursor: 'pointer' }}
+          />
+          <Center w="full" verticalAlign={'center'} minH="42px">
+            <Text w="full" fontSize={'sm'} textAlign="center" >
+              {chart.titleToken.map((t, index) =>
+                t.isPrefered ? (
+                  <Text key={index} as="span" fontWeight={800} color="pink.400">
+                    {`${t.text} `}
+                  </Text>
+                ) : (
+                  <Text key={index} as="span" fontWeight={500}>
+                    {`${t.text} `}
+                  </Text>
+                )
+              )}
+            </Text>
+          </Center>
+          <Icon
+            ml={4}
+            as={RiDeleteBinLine}
+            boxSize={4}
+            onClick={() => {
+              removeChart(chart.key);
+            }}
+            _hover={{ cursor: 'pointer' }}
+          />
+        </Flex>
+        <Center height="full" px={4} mb={2}>
+          <VegaLite
+            height={height}
+            width={width}
+            spec={chart.spec}
+            actions={false}
+            tooltip={new Handler().call}
+          />
+        </Center>
+        <Divider />
+        <Flex
+          flexDir={'row'}
+          justifyContent={'space-between'}
+          align="center"
+          bgColor={showDetail.value ? 'gray.100' : 'white'}
+          borderTopRadius={4}
+          p={2}
+          pb={4}
+        >
+          <Text fontSize={'sm'} textAlign="center" fontWeight={400} mr="auto">
+            Inspectation Detail
+          </Text>
+
+          {showDetail.value ? (
+            <Icon
+              as={RiArrowDownSLine}
+              boxSize={4}
+              onClick={() => {
+                detailTargetSignal.value = -1;
+              }}
+            />
+          ) : (
+            <Icon
+              as={RiArrowUpSLine}
+              boxSize={4}
+              onClick={() => {
+                detailTargetSignal.value = idx;
+              }}
+            />
           )}
-        </Text>
-        <Icon
-          ml={4}
-          as={RiDeleteBinLine}
-          boxSize={4}
-          onClick={() => {
-            removeChart(chart.key);
-          }}
-          _hover={{ cursor: 'pointer' }}
-        />
-      </Flex>
-      <Center height="full" px={4} mb={2}>
-        <VegaLite
-          height={height}
-          width={width}
-          spec={chart.spec}
-          actions={false}
-          tooltip={new Handler().call}
-        />
-      </Center>
-      <Divider mb={2} />
-      <Flex flexDir={'row'} justifyContent={'space-between'} align="center">
-        <Text fontSize={'sm'} textAlign="center" fontWeight={400} mr="auto">
-          Inspectation Detail
-        </Text>
-
-        {showStatistics.value ? (
-          <Icon
-            as={RiArrowDownSLine}
-            boxSize={4}
-            onClick={toggleShowStatistics}
-          />
-        ) : (
-          <Icon
-            as={RiArrowUpSLine}
-            boxSize={4}
-            onClick={toggleShowStatistics}
-          />
-        )}
-      </Flex>
-
-      <Collapse in={showStatistics.value} animateOpacity>
+        </Flex>
+        {/* 
+      <Collapse in={showDetail.value} animateOpacity>
         <Flex flexDir={'column'} gap={2} mt={2}>
           <Text fontSize={'sm'} minW={'80px'} align={'center'} fontWeight={700}>
             This chart contributes to{' '}
           </Text>
-          {/* specificity interestingnenss coverage diversity parsimony */}
           {chart.chartResults &&
           Math.abs(
             inferResponseSignal.value.result.specificity -
@@ -433,8 +442,9 @@ const ChartView = ({ chart, width, height }: ChartViewProps) => {
             );
           })}
         </Flex>
-      </Collapse>
-    </Flex>
+      </Collapse> */}
+      </Flex>
+    </GridItem>
   );
 };
 

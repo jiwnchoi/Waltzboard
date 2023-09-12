@@ -1,7 +1,6 @@
 import { Center, Flex, FlexProps, Text } from '@chakra-ui/react';
 import { VegaLite } from 'react-vega';
 import { Handler } from 'vega-tooltip';
-import { appendChartToDashboard } from '../controller/recommend';
 import type { ChartView } from '../types/ChartView';
 
 interface ChartViewProps extends FlexProps {
@@ -9,24 +8,19 @@ interface ChartViewProps extends FlexProps {
   chartWidth: number;
   chartHeight: number;
 }
-const RecommendedChartView = (props: ChartViewProps) => {
+export const VariantChartView = (props: ChartViewProps) => {
   return (
     <Flex
       flexDir={'column'}
       {...props}
-      onClick={() => appendChartToDashboard(props.chart)}
+      // onClick={() => appendChartToDashboard(props.chart)}
       _hover={{
         backgroundColor: 'gray.100',
         cursor: 'pointer',
         borderRadius: 'md',
       }}
     >
-      <Flex
-        flexDir={'row'}
-        justifyContent={'space-between'}
-        align="top"
-        w={'full'}
-      >
+      <Center w="full" verticalAlign={'center'} minH="42px">
         <Text w="full" fontSize={'sm'} textAlign="center">
           {props.chart.titleToken.map((t, i) =>
             t.isPrefered ? (
@@ -45,7 +39,7 @@ const RecommendedChartView = (props: ChartViewProps) => {
             )
           )}
         </Text>
-      </Flex>
+      </Center>
       <Center height="full" px={4}>
         <VegaLite
           height={props.chartHeight}
@@ -58,5 +52,3 @@ const RecommendedChartView = (props: ChartViewProps) => {
     </Flex>
   );
 };
-
-export default RecommendedChartView;

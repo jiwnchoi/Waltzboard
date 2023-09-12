@@ -1,28 +1,15 @@
 import warnings
-import pandas as pd
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from vega_datasets import data
 
 from api.config import config
-from api.models import *
+from api.routers import *
 
-from gleaner import Gleaner, GleanerDashboard
-from gleaner.model import get_chart_from_tokens
 
 warnings.filterwarnings("ignore")
 
 app = FastAPI()
-
-datasets = {
-    "Birdstrikes": pd.read_csv("data/birdstrikes.csv").sample(1000),
-    "Movies": pd.read_json("data/movies.json"),
-    "Student Performance": pd.read_csv("data/student_performance.csv"),
-}
-
-df = datasets["Movies"]
-gl = Gleaner(df)
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,79 +20,11 @@ app.add_middleware(
 )
 
 
-def string_to_tuple(str: str):
-    return tuple(map(int, str.split(",")))
-
-
-@app.get("/init")
-async def init(name: str = "Movies") -> InitResponse:
-    gl.__init__(datasets[name])
-    gl.config.n_epoch = 20
-    gl.update_config()
-    return InitResponse(
-        datasets=list(datasets.keys()),
-        chartTypes=list(chart_types.values()),
-        transformations=list(trs_types.values()),
-        # taskTypes=list(task_types.values()),
-        attributes=[AttributeModel(name=a.name, type=a.type) for a in gl.config.attrs[1:]],  # type: ignore
-    )
-
-
-@app.post("/train")
-async def train(train: TrainBody) -> TrainResponse:
-    print(train)
-    gl.preferences = train.preferences
-    gl.config.update_constraints(train.constraints)
-    gl.config.update_weight(
-        specificity=train.weight.specificity,
-        interestingness=train.weight.interestingness,
-        coverage=train.weight.coverage,
-        diversity=train.weight.diversity,
-        parsimony=train.weight.parsimony,
-    )
-    gl.update_config()
-    train_result = gl.train(train.preferences)[-1]
-    attrs, cts, ags = gl.generator.prior.export()
-    return TrainResponse(
-        attribute=[AttributeDistModel.model_validate(attr) for attr in attrs],
-        chartType=[ChartTypeDistModel.model_validate(ct) for ct in cts],
-        transformation=[TransformationDistModel.model_validate(ag) for ag in ags],
-        result=ScoreDistModel.model_validate(train_result.to_dict()),
-    )
-
-
-@app.post("/infer")
-async def infer(body: InferBody) -> InferResponse:
-    dashboard, result = gl.explorer.search(gl.generator, gl.oracle, gl.preferences)
-    charts = [GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in dashboard.charts]
-
-    return InferResponse(
-        charts=charts,
-        result=OracleResultModel.from_oracle_result(result),
-    )
-
-
-@app.post("/recommend")
-async def recommend(body: RecommendBody) -> RecommendResponse:
-    charts = [get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]]  # type: ignore
-    results = gl.recommend(GleanerDashboard(charts), gl.preferences, body.nResults)
-    return RecommendResponse(
-        charts=[GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in results]
-    )
-
-
-@app.post("/score")
-async def score(body: ScoreBody) -> ScoreResponse:
-    dashboard = GleanerDashboard([get_chart_from_tokens(c, gl.config) for c in [tuple(json.loads(c)) for c in body.chartKeys]])  # type: ignore
-    results = gl.oracle.get_result(dashboard, set(gl.preferences))
-    ablated_dashboard = [
-        GleanerDashboard([c for j, c in enumerate(dashboard.charts) if i != j]) for i in range((len(dashboard)))
-    ]
-    ablated_result = [gl.oracle.get_result(d, set(gl.preferences)) for d in ablated_dashboard]
-    return ScoreResponse(
-        result=OracleResultModel.from_oracle_result(results),
-        chartResults=[OracleResultModel.from_oracle_result(r) for r in ablated_result],
-    )
+app.include_router(train.router)
+app.include_router(init.router)
+app.include_router(infer.router)
+app.include_router(score.router)
+app.include_router(variants.router)
 
 
 if __name__ == "__main__":

@@ -7,7 +7,8 @@ from gleaner.generator import Generator
 from gleaner.model import GleanerDashboard, BaseChart, ChartTokens
 from gleaner.config import GleanerConfig
 from gleaner.oracle import Oracle
-from gleaner.utill import display_function
+from gleaner.utills import display_function
+from gleaner.model import is_valid_tokens, get_variants_from_charts, get_chart_from_tokens
 
 
 class Gleaner:
@@ -24,6 +25,7 @@ class Gleaner:
 
         self.config = GleanerConfig(df) if not config else config
         self.update_config()
+        self.preferences = []
 
     def update_config(self):
         self.oracle = Oracle(self.config)
@@ -51,3 +53,14 @@ class Gleaner:
         result_and_charts.sort(key=lambda x: x[0].get_score(), reverse=True)
         print([r.get_score() for r, _ in result_and_charts[:n_results]])
         return [c for _, c in result_and_charts[:n_results]]
+
+    def is_valid_tokens(self, key: ChartTokens):
+        return is_valid_tokens(key, self.config)
+
+    def get_variants_from_chart(self, chart: BaseChart):
+        return get_variants_from_charts(chart, self.config)
+
+    def get_chart_from_tokens(self, key: ChartTokens):
+        if not self.is_valid_tokens(key):
+            raise Exception("Chart tuple is not valid")
+        return get_chart_from_tokens(key, self.config)

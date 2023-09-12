@@ -101,66 +101,11 @@ class ScoreDistModel(BaseModel):
     parsimony: list[float]
 
 
-# Bodys
-
-
-class InferBody(BaseModel):
-    nCharts: int | None
-    chartKeys: list[str]
-
-
-class TrainBody(BaseModel):
-    weight: OracleWeightModel
-    preferences: list[str]
-    constraints: list[str]
-
-
-class RecommendBody(BaseModel):
-    chartKeys: list[str]
-    nResults: int
-
-
 class SetConfigBody(BaseModel):
     nCandidates: int
     nFilters: int
     robustness: int
     halvingRatio: float
-
-
-class ScoreBody(BaseModel):
-    chartKeys: list[str]
-
-
-# Responses
-
-
-class InitResponse(BaseModel):
-    datasets: list[str]
-    chartTypes: list[ChartTypeModel]
-    # taskTypes: list[TaskTypeModel]
-    transformations: list[TrsTypeModel]
-    attributes: list[AttributeModel]
-
-
-class InferResponse(BaseModel):
-    charts: list[GleanerChartModel]
-    result: OracleResultModel
-
-
-class TrainResponse(BaseModel):
-    attribute: list[AttributeDistModel]
-    chartType: list[ChartTypeDistModel]
-    transformation: list[TransformationDistModel]
-    result: ScoreDistModel
-
-
-class RecommendResponse(BaseModel):
-    charts: list[GleanerChartModel]
-
-
-class ScoreResponse(BaseModel):
-    result: OracleResultModel
-    chartResults: list[OracleResultModel]
 
 
 chart_types: dict[str, ChartTypeModel] = {
@@ -186,66 +131,3 @@ trs_types: dict[str, TrsTypeModel] = {
     "month": TrsTypeModel(name="Month", type="month"),
     "day": TrsTypeModel(name="Day", type="day"),
 }
-
-# task_types: dict[str, TaskTypeModel] = {
-#     "retrieve": TaskTypeModel(
-#         name="Retrieve Value",
-#         weight=OracleWeightModel(coverage=2, diversity=0, specificity=2, interestingness=0, parsimony=1),
-#         chartTypes=[chart_types["scatter"], chart_types["heatmap"]],
-#     ),
-#     "correlation": TaskTypeModel(
-#         name="Correlation",
-#         weight=OracleWeightModel(coverage=0, diversity=2, specificity=1, interestingness=2, parsimony=1),
-#         chartTypes=[chart_types["scatter"], chart_types["heatmap"]],
-#     ),
-#     "compare": TaskTypeModel(
-#         name="Compare",
-#         weight=OracleWeightModel(coverage=0, diversity=2, specificity=2, interestingness=0, parsimony=1),
-#         chartTypes=[
-#             chart_types["bar"],
-#             chart_types["line"],
-#             chart_types["area"],
-#             chart_types["scatter"],
-#             chart_types["heatmap"],
-#         ],
-#     ),
-#     "cluster": TaskTypeModel(
-#         name="Cluster",
-#         weight=OracleWeightModel(coverage=1, diversity=1, specificity=1, interestingness=-3, parsimony=1),
-#         chartTypes=[chart_types["scatter"], chart_types["heatmap"]],
-#     ),
-#     "distribution": TaskTypeModel(
-#         name="Characterize Distribution",
-#         weight=OracleWeightModel(coverage=2, diversity=2, specificity=1, interestingness=0, parsimony=1),
-#         chartTypes=[
-#             chart_types["scatter"],
-#             chart_types["boxplot"],
-#             chart_types["stripplot"],
-#             chart_types["bar"],
-#             chart_types["line"],
-#             chart_types["area"],
-#             chart_types["heatmap"],
-#         ],
-#     ),
-#     "anomalies": TaskTypeModel(
-#         name="Find Anomalies",
-#         weight=OracleWeightModel(coverage=1, diversity=1, specificity=1, interestingness=2, parsimony=1),
-#         chartTypes=[
-#             chart_types["scatter"],
-#             chart_types["line"],
-#             chart_types["boxplot"],
-#             chart_types["heatmap"],
-#             chart_types["stripplot"],
-#         ],
-#     ),
-#     "extremum": TaskTypeModel(
-#         name="Find Extremum",
-#         weight=OracleWeightModel(coverage=1, diversity=1, specificity=1, interestingness=0, parsimony=1),
-#         chartTypes=[chart_types["bar"], chart_types["line"], chart_types["scatter"]],
-#     ),
-#     "derived": TaskTypeModel(
-#         name="Compute Derived Value",
-#         weight=OracleWeightModel(coverage=1, diversity=2, specificity=2, interestingness=1, parsimony=1),
-#         chartTypes=[chart_types["bar"], chart_types["line"], chart_types["scatter"], chart_types["pie"]],
-#     ),
-# }
