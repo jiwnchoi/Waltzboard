@@ -2,7 +2,6 @@ import { batch, computed, signal } from '@preact/signals-react';
 import axios from 'axios';
 import { URI } from '../../config';
 import { InferBody, InferResponse } from '../types/API';
-import { configSignal } from './config';
 import { pinnedKeysSignal } from './dashboard';
 
 const inferResponseSignal = signal<InferResponse>({
@@ -20,7 +19,6 @@ const inferResponseSignal = signal<InferResponse>({
 
 const inferBodySignal = computed<InferBody>(() => {
   return {
-    nCharts: configSignal.value.nChart,
     chartKeys: pinnedKeysSignal.value,
   };
 });

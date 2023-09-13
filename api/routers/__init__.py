@@ -5,3 +5,5 @@ from . import train
 from . import variants
 from . import is_valid
 from . import inspect
+from . import recommends
+from . import get_chart

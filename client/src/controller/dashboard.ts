@@ -2,6 +2,8 @@ import { computed, signal } from '@preact/signals-react';
 import type { ChartView } from '../types/ChartView';
 import { toChartView } from '../utils/toChartView';
 import { inferResponseSignal } from './infer';
+import { fromChartView } from '../utils/fromChartView';
+import { getRecommendedChartView } from './append';
 
 const dashboardSignal = computed<ChartView[]>(() =>
   inferResponseSignal.value.charts.map((chart) => toChartView(chart)),
@@ -15,14 +17,27 @@ const isProcessingSignal = signal<boolean>(false);
 
 const pinnedKeysSignal = signal<string[]>([]);
 
-const removeChart = (key: string) => {
+export const appendChart = (chart: ChartView) => {
+  const current = inferResponseSignal.peek();
+  const chartKeys = chartKeysSignal.peek();
+  if (chartKeys.includes(chart.key)) return;
+
   inferResponseSignal.value = {
-    ...inferResponseSignal.peek(),
-    charts: inferResponseSignal
-      .peek()
-      .charts.filter((chart) => chart.key !== key),
+    ...current,
+    charts: [...current.charts, fromChartView(chart)],
   };
+  getRecommendedChartView();
 };
+
+export const removeChart = (chart: ChartView) => {
+  const current = inferResponseSignal.peek();
+  inferResponseSignal.value = {
+    ...current,
+    charts: current.charts.filter((c) => c.key !== chart.key),
+  };
+  getRecommendedChartView();
+};
+
 
 const togglePinChart = (key: string) => {
   if (pinnedKeysSignal.value.includes(key)) {
@@ -37,6 +52,5 @@ export {
   dashboardSignal,
   isProcessingSignal,
   pinnedKeysSignal,
-  removeChart,
   togglePinChart,
 };

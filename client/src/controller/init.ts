@@ -1,7 +1,7 @@
 import { batch, effect, signal } from '@preact/signals-react';
 import axios from 'axios';
 import { URI } from '../../config';
-import { InitResponse } from '../types/API';
+import { InitBody, InitResponse } from '../types/API';
 import { ChartType } from '../types/ChartType';
 import { attributesSignal } from './attribute';
 import { chartTypesSignal } from './chartType';
@@ -12,9 +12,15 @@ import { inferDashboard } from './infer';
 
 const initializedSignal = signal<boolean>(false);
 
-const init = async (datasetName: string = 'Movies') => {
+export const configSignal = signal<InitBody>({
+  n_epoch: 5,
+  robustness: 100,
+  dataset: 'Movies',
+});
+
+const init = async () => {
   const response: InitResponse = (
-    await axios.get(`${URI}/init?name=${datasetName}`)
+    await axios.post(`${URI}/init`, configSignal.peek())
   ).data;
   batch(() => {
     trainGleaner();

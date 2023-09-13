@@ -7,153 +7,203 @@ import {
   Flex,
   Grid,
   GridItem,
+  Icon,
+  Input,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Select,
   Spinner,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
 } from '@chakra-ui/react';
+import {
+  isAppendPanelOpen,
+  isRecommendingSignal,
+  recommendedChartViewSignal,
+} from '../controller/append';
 import { attributesSignal } from '../controller/attribute';
 import { chartTypesSignal } from '../controller/chartType';
 import { dashboardSignal } from '../controller/dashboard';
-import { inferDashboard } from '../controller/infer';
-import { init } from '../controller/init';
 import {
   isDetailExpanded,
   isVariantsLoadingSignal,
   variantChartsSignal,
 } from '../controller/details';
+import { inferDashboard } from '../controller/infer';
+import { configSignal, init } from '../controller/init';
 import { scoreDashboard } from '../controller/score';
 import { isTrainingSignal, trainGleaner } from '../controller/train';
 import { notDayTransformationsSignal } from '../controller/transformation';
+import { ChartAppendView, RecommendChartView } from './AppendChartView';
 import AttributeSelector from './AttributeSelector';
 import { ChartTypeSelector } from './ChartTypeSelector';
-import { ChartAppendView, ChartView } from './ChartView';
-import { HSection, Section } from './Layout';
+import { ChartView } from './ChartView';
+import { MainSection, Section } from './Layout';
 import {
   InsightsView,
   InspectionView,
   VariantChartView,
-} from './ReasoningView';
+} from './InspectionView';
 import { ScoreDistView } from './ScoreDistView';
 import SpaceDistView from './SpaceDistView';
 import { TransformationSelector } from './TransformationSelector';
 import WeightSlider from './WeightSlider';
+import { AiFillSetting } from 'react-icons/ai';
+import { useRef } from 'react';
 
-export const NUM_DASHBOARD_COLUMN = 3;
+export const NUM_COL = 4;
 
+const Settings = () => {
+  const initialFocusRef = useRef(null);
+  return (
+    <Popover
+      initialFocusRef={initialFocusRef}
+      placement="right-start"
+      closeOnBlur={true}
+      closeOnEsc={true}
+      returnFocusOnClose={true}
+    >
+      <PopoverTrigger>
+        <Button colorScheme={'blackAlpha'} variant={'solid'} size={'sm'}>
+          <Icon as={AiFillSetting} />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        bgColor={'white'}
+        p={2}
+        borderRadius={'md'}
+        boxShadow={'md'}
+      >
+        <PopoverHeader fontWeight={700}>Configurations</PopoverHeader>
+        <PopoverArrow bg="white" />
+        <PopoverCloseButton />
+        <PopoverBody>
+          <Grid templateColumns={'1fr 2fr'} gap={2}>
+            <GridItem>Dataset</GridItem>
+            <GridItem>
+              <Select
+                size={'sm'}
+                defaultValue={'Movies'}
+                w="full"
+                onChange={(e) => {
+                  configSignal.value.dataset = e.target.value;
+                }}
+              >
+                <option>Birdstrikes</option>
+                <option>Movies</option>
+                <option>Student Performance</option>
+              </Select>
+            </GridItem>
+            <GridItem># of Epochs</GridItem>
+            <GridItem>
+              <Input
+                size={'sm'}
+                defaultValue={configSignal.value.n_epoch}
+                onChange={(e) => {
+                  configSignal.value.n_epoch = parseInt(e.target.value);
+                }}
+              />
+            </GridItem>
+            <GridItem>Robustness</GridItem>
+            <GridItem>
+              <Input
+                size={'sm'}
+                defaultValue={configSignal.value.robustness}
+                onChange={(e) => {
+                  configSignal.value.robustness = parseInt(e.target.value);
+                }}
+              />
+            </GridItem>
+            <GridItem colSpan={2}>
+              <Button
+                w={'full'}
+                boxShadow={'sm'}
+                borderRadius={'md'}
+                colorScheme="blue"
+                color="white"
+                size="sm"
+                onClick={init}
+              >
+                <Box>Set Configs</Box>
+              </Button>
+            </GridItem>
+          </Grid>
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
+  );
+};
 export const Main = () => {
-  console.log('main');
   return (
     <Flex w="full" flexDir={'row'} px={4} gap={4}>
-      <Flex flexDir={'column'} gap={4}>
-        <Button
-          w={'full'}
-          boxShadow={'sm'}
-          borderRadius={'md'}
-          colorScheme="blue"
-          color="white"
-          loadingText="Designing..."
-          size="sm"
-          p={4}
-          isLoading={isTrainingSignal.value}
-          onClick={() => {
-            trainGleaner();
-            inferDashboard();
-            scoreDashboard();
-          }}
-        >
-          <Box>Design Dashboard</Box>
-        </Button>
-
-        <Flex flexDir={'row'} gap={4} h="fit-content">
-          <Flex flexDir={'column'} w={200} gap={2} h="fit-content">
-            <Section title="Score Weight" gap={1.5} w="full">
-              {/* <Select
-            placeholder="User Task"
-            size="xs"
-            value={selectedTaskTypeSignal.value.name}
-            onChange={(e) => {
-                selectedTaskTypeSignal.value = taskTypesSignal.value.find(
-                    (taskType) => taskType.name === e.target.value
-                    )!;
-                }}
-                >
-                {taskTypesSignal.value.map((taskType, i) => (
-                    <option key={`taskType-${i}`}>{taskType.name}</option>
-                    ))}
-                </Select> */}
-
-              <WeightSlider title="specificity" />
-              <WeightSlider title="interestingness" />
-              <WeightSlider title="coverage" />
-              <WeightSlider title="diversity" />
-              <WeightSlider title="parsimony" />
-            </Section>
-            <Section
-              title="Chart Types"
-              gap={1.5}
-              maxH={160}
-              w="full"
-              innerOverflowY={'scroll'}
-            >
-              {chartTypesSignal.value.map((chartType, i) => (
-                <ChartTypeSelector
-                  chartType={chartType}
-                  key={`chartType-${i}`}
-                />
-              ))}
-              <Box bgColor={'white'} minH={41} />
-            </Section>
-            <Section
-              title="Transformations"
-              gap={1.5}
-              maxH={160}
-              w="full"
-              innerOverflowY={'scroll'}
-            >
-              {notDayTransformationsSignal.value.map((transformation, i) => (
-                <TransformationSelector
-                  transformation={transformation}
-                  key={`attribute-${i}`}
-                />
-              ))}
-              <Box bgColor={'white'} minH={41} />
-            </Section>
-
-            <Section
-              title="Attributes"
-              gap={1.5}
-              minH={'36px'}
-              maxH={'calc(100vh - 700px)'}
-              pb={4}
-              w="full"
-              innerOverflowY={'scroll'}
-            >
-              {attributesSignal.value.map((attribute, i) => (
-                <AttributeSelector
-                  attribute={attribute}
-                  key={`attribute-${i}`}
-                />
-              ))}
-              <Box bgColor={'white'} minH={41} />
-            </Section>
-          </Flex>
+      {/* Left Bar */}
+      <Flex flexDir={'column'} minW={250} w={250}>
+        <Flex gap={2}>
+          <Button
+            w={'full'}
+            boxShadow={'sm'}
+            borderRadius={'md'}
+            colorScheme="blue"
+            color="white"
+            loadingText="Designing..."
+            size="sm"
+            p={4}
+            isLoading={isTrainingSignal.value}
+            onClick={() => {
+              trainGleaner();
+              inferDashboard();
+              scoreDashboard();
+            }}
+          >
+            <Box>Design Dashboard</Box>
+          </Button>
+          <Settings />
         </Flex>
+        <Tabs variant={'line'} colorScheme="blue" isFitted>
+          <TabList p={0}>
+            <Tab fontWeight={500}>Intent</Tab>
+            <Tab
+              fontWeight={500}
+              isDisabled={dashboardSignal.value.length == 0}
+            >
+              Result
+            </Tab>
+          </TabList>
+          <TabPanels>
+            <IntentPanel />
+            <ResultPanel />
+          </TabPanels>
+        </Tabs>
       </Flex>
-      <Flex flexDir={'column'} flexGrow={1} minW={0} h="full" gap={2}>
-        <HSection
-          title={`Best Dashboard Design (${dashboardSignal.value.length} Charts)`}
-          gap={2}
-          bgColor={'white'}
-          flexGrow={1}
-          minW={0}
-          //   maxH={'calc(100vh - 66px)'}
-          innerOverflowY="scroll"
-          innerOverflowX="hidden"
-        >
-          {dashboardSignal.value.length ? (
+      <MainSection
+        title={`Best Dashboard Design (${dashboardSignal.value.length} Charts)`}
+        gap={2}
+        bgColor={'white'}
+        innerOverflowY="scroll"
+        innerOverflowX="hidden"
+        maxH={988}
+        maxW={'1750px'}
+      >
+        <Flex direction={'column'}>
+          <AppendChartPanel />
+          {dashboardSignal.value.length === 0 && (
+            <Center w="full" minH={180}>
+              <Spinner size="xl" />
+            </Center>
+          )}
+          {dashboardSignal.value.length !== 0 && (
             <Grid
               templateColumns={{
-                xl: `repeat(${NUM_DASHBOARD_COLUMN}, minmax(280px, 1fr))`,
+                xl: `repeat(${NUM_COL}, minmax(280px, 1fr))`,
               }}
               w="full"
             >
@@ -168,114 +218,207 @@ export const Main = () => {
                       height={140}
                     />
 
-                    {i % NUM_DASHBOARD_COLUMN == NUM_DASHBOARD_COLUMN - 1 && (
-                      <GridItem colSpan={NUM_DASHBOARD_COLUMN}>
-                        <Collapse
-                          in={isDetailExpanded(i)}
-                          animateOpacity
-                          unmountOnExit
-                        >
-                          <Flex
-                            flexDir={'row'}
-                            bgColor={'gray.50'}
-                            h={'280px'}
-                            mb={2}
-                            borderRadius={'md'}
-                            px={2}
-                            gap={4}
-                          >
-                            <InspectionView />
-                            <InsightsView />
-                            <Flex
-                              minW={'200px'}
-                              w={'full'}
-                              flexDir={'column'}
-                              bgColor={'white'}
-                              borderRadius="md"
-                              p={2}
-                              my={2}
-                            >
-                              <Text fontSize={'md'} fontWeight={600}>
-                                Chart Variants
-                              </Text>
-                              <Divider my={1} />
-                              {isVariantsLoadingSignal.value && (
-                                <Center w="full" minH={180}>
-                                  <Spinner size="md" />
-                                </Center>
-                              )}
-                              {variantChartsSignal.value.length == 0 && (
-                                <Center w="full" minH={180}>
-                                  <Text fontSize={'md'} fontWeight={600}>
-                                    No variants
-                                  </Text>
-                                </Center>
-                              )}
-
-                              <Flex
-                                w={'full'}
-                                overflowX={'scroll'}
-                                gap={3}
-                                px={4}
-                                hidden={isVariantsLoadingSignal.value}
-                              >
-                                {variantChartsSignal.value.map(
-                                  (variantChart, j) => (
-                                    <VariantChartView
-                                      chart={variantChart}
-                                      key={`variant-${j}`}
-                                      chartHeight={125}
-                                      chartWidth={250}
-                                    />
-                                  )
-                                )}
-                              </Flex>
-                            </Flex>
-                          </Flex>
-                        </Collapse>
-                      </GridItem>
-                    )}
-                    {i == dashboardSignal.value.length - 1 && (
-                      <GridItem>
-                        <ChartAppendView />
-                      </GridItem>
-                    )}
+                    {(i == dashboardSignal.value.length - 1 ||
+                      i % NUM_COL == NUM_COL - 1) && <InspectionPanel i={i} />}
                   </>
                 );
               })}
             </Grid>
-          ) : (
-            <Center w="full" minH={180}>
-              <Spinner size="xl" />
-            </Center>
           )}
-        </HSection>
-      </Flex>
-      <Flex flexDir={'column'} minW={200} h="fit-content" gap={2}>
-        <Select
-          size={'sm'}
-          defaultValue={'Movies'}
-          w="full"
-          bgColor={'white'}
-          boxShadow={'sm'}
-          borderRadius={'md'}
-          borderWidth={0}
-          onChange={(e) => {
-            console.log(e.target.value);
-            init(e.target.value);
-          }}
-        >
-          <option>Birdstrikes</option>
-          <option>Movies</option>
-          <option>Student Performance</option>
-        </Select>
-        <Section title="Score Distributions" width={250}>
-          <ScoreDistView width={250} height={250} />
-        </Section>
-        <Section title="Space Distributions" width={250}>
-          <SpaceDistView width={'full'} gap={4} minH={'calc(100vh - 378px)'} />
-        </Section>
-      </Flex>
+        </Flex>
+      </MainSection>
     </Flex>
   );
 };
+
+const AppendChartPanel = () => (
+  <Collapse in={isAppendPanelOpen.value} animateOpacity unmountOnExit>
+    <Flex
+      flexDir={'row'}
+      bgColor={'gray.100'}
+      minH={'260px'}
+      mb={2}
+      borderRadius={'md'}
+      p={2}
+      gap={4}
+    >
+      <ChartAppendView />
+      <Flex
+        minW={'200px'}
+        maxW={'full'}
+        w={'full'}
+        flexDir={'column'}
+        bgColor={'white'}
+        borderRadius="md"
+        p={2}
+      >
+        <Text fontSize={'md'} fontWeight={600} mb={2}>
+          Chart Recommendation
+        </Text>
+
+        {isRecommendingSignal.value && (
+          <Center w="full" minH={180}>
+            <Spinner size="md" />
+          </Center>
+        )}
+        <Flex
+          w={'full'}
+          overflowX={'scroll'}
+          gap={3}
+          px={4}
+          hidden={isRecommendingSignal.value}
+        >
+          {recommendedChartViewSignal.value.map((chart, j) => (
+            <RecommendChartView
+              chart={chart}
+              key={`recommend-${j}`}
+              chartWidth={250}
+              chartHeight={125}
+            />
+          ))}
+        </Flex>
+      </Flex>
+    </Flex>
+  </Collapse>
+);
+
+const InspectionPanel = ({ i }: { i: number }) => (
+  <GridItem colSpan={NUM_COL}>
+    <Collapse in={isDetailExpanded(i)} animateOpacity unmountOnExit>
+      <Flex
+        flexDir={'row'}
+        bgColor={'gray.100'}
+        h={'280px'}
+        mb={2}
+        borderRadius={'md'}
+        px={2}
+        gap={4}
+      >
+        <InspectionView />
+        <InsightsView />
+        <Flex
+          minW={'200px'}
+          w={'full'}
+          flexDir={'column'}
+          bgColor={'white'}
+          borderRadius="md"
+          p={2}
+          my={2}
+        >
+          <Text fontSize={'md'} fontWeight={600}>
+            Chart Variants
+          </Text>
+          <Divider my={1} />
+          {isVariantsLoadingSignal.value && (
+            <Center w="full" minH={180}>
+              <Spinner size="md" />
+            </Center>
+          )}
+          {variantChartsSignal.value.length == 0 && (
+            <Center w="full" minH={180}>
+              <Text fontSize={'md'} fontWeight={600}>
+                No variants
+              </Text>
+            </Center>
+          )}
+
+          <Flex
+            w={'full'}
+            overflowX={'scroll'}
+            gap={3}
+            px={4}
+            hidden={isVariantsLoadingSignal.value}
+          >
+            {variantChartsSignal.value.map((variantChart, j) => (
+              <VariantChartView
+                chart={variantChart}
+                key={`variant-${j}`}
+                chartHeight={125}
+                chartWidth={250}
+              />
+            ))}
+          </Flex>
+        </Flex>
+      </Flex>
+    </Collapse>
+  </GridItem>
+);
+
+const IntentPanel = () => (
+  <TabPanel
+    display={'flex'}
+    flexDir={'column'}
+    w={'full'}
+    px={0}
+    gap={2}
+    h={930}
+  >
+    <Section title="Score Weight" gap={1.5} w="full">
+      <WeightSlider title="specificity" />
+      <WeightSlider title="interestingness" />
+      <WeightSlider title="coverage" />
+      <WeightSlider title="diversity" />
+      <WeightSlider title="parsimony" />
+    </Section>
+    <Section
+      title="Chart Types"
+      gap={1.5}
+      maxH={160}
+      w="full"
+      innerOverflowY={'scroll'}
+    >
+      {chartTypesSignal.value.map((chartType, i) => (
+        <ChartTypeSelector chartType={chartType} key={`chartType-${i}`} />
+      ))}
+      <Box bgColor={'white'} minH={41} />
+    </Section>
+    <Section
+      title="Transformations"
+      gap={1.5}
+      maxH={160}
+      w="full"
+      innerOverflowY={'scroll'}
+    >
+      {notDayTransformationsSignal.value.map((transformation, i) => (
+        <TransformationSelector
+          transformation={transformation}
+          key={`attribute-${i}`}
+        />
+      ))}
+      <Box bgColor={'white'} minH={41} />
+    </Section>
+
+    <Section
+      title="Attributes"
+      gap={1.5}
+      minH={'36px'}
+      h="full"
+      pb={4}
+      w="full"
+      innerOverflowY={'scroll'}
+    >
+      {attributesSignal.value.map((attribute, i) => (
+        <AttributeSelector attribute={attribute} key={`attribute-${i}`} />
+      ))}
+      <Box bgColor={'white'} minH={41} />
+    </Section>
+  </TabPanel>
+);
+
+const ResultPanel = () => (
+  <TabPanel
+    display={'flex'}
+    flexDir={'column'}
+    w={'full'}
+    px={0}
+    gap={2}
+    h={930}
+  >
+    <Section title="Score Distributions" width={250}>
+      <ScoreDistView width={250} height={250} />
+    </Section>
+    <Section title="Space Distributions" width={250} h="full">
+      <SpaceDistView width={'full'} gap={4} />
+    </Section>
+  </TabPanel>
+);

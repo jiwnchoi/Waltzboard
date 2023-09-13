@@ -21,6 +21,7 @@ import {
   replaceChart,
 } from '../controller/details';
 import type { ChartView } from '../types/ChartView';
+import { inferResponseSignal } from '../controller/infer';
 
 interface ChartViewProps extends FlexProps {
   chart: ChartView;
@@ -46,55 +47,73 @@ export const InspectionView = () => {
       p={2}
       my={2}
     >
-      <Text fontSize={'md'} fontWeight={600}>
-        Single Chart Scores
+      <Text fontSize={'md'} fontWeight={600} mb={2}>
+        Without this chart
       </Text>
-      <Divider my={1} />
       {isInspectionLoadingSignal.value && (
         <Center w="full" minH={180}>
           <Spinner size="md" />
         </Center>
       )}
-      {inspectionSignal.value &&
-        Object.entries(inspectionSignal.value).map(([key, value]) => {
-          return (
-            <Flex
-              key={`inspect-${key}`}
-              flexDir={'row'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
-              mb={3}
-            >
-              <Text color={'gray.500'} fontSize={'sm'} fontWeight={600}>
-                {key[0].toUpperCase() + key.slice(1)}
-              </Text>
-              <Text>
-                <Text
-                  as={'span'}
-                  fontSize={'sm'}
-                  fontWeight={600}
-                  color={'blue.500'}
-                >
-                  {format('.2f')(value)}
+      {!isInspectionLoadingSignal.value &&
+        inspectionChartSignal.value?.chartResults &&
+        Object.entries(inspectionChartSignal.value.chartResults).map(
+          ([key, value]) => {
+            const currentScore =
+              inferResponseSignal.value.result[
+                key as keyof typeof inferResponseSignal.value.result
+              ];
+            return (
+              <Flex
+                key={`inspect-${key}`}
+                flexDir={'row'}
+                justifyContent={'space-between'}
+                alignItems={'center'}
+                mb={3}
+              >
+                <Text color={'gray.500'} fontSize={'sm'} fontWeight={600}>
+                  {key[0].toUpperCase() + key.slice(1)}
                 </Text>
-                <Text as={'span'} fontSize={'sm'}>
-                  {key === 'score' ? `/4.00` : `/1.00`}
+                <Text>
+                  <Text
+                    as={'span'}
+                    fontSize={'sm'}
+                    fontWeight={800}
+                    color={
+                      currentScore == value
+                        ? 'black'
+                        : currentScore > value
+                        ? 'green.500'
+                        : 'red.500'
+                    }
+                  >
+                    {format('.2f')(currentScore - value)}
+                  </Text>
+                  {/* <Text as={'span'} fontSize={'sm'}>
+                    {key === 'score' ? `/4.00` : `/1.00`}
+                  </Text> */}
                 </Text>
-              </Text>
-            </Flex>
-          );
-        })}
+              </Flex>
+            );
+          }
+        )}
     </Flex>
   );
 };
 
 export const InsightsView = () => {
   return (
-    <Flex flexDir={'column'} bgColor={'white'} borderRadius="md" p={2} my={2}>
-      <Text fontSize={'md'} fontWeight={600}>
-        Statistic Insights
+    <Flex
+      flexDir={'column'}
+      bgColor={'white'}
+      borderRadius="md"
+      p={2}
+      my={2}
+      w={336}
+    >
+      <Text fontSize={'md'} fontWeight={600} mb={2}>
+        This chart contains these insights
       </Text>
-      <Divider my={1} />
 
       {inspectionChartSignal.value && (
         <Flex flexDir={'column'} gap={2} mt={2} overflowY={'auto'} w={'320px'}>
@@ -137,7 +156,7 @@ export const VariantChartView = (props: ChartViewProps) => {
       p={2}
       _hover={{
         cursor: 'pointer',
-        bgColor: 'blue.50',
+        bgColor: 'gray.100',
       }}
       onClick={() => {
         replaceChart(inspectionIndexSignal.value, props.chart);

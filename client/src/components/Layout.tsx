@@ -10,9 +10,11 @@ import {
 } from '@chakra-ui/react';
 import { useSignal } from '@preact/signals-react';
 import { AiFillGithub } from 'react-icons/ai';
+import { BsPlusSquareDotted } from 'react-icons/bs';
 import { FiExternalLink } from 'react-icons/fi';
 import { GiWheat } from 'react-icons/gi';
 import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
+import { toggleAppendPanel } from '../controller/append';
 
 const Header = () => (
   <Flex align="center" justifyContent="space-between" px={4} py={2} w="full">
@@ -23,11 +25,6 @@ const Header = () => (
       </Heading>
     </Flex>
     <Flex alignItems={'center'} gap={4}>
-      <Link href="https://github.com/jason-choi/gleaner" isExternal>
-        <Button variant={'layout'} leftIcon={<AiFillGithub />} p={0} m={0}>
-          GitHub
-        </Button>
-      </Link>
       <Link href="https://idclab.skku.edu" isExternal>
         <Button variant={'layout'} leftIcon={<FiExternalLink />} p={0} m={0}>
           <Text
@@ -46,6 +43,11 @@ const Header = () => (
           >
             Lab
           </Text>
+        </Button>
+      </Link>
+      <Link href="https://github.com/jason-choi/gleaner" isExternal>
+        <Button variant={'layout'} leftIcon={<AiFillGithub />} p={0} m={0}>
+          GitHub
         </Button>
       </Link>
     </Flex>
@@ -160,18 +162,12 @@ const Section = (props: SectionProps) => {
   );
 };
 
-const HSection = (props: SectionProps) => {
-  const show = useSignal<boolean | undefined>(!props.collapsed);
-
-  const toggleShow = () => {
-    show.value = !show.value;
-  };
-
+const MainSection = (props: SectionProps) => {
   return (
     <Flex
-      flexDir={'column'}
-      gap={props.gap}
       {...props}
+      flexDir={'column'}
+      w="full"
       p={2}
       bgColor="white"
       borderRadius="md"
@@ -183,28 +179,28 @@ const HSection = (props: SectionProps) => {
         alignItems={'center'}
       >
         <Heading variant={'section'}>{props.title}</Heading>
-        {show.value ? (
-          <Icon as={RiArrowDownSLine} boxSize={4} onClick={toggleShow} />
-        ) : (
-          <Icon as={RiArrowUpSLine} boxSize={4} onClick={toggleShow} />
-        )}
-      </Flex>
-      <Collapse in={show.value} animateOpacity>
-        <Flex
-          flexDir={'row'}
-          w="full"
-          gap={props.gap}
-          bgColor="white"
-          borderRadius="md"
-          boxShadow="sm"
-          overflowY={props.innerOverflowY}
-          overflowX={props.innerOverflowX}
+        <Button
+          colorScheme="blue"
+          size={'xs'}
+          leftIcon={<BsPlusSquareDotted />}
+          onClick={toggleAppendPanel}
         >
-          {props.children}
-        </Flex>
-      </Collapse>
+          <Text>Append Chart</Text>
+        </Button>
+      </Flex>
+      <Flex
+        flexDir={'column'}
+        w="full"
+        gap={props.gap}
+        maxH={props.maxH}
+        overflowX={props.innerOverflowX}
+        overflowY={props.innerOverflowY}
+      >
+        {props.children}
+      </Flex>
     </Flex>
   );
 };
 
-export { Footer, HSection, Header, Section };
+export { Footer, Header, MainSection, Section };
+

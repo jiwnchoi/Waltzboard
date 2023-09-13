@@ -4,7 +4,7 @@ import { Main } from './components/Main';
 import { initializedSignal } from './controller/init';
 
 const App = () => (
-  <Center w="full" minH={'90vh'} flexDir={'column'}>
+  <Center w="full" h="full" flexDir={'column'}>
     <Header />
     {initializedSignal.value ? (
       <Main />

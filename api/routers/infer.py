@@ -5,7 +5,6 @@ from api.config import gl
 
 
 class InferBody(BaseModel):
-    nCharts: int | None
     chartKeys: list[str]
 
 

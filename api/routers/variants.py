@@ -45,6 +45,9 @@ async def variants(body: VariantsBody) -> VariantsResponse:
 
     return VariantsResponse(
         variants=[
-            GleanerChartModel.from_gleaner_chart(c, gl.oracle.get_statistics_from_chart(c)) for c in top_five_charts
+            GleanerChartModel.from_gleaner_chart(
+                c, gl.oracle.get_statistics_from_chart(c)
+            )
+            for c in top_five_charts
         ]
     )

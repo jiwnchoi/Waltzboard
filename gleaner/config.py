@@ -14,7 +14,7 @@ class GleanerConfig:
     chart_map: dict[ChartKeyTokens, type]
 
     # Explorer config
-    n_epoch: int = 50
+    n_epoch: int = 10
     n_candidates: int = 100
     n_search_space: int = 100
     n_beam: int = 10
@@ -27,7 +27,7 @@ class GleanerConfig:
         self,
         df: pd.DataFrame,
         robustness: int = 100,
-        n_epoch: int = 50,
+        n_epoch: int = 10,
         n_candidates: int = 100,
         halving_ratio: float = 0.1,
     ) -> None:

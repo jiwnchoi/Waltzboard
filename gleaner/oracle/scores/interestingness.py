@@ -93,16 +93,18 @@ def mean(l):
 
 from typing import List, Union
 
+
 @dataclass
 class Statistics:
     key: str
     features: List[str | None]
-    
+
     def to_dict(self) -> list[dict[str, str | list[str | None]]]:
         return {
             "key": self.key,
             "features": self.features,
         }
+
 
 def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
     attr_notnull = [
@@ -181,11 +183,12 @@ def get_statistic_features(node: "BaseChart") -> dict[str, list[str | None]]:
 
     return features
 
+
 def get_statistics(node: "BaseChart") -> list[Statistics]:
     features = get_statistic_features(node)
     stats = [Statistics(key, value) for key, value in features.items()]
-    print(stats)
     return stats
+
 
 def feature_to_interestingness(features: list[list[str | None]]) -> float:
     values = [bool(value) for feature in features for value in feature]

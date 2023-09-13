@@ -5,10 +5,11 @@ import { InspectResponse, VariantsResponse } from '../types/API';
 import { ChartView } from '../types/ChartView';
 import { toChartView } from '../utils/toChartView';
 import { chartKeysSignal, dashboardSignal } from './dashboard';
-import { NUM_DASHBOARD_COLUMN } from '../components/Main';
+import { NUM_COL } from '../components/Main';
 import { inferResponseSignal } from './infer';
 import { fromChartView } from '../utils/fromChartView';
 import { OracleSingleResult } from '../types/OracleResult';
+import { isAppendPanelOpen } from './append';
 
 export const variantChartsSignal = signal<ChartView[]>([]);
 
@@ -28,8 +29,9 @@ export const inspectionChartSignal = computed(() => {
 })
 
 export const isDetailExpanded = (idx: number) => {
+  if (isAppendPanelOpen.value) return false;
   const value = inspectionIndexSignal.value
-  return idx - NUM_DASHBOARD_COLUMN < value && value <= idx;
+  return idx - NUM_COL < value && value <= idx;
 };
 
 export const getVariants = async () => {

@@ -43,7 +43,5 @@ class Oracle:
             parsimony=get_parsimony(nodes, self.config.attr_names),
         )
 
-    def get_statistics_from_chart(
-        self, chart: "BaseChart"
-    ) -> list[Statistics]:
+    def get_statistics_from_chart(self, chart: "BaseChart") -> list[Statistics]:
         return get_statistics(chart)

@@ -30,7 +30,12 @@ async def init(body: InspectBody) -> InspectResponse:
     return InspectResponse(
         result=OracleSingleResultModel.from_oracle_result(
             gl.oracle.get_single_chart_results(
-                GleanerDashboard([get_chart_from_tokens(tokenize(key), gl.config) for key in body.chartKeys]),
+                GleanerDashboard(
+                    [
+                        get_chart_from_tokens(tokenize(key), gl.config)
+                        for key in body.chartKeys
+                    ]
+                ),
                 body.target,
                 set(gl.preferences),
             )

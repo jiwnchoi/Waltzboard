@@ -16,7 +16,9 @@ class GleanerDashboard:
         return self
 
     def extend(self, charts: list[BaseChart]):
-        return GleanerDashboard(self.charts + charts)
+        keys = [c.tokens for c in self.charts]
+        new_charts = [c for c in charts if c.tokens not in keys]
+        return GleanerDashboard(self.charts + new_charts)
 
     def display(self, width: int = 150, height: int = 150, num_cols: int = 4):
         if self.charts is None:

@@ -29,7 +29,6 @@ export interface GleanerChartModel {
 }
 
 export interface InferBody {
-  nCharts: number | null;
   chartKeys: string[];
 }
 
@@ -49,6 +48,12 @@ export interface SetConfigBody {
   nFilters: number;
   robustness: number;
   halvingRatio: number;
+}
+
+export interface InitBody {
+  n_epoch: number;
+  robustness: number;
+  dataset: string;
 }
 
 export interface InitResponse {
@@ -100,4 +105,16 @@ export interface InspectBody {
 
 export interface InspectResponse {
   result: OracleSingleResult;
+}
+
+export interface RecommendBody {
+  chartKeys: string[];
+}
+
+export interface RecommendResponse {
+  recommends: GleanerChartModel[];
+}
+
+export interface GetChartResponse {
+  chart: GleanerChartModel;
 }
