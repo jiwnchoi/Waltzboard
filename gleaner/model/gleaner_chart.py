@@ -111,7 +111,9 @@ def get_variants_from_charts(
                 )
                 if is_valid_tokens(new_key, config):
                     variants.append(get_chart_from_tokens(new_key, config))
-    for c, tx, ty, tz in product(config.chart_type, config.txs, config.tys, config.tzs):
+    for c, tx, ty, tz in product(
+        config.chart_type, config.txs, config.tys, config.tzs
+    ):
         if (
             c != charts.tokens[0]
             and tx != charts.tokens[4]
@@ -131,12 +133,19 @@ def get_variants_from_charts(
                 variants.append(get_chart_from_tokens(new_key, config))
     return variants
 
-def get_all_charts(
-    config: "GleanerConfig"
-) -> list["BaseChart"]:
-    attrs = [
-        a.name for a in config.attrs
-    ]
-    all_keys = list(product(config.chart_type, attrs,attrs,attrs, config.txs, config.tys, config.tzs))
+
+def get_all_charts(config: "GleanerConfig") -> list["BaseChart"]:
+    attrs = [a.name for a in config.attrs]
+    all_keys = list(
+        product(
+            config.chart_type,
+            attrs,
+            attrs,
+            attrs,
+            config.txs,
+            config.tys,
+            config.tzs,
+        )
+    )
     valid_keys = [k for k in all_keys if is_valid_tokens(k, config)]
     return [get_chart_from_tokens(k, config) for k in valid_keys]

@@ -7,13 +7,13 @@ const attributesSignal = signal<Attribute[]>([]);
 const attributePreferedSignal = computed(() =>
   attributesSignal.value
     .filter((attribute) => attribute.prefer)
-    .map((attribute) => attribute.name),
+    .map((attribute) => attribute.name)
 );
 
 const attributeContrainedSignal = computed(() =>
   attributesSignal.value
     .filter((attribute) => attribute.ignore)
-    .map((attribute) => attribute.name),
+    .map((attribute) => attribute.name)
 );
 
 const toggleAttributePrefer = (target: Attribute) => {

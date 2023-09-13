@@ -203,4 +203,3 @@ const MainSection = (props: SectionProps) => {
 };
 
 export { Footer, Header, MainSection, Section };
-

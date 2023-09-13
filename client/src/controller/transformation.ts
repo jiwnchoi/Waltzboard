@@ -7,32 +7,32 @@ const transformationsSignal = signal<Transformation[]>([]);
 const notDayTransformationsSignal = computed(() =>
   transformationsSignal.value.filter(
     (transformation) =>
-      !['year', 'day', 'month', 'bin'].includes(transformation.type),
-  ),
+      !['year', 'day', 'month', 'bin'].includes(transformation.type)
+  )
 );
 
 const dayTransformationsSignal = computed(() =>
   transformationsSignal.value.filter((transformation) =>
-    ['year', 'day', 'month'].includes(transformation.type),
-  ),
+    ['year', 'day', 'month'].includes(transformation.type)
+  )
 );
 
 const targetTransformationSignal = computed(() =>
   transformationsSignal.value
     .filter((transformation) => !transformation.ignore)
-    .map((transformation) => transformation.type),
+    .map((transformation) => transformation.type)
 );
 
 const transformationPreferredSignal = computed(() =>
   transformationsSignal.value
     .filter((transformation) => transformation.prefer)
-    .map((transformation) => `${transformation.type}`),
+    .map((transformation) => `${transformation.type}`)
 );
 
 const transformationConstrainedSignal = computed(() =>
   transformationsSignal.value
     .filter((transformation) => transformation.ignore)
-    .map((transformation) => `${transformation.type}`),
+    .map((transformation) => `${transformation.type}`)
 );
 
 const toggleTransformationPrefer = (target: Transformation) => {

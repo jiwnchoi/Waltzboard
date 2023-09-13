@@ -26,11 +26,11 @@ export const inspectionChartSignal = computed(() => {
   const target = inspectionIndexSignal.value;
   if (target === -1) return undefined;
   return dashboardSignal.value[target];
-})
+});
 
 export const isDetailExpanded = (idx: number) => {
   if (isAppendPanelOpen.value) return false;
-  const value = inspectionIndexSignal.value
+  const value = inspectionIndexSignal.value;
   return idx - NUM_COL < value && value <= idx;
 };
 
@@ -70,8 +70,8 @@ export const getInspectation = async () => {
   const target = inspectionIndexSignal.value;
   if (target === -1) {
     inspectionSignal.value = undefined;
-    return 
-  };
+    return;
+  }
   const chartKeys = chartKeysSignal.value;
   const res: InspectResponse = (
     await axios.post(`${URI}/inspect`, {

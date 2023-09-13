@@ -32,7 +32,6 @@ export const resetTuple = () => {
 
 export const recommendedChartViewSignal = signal<ChartView[]>([]);
 
-
 effect(() => {
   const getIsValid = async () => {
     const res = await axios.get(

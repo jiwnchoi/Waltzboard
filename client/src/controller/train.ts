@@ -51,7 +51,7 @@ const attributeDistSignal = computed(() => trainResponseSignal.value.attribute);
 const chartTypeDistSignal = computed(() => trainResponseSignal.value.chartType);
 
 const transformationDistSignal = computed(
-  () => trainResponseSignal.value.transformation,
+  () => trainResponseSignal.value.transformation
 );
 
 const scoreDistSignal = computed(() => trainResponseSignal.value.result);
@@ -63,7 +63,7 @@ const trainGleaner = async () => {
   ).data;
   response.transformation = response.transformation.filter(
     (transformation) =>
-      !['year', 'day', 'month', 'bin'].includes(transformation.name),
+      !['year', 'day', 'month', 'bin'].includes(transformation.name)
   );
   response.transformation.sort((a, b) => {
     if (a.name === 'None') return 1;

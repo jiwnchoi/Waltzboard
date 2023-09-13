@@ -7,19 +7,19 @@ const chartTypesSignal = signal<ChartType[]>([]);
 const targetChartTypeSignal = computed(() =>
   chartTypesSignal.value
     .filter((chartType) => !chartType.ignore)
-    .map((chartType) => chartType.mark),
+    .map((chartType) => chartType.mark)
 );
 
 const chartTypePreferredSignal = computed(() =>
   chartTypesSignal.value
     .filter((chartType) => chartType.prefer)
-    .map((chartType) => `${chartType.mark}`),
+    .map((chartType) => `${chartType.mark}`)
 );
 
 const chartTypeConstrainedSignal = computed(() =>
   chartTypesSignal.value
     .filter((chartType) => chartType.ignore)
-    .map((chartType) => `${chartType.mark}`),
+    .map((chartType) => `${chartType.mark}`)
 );
 
 const toggleChartTypePrefer = (target: ChartType) => {

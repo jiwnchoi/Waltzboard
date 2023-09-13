@@ -63,6 +63,6 @@ class Gleaner:
         if not self.is_valid_tokens(key):
             raise Exception("Chart tuple is not valid")
         return get_chart_from_tokens(key, self.config)
-    
+
     def get_all_charts(self):
         return get_all_charts(self.config)

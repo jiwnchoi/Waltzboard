@@ -37,7 +37,7 @@ effect(() => {
     chartTypesSignal.value = chartTypesSignal.peek().map((chartType) => {
       if (
         selectedTaskTypeSignal.value.chartTypes.some(
-          (selectedChartType) => selectedChartType.name === chartType.name,
+          (selectedChartType) => selectedChartType.name === chartType.name
         )
       ) {
         return {

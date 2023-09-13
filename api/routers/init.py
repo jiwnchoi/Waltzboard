@@ -8,11 +8,11 @@ class InitBody(BaseModel):
     dataset: str = 'Movies'
     n_epoch: int = 5
     robustness: int = 50
-    
+
 
 class InitResponse(BaseModel):
     n_epoch: int
-    robustness: int 
+    robustness: int
     datasets: list[str]
     chartTypes: list[ChartTypeModel]
     transformations: list[TrsTypeModel]

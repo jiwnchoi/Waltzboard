@@ -21,4 +21,3 @@ router = APIRouter(
 @router.get("/")
 async def init(token: str) -> IsValidResponse:
     return IsValidResponse(isValid=gl.is_valid_tokens(tokenize(token)))
-

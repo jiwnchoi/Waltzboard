@@ -46,7 +46,7 @@ const init = async () => {
           prefer: false,
           ignore: false,
         };
-      },
+      }
     );
     // taskTypesSignal.value = response.taskTypes.map((taskType) => {
     //     return {

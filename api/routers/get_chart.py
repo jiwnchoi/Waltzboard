@@ -7,7 +7,6 @@ from api.config import gl
 from api.utills import tokenize
 
 
-
 class GetChartResponse(BaseModel):
     chart: GleanerChartModel
 
