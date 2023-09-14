@@ -56,7 +56,7 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
         <Icon
           as={attribute.ignore ? RiCheckboxCircleLine : RiCheckboxCircleFill}
           boxSize={3.5}
-          color="blue.400"
+          color={attribute.ignore ? 'gray.400' : 'blue.400'}
           ml={'auto'}
           mr={1}
           cursor="pointer"
@@ -65,7 +65,7 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
         <Icon
           as={attribute.prefer ? RiHeartAddFill : RiHeartAddLine}
           boxSize={3.5}
-          color="pink.400"
+          color={attribute.ignore ? 'gray.400' : 'pink.400'}
           cursor="pointer"
           onClick={() => toggleAttributePrefer(attribute)}
         />
@@ -87,7 +87,7 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
               <Icon
                 as={t.ignore ? RiCheckboxCircleLine : RiCheckboxCircleFill}
                 boxSize={3.5}
-                color="blue.400"
+                color={t.ignore ? 'gray.400' : 'blue.400'}
                 ml={'auto'}
                 mr={1}
                 cursor="pointer"
@@ -96,7 +96,7 @@ const AttributeSelector = ({ attribute }: { attribute: Attribute }) => {
               <Icon
                 as={t.prefer ? RiHeartAddFill : RiHeartAddLine}
                 boxSize={3.5}
-                color="pink.400"
+                color={t.ignore ? 'gray.400' : 'pink.400'}
                 cursor="pointer"
                 onClick={() => toggleTransformationPrefer(t)}
               />

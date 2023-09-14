@@ -81,9 +81,7 @@ export const ChartAppendView = () => {
                 inputTuple.value = oldCurrentState;
               }}
             >
-              <option key={`appendNone`} value={''}>
-                None
-              </option>
+              <option key={`appendNone`}>None</option>
               {chartTypesSignal.value.map((chartType) => (
                 <option key={`append${chartType.mark}`} value={chartType.mark}>
                   {chartType.name}
@@ -116,9 +114,7 @@ export const ChartAppendView = () => {
                 inputTuple.value = oldCurrentState;
               }}
             >
-              <option key={`appendNone`} value={''}>
-                None
-              </option>
+              <option key={`appendNone`}>None</option>
               {attributesSignal.value.map((a) => (
                 <option key={`append${a.name}x`} value={a.name}>
                   {a.name}
@@ -137,6 +133,7 @@ export const ChartAppendView = () => {
                 inputTuple.value = oldCurrentState;
               }}
             >
+              <option key={`appendNone`}>None</option>
               {transformationsSignal.value.map((a) => (
                 <option key={`append${a.type}y`} value={a.type}>
                   {a.name}
@@ -169,9 +166,7 @@ export const ChartAppendView = () => {
                 inputTuple.value = oldCurrentState;
               }}
             >
-              <option key={`appendNone`} value={''}>
-                None
-              </option>
+              <option key={`appendNone`}>None</option>
               {attributesSignal.value.map((a) => (
                 <option key={`append${a.name}x`} value={a.name}>
                   {a.name}
@@ -190,6 +185,7 @@ export const ChartAppendView = () => {
                 inputTuple.value = oldCurrentState;
               }}
             >
+              <option key={`appendNone`}>None</option>
               {transformationsSignal.value.map((a) => (
                 <option key={`append${a.type}y`} value={a.type}>
                   {a.name}
@@ -222,9 +218,7 @@ export const ChartAppendView = () => {
                 inputTuple.value = oldCurrentState;
               }}
             >
-              <option key={`appendNone`} value={''}>
-                None
-              </option>
+              <option key={`appendNone`}>None</option>
               {attributesSignal.value.map((a) => (
                 <option key={`append${a.name}x`} value={a.name}>
                   {a.name}
@@ -243,6 +237,7 @@ export const ChartAppendView = () => {
                 inputTuple.value = oldCurrentState;
               }}
             >
+              <option key={`appendNone`}>None</option>
               {transformationsSignal.value.map((a) => (
                 <option key={`append${a.type}y`} value={a.type}>
                   {a.name}

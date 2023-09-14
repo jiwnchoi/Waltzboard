@@ -29,7 +29,7 @@ export const ChartTypeSelector = ({ chartType }: { chartType: ChartType }) => {
         <Icon
           as={chartType.ignore ? RiCheckboxCircleLine : RiCheckboxCircleFill}
           boxSize={3.5}
-          color="blue.400"
+          color={chartType.ignore ? 'gray.400' : 'blue.400'}
           ml={'auto'}
           mr={1}
           cursor="pointer"

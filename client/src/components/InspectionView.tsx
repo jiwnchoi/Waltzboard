@@ -80,14 +80,14 @@ export const InspectionView = () => {
                     fontSize={'sm'}
                     fontWeight={800}
                     color={
-                      currentScore == value
+                      Math.abs(currentScore - value) < 0.01
                         ? 'black'
-                        : currentScore > value
+                        : currentScore < value
                         ? 'green.500'
                         : 'red.500'
                     }
                   >
-                    {format('.2f')(currentScore - value)}
+                    {format('.2f')(value - currentScore)}
                   </Text>
                   {/* <Text as={'span'} fontSize={'sm'}>
                     {key === 'score' ? `/4.00` : `/1.00`}
