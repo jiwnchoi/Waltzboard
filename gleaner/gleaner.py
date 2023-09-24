@@ -30,7 +30,7 @@ class Gleaner:
         if config and (df is not config.df):
             raise RuntimeError("df and config.df must be same")
 
-        self.config = GleanerConfig(df) if not config else config
+        self.config = GleanerConfig(df)
         self.update_config()
         self.preferences = []
 

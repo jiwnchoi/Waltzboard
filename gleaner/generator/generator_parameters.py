@@ -40,16 +40,17 @@ class NormalPrior:
 
     def update(self, n, observed_mean, observed_var):
         self.mean = (
-            self.mean / self.var + observed_mean * n / observed_var
-        ) / (1 / self.var + n / observed_var)
+            self.mean / (self.var + 1e-10)
+            + observed_mean * n / (observed_var + 1e-10)
+        ) / (1 / (self.var + 1e-10) + n / (observed_var + 1e-10) + 1e-10)
         # self.var = 1 / (1 / self.var + n / observed_var)
         self.history.append(self.mean)
 
     def sample(self):
         sampled = np.random.normal(self.mean, np.sqrt(self.var))
-        if sampled == np.nan:
+        if np.isnan(sampled):
             sampled = 0
-        return np.max([sampled, 2])
+        return max(2, sampled)
 
 
 class PriorParameters:

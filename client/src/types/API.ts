@@ -8,113 +8,117 @@ import { TransformationDist, AttributeDist, ChartTypeDist } from './Space';
 import { TaskTypeFetched } from './TaskType';
 
 export interface AttributeModel {
-  name: string;
-  type: string;
+    name: string;
+    type: string;
 }
 
 export interface ScoreDistModel {
-  score: number[];
-  specificity: number[];
-  interestingness: number[];
-  coverage: number[];
-  diversity: number[];
-  parsimony: number[];
+    score: number[];
+    specificity: number[];
+    interestingness: number[];
+    coverage: number[];
+    diversity: number[];
+    parsimony: number[];
 }
 
 export interface GleanerChartModel {
-  key: string;
-  title: string[];
-  spec: string;
-  statistics: StatisticFeature[];
+    key: string;
+    title: string[];
+    spec: string;
+    statistics: StatisticFeature[];
 }
 
 export interface InferBody {
-  chartKeys: string[];
+    chartKeys: string[];
 }
 
 export interface TrainBody {
-  weight: OracleWeight;
-  preferences: string[];
-  constraints: string[];
+    weight: OracleWeight;
+    preferences: string[];
+    constraints: string[];
 }
 
 export interface RecommendBody {
-  chartKeys: string[];
-  nResults: number;
+    chartKeys: string[];
+    nResults: number;
 }
 
 export interface SetConfigBody {
-  nCandidates: number;
-  nFilters: number;
-  robustness: number;
-  halvingRatio: number;
+    nCandidates: number;
+    nFilters: number;
+    robustness: number;
+    halvingRatio: number;
 }
 
 export interface InitBody {
-  n_epoch: number;
-  robustness: number;
-  dataset: string;
+    n_epoch?: number;
+    n_candidates?: number;
+    n_search_space?: number;
+    n_beam?: number;
+    robustness?: number;
+    dataset?: string;
 }
 
 export interface InitResponse {
-  chartTypes: ChartTypeFetched[];
-  taskTypes: TaskTypeFetched[];
-  attributes: AttributeFetched[];
-  transformations: TransformationFetched[];
+    chartTypes: ChartTypeFetched[];
+    taskTypes: TaskTypeFetched[];
+    attributes: AttributeFetched[];
+    transformations: TransformationFetched[];
+    configs: InitBody;
 }
 
 export interface InferResponse {
-  charts: GleanerChartModel[];
-  result: OracleResult;
-  chartResults: OracleResult[];
+    charts: GleanerChartModel[];
+    result: OracleResult;
+    chartResults: OracleResult[];
 }
 
 export interface RecommendResponse {
-  charts: GleanerChartModel[];
+    charts: GleanerChartModel[];
 }
 
 export interface TrainResponse {
-  attribute: AttributeDist[];
-  chartType: ChartTypeDist[];
-  transformation: TransformationDist[];
-  result: ScoreDistModel;
+    attribute: AttributeDist[];
+    chartType: ChartTypeDist[];
+    transformation: TransformationDist[];
+    result: ScoreDistModel;
 }
 
 export interface ScoreBody {
-  chartKeys: string[];
+    chartKeys: string[];
 }
 
 export interface ScoreResponse {
-  result: OracleResult;
-  chartResults: OracleResult[];
+    result: OracleResult;
+    chartResults: OracleResult[];
 }
 
 export interface VariantsBody {
-  chartKeys: string[];
-  targetIndex: number;
+    chartKeys: string[];
+    targetIndex: number;
 }
 
 export interface VariantsResponse {
-  variants: GleanerChartModel[];
+    variants: GleanerChartModel[];
 }
 
 export interface InspectBody {
-  chartKeys: string[];
-  target: number;
+    chartKeys: string[];
+    target: number;
 }
 
 export interface InspectResponse {
-  result: OracleSingleResult;
+    result: OracleSingleResult;
 }
 
 export interface RecommendBody {
-  chartKeys: string[];
+    chartKeys: string[];
 }
 
 export interface RecommendResponse {
-  recommends: GleanerChartModel[];
+    recommends: GleanerChartModel[];
 }
 
 export interface GetChartResponse {
-  chart: GleanerChartModel;
+    chart: GleanerChartModel;
 }

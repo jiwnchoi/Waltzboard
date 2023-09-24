@@ -29,7 +29,9 @@ async def recommends(body: RecommendBody) -> RecommendResponse:
         [gl.get_chart_from_tokens(tokenize(c)) for c in body.chartKeys]
     )
     all_charts = gl.get_all_charts()
-    all_charts = choices(all_charts, k=200)
+    print(len(all_charts))
+    if len(all_charts) > 10000:
+        all_charts = choices(all_charts, k=10000)
     appended_dashboards = [dashboard.extend([c]) for c in all_charts]
     scores = [
         gl.oracle.get_result(d, set(gl.preferences)).get_score()

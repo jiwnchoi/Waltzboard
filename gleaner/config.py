@@ -7,18 +7,19 @@ from gleaner.model import ChartMap, ChartKeyTokens, ChartMapType
 
 class GleanerConfig:
     # Generator config
-    robustness: int
     attr_names: list[str]
     chart_type: list[str]
     trs_type: list[str | None]
     chart_map: dict[ChartKeyTokens, type]
 
+    robustness: int
+
     # Explorer config
-    n_epoch: int = 10
-    n_candidates: int = 100
-    n_search_space: int = 100
-    n_beam: int = 10
-    halving_ratio: float = 0.1
+    n_epoch: int
+    n_candidates: int
+    n_search_space: int
+    n_beam: int
+    halving_ratio: float
 
     # Oracle Config
     weight: OracleWeight
@@ -26,16 +27,20 @@ class GleanerConfig:
     def __init__(
         self,
         df: pd.DataFrame,
-        robustness: int = 100,
-        n_epoch: int = 10,
-        n_candidates: int = 100,
-        halving_ratio: float = 0.1,
+        robustness: int = 50,
+        n_epoch: int = 50,
+        n_candidates: int = 20,
+        halving_ratio: float = 0.5,
+        n_search_space: int = 100,
+        n_beam: int = 10,
     ) -> None:
         self.robustness = robustness
         self.n_epoch = n_epoch
         self.n_candidates = n_candidates
         self.chart_map = ChartMap
         self.halving_ratio = halving_ratio
+        self.n_search_space = n_search_space
+        self.n_beam = n_beam
         self.df = df
         self.weight = OracleWeight()
         self.init_constraints()

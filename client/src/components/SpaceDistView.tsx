@@ -37,7 +37,7 @@ interface SVGProp {
 
 function getSVGProp(data: Data[], keys: Key[]): SVGProp {
   return {
-    data,
+    data: data,
     keys,
     xMax: SVG_WIDTH - margin.left - margin.right,
     yMax: data.length * BAR_HEIGHT,
@@ -49,7 +49,7 @@ function getSVGProp(data: Data[], keys: Key[]): SVGProp {
       range: [data.length * BAR_HEIGHT, 0],
     }),
     xScale: scaleLinear<number>({
-      domain: [0, keys.length == 1 ? 1 : 2],
+      domain: [0, keys.length == 1 ? 1 : 1],
       nice: true,
       range: [margin.left, SVG_WIDTH - margin.left - margin.right],
     }),
@@ -178,12 +178,14 @@ const StackedBarChart = ({
 
 const SpaceDistView = (props: FlexProps) => {
   const chartTypeProp = getSVGProp(chartTypeDistSignal.value, ['prob']);
-  const transformationProp = getSVGProp(transformationDistSignal.value, [
-    'x',
-    'y',
-    'z',
-  ]);
-  const attributeProp = getSVGProp(attributeDistSignal.value, ['x', 'y', 'z']);
+  const transformationProp = getSVGProp(
+    transformationDistSignal.value.filter((d) => d.name !== 'None'),
+    ['x', 'y', 'z']
+  );
+  const attributeProp = getSVGProp(
+    attributeDistSignal.value.filter((d) => d.name !== 'None'),
+    ['x', 'y', 'z']
+  );
 
   return (
     <Flex {...props} flexDir={'column'}>

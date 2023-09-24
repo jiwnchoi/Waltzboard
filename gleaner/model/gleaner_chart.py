@@ -135,17 +135,33 @@ def get_variants_from_charts(
 
 
 def get_all_charts(config: "GleanerConfig") -> list["BaseChart"]:
-    attrs = [a.name for a in config.attrs]
-    all_keys = list(
-        product(
-            config.chart_type,
-            attrs,
-            attrs,
-            attrs,
-            config.txs,
-            config.tys,
-            config.tzs,
-        )
-    )
-    valid_keys = [k for k in all_keys if is_valid_tokens(k, config)]
-    return [get_chart_from_tokens(k, config) for k in valid_keys]
+    all_charts = []
+    typename = {
+        "Q": [a.name for a in config.attrs if a.type == "Q"],
+        "N": [a.name for a in config.attrs if a.type == "N"],
+        "T": [a.name for a in config.attrs if a.type == "T"],
+        None: [None],
+    }
+    chart_map = config.get_chart_map()
+    for map in chart_map:
+        for x_name in typename[map[1]]:
+            for y_name in typename[map[2]]:
+                if y_name == x_name:
+                    continue
+                for z_name in typename[map[3]]:
+                    if z_name == x_name or z_name == y_name:
+                        continue
+
+                    all_charts.append(
+                        (
+                            map[0],
+                            x_name,
+                            y_name,
+                            z_name,
+                            map[4],
+                            map[5],
+                            map[6],
+                        )
+                    )
+
+    return [get_chart_from_tokens(k, config) for k in all_charts]

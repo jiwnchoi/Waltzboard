@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from collections import Counter
 from itertools import combinations
 
@@ -44,17 +45,48 @@ class Counters:
         self.tz[tz] += 1
 
 
+@dataclass
+class Normalizer:
+    specificity_mean: float
+    specificity_std: float
+    interestingness_mean: float
+    interestingness_std: float
+    coverage_mean: float
+    coverage_std: float
+    diversity_mean: float
+    diversity_std: float
+    parsimony_mean: float
+    parsimony_std: float
+
+    def normalize(self, scores: np.ndarray, score_type: str):
+        if score_type == 'specificity':
+            s = (scores - self.specificity_mean) / self.specificity_std
+        elif score_type == 'interestingness':
+            s = (scores - self.interestingness_mean) / self.interestingness_std
+        elif score_type == 'coverage':
+            s = (scores - self.coverage_mean) / self.coverage_std
+        elif score_type == 'diversity':
+            s = (scores - self.diversity_mean) / self.diversity_std
+        elif score_type == 'parsimony':
+            s = (scores - self.parsimony_mean) / self.parsimony_std
+        else:
+            s = scores
+        return s
+
+
 class Explorer:
     config: GleanerConfig
     df: pd.DataFrame
     dashboard: GleanerDashboard | None
     result: OracleResult | None
+    normalizer: Normalizer | None
 
     def __init__(self, config: "GleanerConfig"):
         self.df = config.df
         self.config = config
         self.dashboard = None
         self.result = None
+        self.normalizer = None
 
     def _infer(
         self,
@@ -103,25 +135,30 @@ class Explorer:
             + parsimony * oracle.weight.parsimony
         )
 
-        normalized_scores: np.ndarray = (
-            (
-                0
-                if len(preferences) == 0
-                else (specificity - specificity.mean())
-                / specificity.std()
-                * oracle.weight.specificity
+        if self.normalizer is None:
+            self.normalizer = Normalizer(
+                specificity.mean(),
+                specificity.std(),
+                interestingness.mean(),
+                interestingness.std(),
+                coverage.mean(),
+                coverage.std(),
+                diversity.mean(),
+                diversity.std(),
+                parsimony.mean(),
+                parsimony.std(),
             )
-            + (interestingness - interestingness.mean())
-            / interestingness.std()
+
+        normalized_scores: np.ndarray = (
+            self.normalizer.normalize(specificity, 'specificity')
+            * oracle.weight.specificity
+            + self.normalizer.normalize(interestingness, 'interestingness')
             * oracle.weight.interestingness
-            + (coverage - coverage.mean())
-            / coverage.std()
+            + self.normalizer.normalize(coverage, 'coverage')
             * oracle.weight.coverage
-            + (diversity - diversity.mean())
-            / diversity.std()
+            + self.normalizer.normalize(diversity, 'diversity')
             * oracle.weight.diversity
-            + (parsimony - parsimony.mean())
-            / parsimony.std()
+            + self.normalizer.normalize(parsimony, 'parsimony')
             * oracle.weight.parsimony
         )
 
@@ -159,13 +196,10 @@ class Explorer:
             parsimony,
         ) = self._infer(gen, oracle, preferences)
 
-        expl_idx = np.argmax(normalized_scores)
-        if (
-            self.result is None
-            or raw_scores[expl_idx] < self.result.get_score()
-        ):
-            self.dashboard = result_n_scores[expl_idx][1]
-            self.result = result_n_scores[expl_idx][0]
+        idx = np.argmax(raw_scores)
+        if self.result is None or raw_scores[idx] < self.result.get_score():
+            self.dashboard = result_n_scores[idx][1]
+            self.result = result_n_scores[idx][0]
 
         result_n_scores = sorted(
             result_n_scores, key=lambda x: x[-1], reverse=True

@@ -124,7 +124,7 @@ class Generator:
         limit = 0
         while len(charts) < n:
             limit += 1
-            if limit > 1000:
+            if limit > 10000:
                 print("Cannot sample enough charts", len(charts), n)
                 break
             chart = self.sample_one()

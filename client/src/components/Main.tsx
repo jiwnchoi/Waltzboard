@@ -190,8 +190,8 @@ export const Main = () => {
         bgColor={'white'}
         innerOverflowY="scroll"
         innerOverflowX="hidden"
-        maxH={988}
-        maxW={'1750px'}
+        maxH={'894px'}
+        maxW={'1610px'}
       >
         <Flex direction={'column'}>
           <AppendChartPanel />
@@ -392,6 +392,7 @@ const IntentPanel = () => (
       title="Attributes"
       gap={1.5}
       minH={'36px'}
+      maxH={220}
       h="full"
       pb={4}
       w="full"
