@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Literal
-from gleaner.model import AttrTypes
+from waltzboard.model import AttrTypes
 
 
 @dataclass

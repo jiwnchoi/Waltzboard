@@ -1,8 +1,8 @@
 import json
 import altair as alt
 from pydantic import BaseModel
-from gleaner.model import BaseChart, ChartTokens
-from gleaner.oracle import OracleResult, OracleSingleResult, Statistics
+from waltzboard.model import BaseChart, ChartTokens
+from waltzboard.oracle import OracleResult, OracleSingleResult, Statistics
 
 
 # Atoms
@@ -94,15 +94,15 @@ class TransformationDistModel(BaseModel):
     z: float
 
 
-class GleanerChartModel(BaseModel):
+class WaltzboardChartModel(BaseModel):
     key: str
     spec: str
     title: list[str]
     statistics: list[dict[str, str | list[str | None]]]
 
     @staticmethod
-    def from_gleaner_chart(chart: BaseChart, statistics: list[Statistics] = []):
-        return GleanerChartModel(
+    def from_waltzboard_chart(chart: BaseChart, statistics: list[Statistics] = []):
+        return WaltzboardChartModel(
             key=json.dumps(chart.tokens),
             spec=chart.get_vegalite(),
             title=chart.title_tokens,

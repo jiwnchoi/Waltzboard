@@ -2,7 +2,7 @@ import altair as alt
 from altair.utils.schemapi import Undefined
 from altair import Chart
 from .base_chart import BaseChart
-from gleaner.utills import x_to_y, y_to_x
+from waltzboard.utills import x_to_y, y_to_x
 
 
 class Heatmap(BaseChart):

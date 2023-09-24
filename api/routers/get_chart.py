@@ -8,7 +8,7 @@ from api.utills import tokenize
 
 
 class GetChartResponse(BaseModel):
-    chart: GleanerChartModel
+    chart: WaltzboardChartModel
 
 
 router = APIRouter(
@@ -22,7 +22,7 @@ router = APIRouter(
 async def get_chart(token: str) -> GetChartResponse:
     chart = gl.get_chart_from_tokens(tokenize(token))
     return GetChartResponse(
-        chart=GleanerChartModel.from_gleaner_chart(
+        chart=WaltzboardChartModel.from_waltzboard_chart(
             chart, gl.oracle.get_statistics_from_chart(chart)
         )
     )

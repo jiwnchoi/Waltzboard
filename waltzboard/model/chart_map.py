@@ -1,5 +1,5 @@
 from .charts import *
-from gleaner.model import ChartKeyTokens
+from waltzboard.model import ChartKeyTokens
 
 ChartMapType = dict[ChartKeyTokens, type]
 

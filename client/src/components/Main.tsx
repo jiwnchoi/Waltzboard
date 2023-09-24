@@ -41,7 +41,7 @@ import {
 import { inferDashboard } from '../controller/infer';
 import { configSignal, init } from '../controller/init';
 import { scoreDashboard } from '../controller/score';
-import { isTrainingSignal, trainGleaner } from '../controller/train';
+import { isTrainingSignal, trainWaltzboard } from '../controller/train';
 import { notDayTransformationsSignal } from '../controller/transformation';
 import { ChartAppendView, RecommendChartView } from './AppendChartView';
 import AttributeSelector from './AttributeSelector';
@@ -159,7 +159,7 @@ export const Main = () => {
             p={4}
             isLoading={isTrainingSignal.value}
             onClick={() => {
-              trainGleaner();
+              trainWaltzboard();
               inferDashboard();
               scoreDashboard();
             }}

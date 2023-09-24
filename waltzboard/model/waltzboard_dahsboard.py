@@ -1,11 +1,11 @@
 import altair as alt
-from gleaner.model import BaseChart
+from waltzboard.model import BaseChart
 from dataclasses import dataclass
 from copy import deepcopy
 
 
 @dataclass
-class GleanerDashboard:
+class WaltzboardDashboard:
     charts: list[BaseChart]
 
     def __len__(self):
@@ -18,7 +18,7 @@ class GleanerDashboard:
     def extend(self, charts: list[BaseChart]):
         keys = [c.tokens for c in self.charts]
         new_charts = [c for c in charts if c.tokens not in keys]
-        return GleanerDashboard(self.charts + new_charts)
+        return WaltzboardDashboard(self.charts + new_charts)
 
     def display(self, width: int = 150, height: int = 150, num_cols: int = 4):
         if self.charts is None:

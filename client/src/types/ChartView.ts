@@ -1,5 +1,5 @@
 import type { TopLevelSpec } from 'vega-lite';
-import { GleanerChartModel } from '../types/API';
+import { WaltzboardChartModel } from '../types/API';
 import { OracleResult } from './OracleResult';
 
 interface StatisticFeature {
@@ -12,7 +12,7 @@ interface TitleToken {
   isPrefered: boolean;
 }
 
-interface ChartView extends GleanerChartModel {
+interface ChartView extends WaltzboardChartModel {
   key: string;
   spec: TopLevelSpec | any;
   statistics: StatisticFeature[];

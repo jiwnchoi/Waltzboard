@@ -1,5 +1,5 @@
 import pandas as pd
-from gleaner.model import BaseChart
+from waltzboard.model import BaseChart
 
 
 def get_coverage(nodes: list["BaseChart"], attr_names: list[str]) -> float:

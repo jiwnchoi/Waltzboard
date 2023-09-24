@@ -1,10 +1,10 @@
 import { attributePreferedSignal } from '../controller/attribute';
 import { pinnedKeysSignal } from '../controller/dashboard';
 import { transformationPreferredSignal } from '../controller/transformation';
-import { GleanerChartModel } from '../types/API';
+import { WaltzboardChartModel } from '../types/API';
 import { ChartView, TitleToken } from '../types/ChartView';
 
-export const toChartView = (chart: GleanerChartModel): ChartView => {
+export const toChartView = (chart: WaltzboardChartModel): ChartView => {
   const specObject = JSON.parse(chart.spec);
   const title = chart.title;
   const titleToken: TitleToken[] = title.map((t) => {

@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "gleaner"
+name = "waltzboard"
 dynamic = ["version"]
-description = 'Gleaner: Multi-Criteria Optimization for Automatic Dashboard Design'
+description = 'Waltzboard: Multi-Criteria Optimization for Automatic Dashboard Design'
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -31,12 +31,12 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/jason-choi/gleaner"
-Issues = "https://github.com/jason-choi/gleaner/issues"
-Source = "https://github.com/jason-choi/gleaner"
+Documentation = "https://github.com/jason-choi/waltzboard"
+Issues = "https://github.com/jason-choi/waltzboard/issues"
+Source = "https://github.com/jason-choi/waltzboard"
 
 [tool.hatch.version]
-path = "gleaner/__about__.py"
+path = "waltzboard/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = ["coverage[toml]>=6.5", "pytest"]
@@ -53,7 +53,7 @@ python = ["3.10", "3.11"]
 detached = true
 dependencies = ["black>=23.1.0", "mypy>=1.0.0", "ruff>=0.0.243"]
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:gleaner tests}"
+typing = "mypy --install-types --non-interactive {args:waltzboard tests}"
 style = ["ruff {args:.}", "black --check --diff {args:.}"]
 fmt = ["black {args:.}", "ruff --fix {args:.}", "style"]
 all = ["style", "typing"]
@@ -115,7 +115,7 @@ unfixable = [
 ]
 
 [tool.ruff.isort]
-known-first-party = ["gleaner"]
+known-first-party = ["waltzboard"]
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
@@ -125,14 +125,14 @@ ban-relative-imports = "all"
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
 [tool.coverage.run]
-source_pkgs = ["gleaner", "tests"]
+source_pkgs = ["waltzboard", "tests"]
 branch = true
 parallel = true
-omit = ["gleaner/__about__.py"]
+omit = ["waltzboard/__about__.py"]
 
 [tool.coverage.paths]
-gleaner = ["gleaner", "*/gleaner/gleaner"]
-tests = ["tests", "*/gleaner/tests"]
+waltzboard = ["waltzboard", "*/waltzboard/waltzboard"]
+tests = ["tests", "*/waltzboard/tests"]
 
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
@@ -148,4 +148,4 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["gleaner"]
+packages = ["waltzboard"]

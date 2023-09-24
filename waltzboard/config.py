@@ -1,11 +1,11 @@
-from gleaner.model import Attribute
+from waltzboard.model import Attribute
 import pandas as pd
-from gleaner.oracle import OracleWeight
+from waltzboard.oracle import OracleWeight
 from collections import Counter
-from gleaner.model import ChartMap, ChartKeyTokens, ChartMapType
+from waltzboard.model import ChartMap, ChartKeyTokens, ChartMapType
 
 
-class GleanerConfig:
+class WaltzboardConfig:
     # Generator config
     attr_names: list[str]
     chart_type: list[str]

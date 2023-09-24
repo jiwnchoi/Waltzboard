@@ -7,7 +7,7 @@ from scipy.stats import chi2_contingency
 from .anova import f_oneway
 from itertools import combinations
 
-from gleaner.model import BaseChart, Attribute
+from waltzboard.model import BaseChart, Attribute
 
 lof = LocalOutlierFactor()
 

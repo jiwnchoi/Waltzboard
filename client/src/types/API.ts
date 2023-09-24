@@ -21,7 +21,7 @@ export interface ScoreDistModel {
     parsimony: number[];
 }
 
-export interface GleanerChartModel {
+export interface WaltzboardChartModel {
     key: string;
     title: string[];
     spec: string;
@@ -68,13 +68,13 @@ export interface InitResponse {
 }
 
 export interface InferResponse {
-    charts: GleanerChartModel[];
+    charts: WaltzboardChartModel[];
     result: OracleResult;
     chartResults: OracleResult[];
 }
 
 export interface RecommendResponse {
-    charts: GleanerChartModel[];
+    charts: WaltzboardChartModel[];
 }
 
 export interface TrainResponse {
@@ -99,7 +99,7 @@ export interface VariantsBody {
 }
 
 export interface VariantsResponse {
-    variants: GleanerChartModel[];
+    variants: WaltzboardChartModel[];
 }
 
 export interface InspectBody {
@@ -116,9 +116,9 @@ export interface RecommendBody {
 }
 
 export interface RecommendResponse {
-    recommends: GleanerChartModel[];
+    recommends: WaltzboardChartModel[];
 }
 
 export interface GetChartResponse {
-    chart: GleanerChartModel;
+    chart: WaltzboardChartModel;
 }

@@ -1,20 +1,20 @@
 from typing import Literal, TYPE_CHECKING
 import pandas as pd
 
-from gleaner.model import Attribute, ChartTokens, ChartSampled
+from waltzboard.model import Attribute, ChartTokens, ChartSampled
 from .chart_map import ChartMap
 from itertools import product
 
 if TYPE_CHECKING:
-    from gleaner.model import BaseChart
-    from gleaner.config import GleanerConfig
+    from waltzboard.model import BaseChart
+    from waltzboard.config import WaltzboardConfig
 
 
 chart_hash: dict[ChartTokens, "BaseChart"] = {}
 
 
 def get_chart_from_tokens(
-    key: ChartTokens, config: "GleanerConfig"
+    key: ChartTokens, config: "WaltzboardConfig"
 ) -> "BaseChart":
     name_type_map = {a.name: a.type for a in config.attrs}
     type_key = (
@@ -39,7 +39,7 @@ def get_chart_from_tokens(
     return chart if chart else ChartMap[type_key](sampled, config.df)
 
 
-def is_valid_tokens(key: ChartTokens, config: "GleanerConfig") -> bool:
+def is_valid_tokens(key: ChartTokens, config: "WaltzboardConfig") -> bool:
     name_type_map = {a.name: a.type for a in config.attrs}
     type_key = (
         key[0],
@@ -91,7 +91,7 @@ def get_chart_from_sample(
 
 
 def get_variants_from_charts(
-    charts: "BaseChart", config: "GleanerConfig"
+    charts: "BaseChart", config: "WaltzboardConfig"
 ) -> list["BaseChart"]:
     variants = []
     for c in config.chart_type:
@@ -134,7 +134,7 @@ def get_variants_from_charts(
     return variants
 
 
-def get_all_charts(config: "GleanerConfig") -> list["BaseChart"]:
+def get_all_charts(config: "WaltzboardConfig") -> list["BaseChart"]:
     all_charts = []
     typename = {
         "Q": [a.name for a in config.attrs if a.type == "Q"],

@@ -1,6 +1,6 @@
 import pandas as pd
-from gleaner.config import GleanerConfig
-from gleaner.model import Attribute
+from waltzboard.config import WaltzboardConfig
+from waltzboard.model import Attribute
 import numpy as np
 from IPython.display import display
 
@@ -65,7 +65,7 @@ class PriorParameters:
 
     def __init__(
         self,
-        config: GleanerConfig,
+        config: WaltzboardConfig,
     ) -> None:
         self.config = config
         self.ct = DirichletPrior(

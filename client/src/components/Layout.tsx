@@ -21,7 +21,7 @@ const Header = () => (
     <Flex alignItems={'center'}>
       <Icon as={GiWheat} mr={1} boxSize={6} color="gray.500" />
       <Heading size="md" variant={'layout'} alignItems="center">
-        Gleaner
+        Waltzboard
       </Heading>
     </Flex>
     <Flex alignItems={'center'} gap={4}>
@@ -45,7 +45,7 @@ const Header = () => (
           </Text>
         </Button>
       </Link>
-      <Link href="https://github.com/jason-choi/gleaner" isExternal>
+      <Link href="https://github.com/jason-choi/waltzboard" isExternal>
         <Button variant={'layout'} leftIcon={<AiFillGithub />} p={0} m={0}>
           GitHub
         </Button>

@@ -1,4 +1,4 @@
-from gleaner.model import BaseChart
+from waltzboard.model import BaseChart
 
 
 def includeness(bovs: set, preferences: set) -> float:

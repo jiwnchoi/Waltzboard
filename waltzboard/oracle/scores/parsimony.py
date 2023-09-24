@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from gleaner.model import BaseChart
+from waltzboard.model import BaseChart
 
 NUM_MIN_CHART = 2
 

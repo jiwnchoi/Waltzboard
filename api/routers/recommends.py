@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from api.models import *
 from api.config import gl
 from api.utills import tokenize
-from gleaner import GleanerDashboard
-from gleaner.oracle import get_statistics
+from waltzboard import WaltzboardDashboard
+from waltzboard.oracle import get_statistics
 
 
 class RecommendBody(BaseModel):
@@ -13,7 +13,7 @@ class RecommendBody(BaseModel):
 
 
 class RecommendResponse(BaseModel):
-    recommends: list[GleanerChartModel]
+    recommends: list[WaltzboardChartModel]
 
 
 router = APIRouter(
@@ -25,7 +25,7 @@ router = APIRouter(
 
 @router.post("/")
 async def recommends(body: RecommendBody) -> RecommendResponse:
-    dashboard = GleanerDashboard(
+    dashboard = WaltzboardDashboard(
         [gl.get_chart_from_tokens(tokenize(c)) for c in body.chartKeys]
     )
     all_charts = gl.get_all_charts()
@@ -42,7 +42,7 @@ async def recommends(body: RecommendBody) -> RecommendResponse:
     )[:10]
     return RecommendResponse(
         recommends=[
-            GleanerChartModel.from_gleaner_chart(
+            WaltzboardChartModel.from_waltzboard_chart(
                 all_charts[i], get_statistics(all_charts[i])
             )
             for i in top_scoreed_indices

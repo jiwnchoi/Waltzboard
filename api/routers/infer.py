@@ -9,7 +9,7 @@ class InferBody(BaseModel):
 
 
 class InferResponse(BaseModel):
-    charts: list[GleanerChartModel]
+    charts: list[WaltzboardChartModel]
     result: OracleResultModel
 
 
@@ -26,7 +26,7 @@ async def infer(body: InferBody) -> InferResponse:
         gl.generator, gl.oracle, gl.preferences
     )
     charts = [
-        GleanerChartModel.from_gleaner_chart(
+        WaltzboardChartModel.from_waltzboard_chart(
             c, gl.oracle.get_statistics_from_chart(c)
         )
         for c in dashboard.charts

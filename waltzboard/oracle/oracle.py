@@ -2,24 +2,24 @@ from typing import TYPE_CHECKING
 from dataclasses import dataclass
 
 import pandas as pd
-from gleaner.oracle import OracleResult, OracleSingleResult
-from gleaner.oracle.scores import *
+from waltzboard.oracle import OracleResult, OracleSingleResult
+from waltzboard.oracle.scores import *
 
 if TYPE_CHECKING:
-    from gleaner.model import GleanerDashboard, BaseChart
-    from gleaner.config import GleanerConfig
+    from waltzboard.model import WaltzboardDashboard, BaseChart
+    from waltzboard.config import WaltzboardConfig
 
 
 class Oracle:
     df: pd.DataFrame
 
-    def __init__(self, config: "GleanerConfig") -> None:
+    def __init__(self, config: "WaltzboardConfig") -> None:
         self.df = config.df
         self.weight = config.weight
         self.config = config
 
     def get_single_chart_results(
-        self, dashboard: "GleanerDashboard", target: int, preferences: set[str]
+        self, dashboard: "WaltzboardDashboard", target: int, preferences: set[str]
     ) -> OracleResult:
         nodes = dashboard.charts
         return OracleSingleResult(
@@ -31,7 +31,7 @@ class Oracle:
         )
 
     def get_result(
-        self, dashboard: "GleanerDashboard", preferences: set[str]
+        self, dashboard: "WaltzboardDashboard", preferences: set[str]
     ) -> OracleResult:
         nodes = dashboard.charts
         return OracleResult(

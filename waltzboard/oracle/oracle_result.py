@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import pandas as pd
-from gleaner.oracle import OracleWeight
+from waltzboard.oracle import OracleWeight
 
 
 @dataclass

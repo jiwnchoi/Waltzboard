@@ -6,10 +6,10 @@ import pandas as pd
 
 from typing import TYPE_CHECKING
 
-from gleaner.model import ChartTokens, TrsTypes, TrsXTypes, ChartSampled
+from waltzboard.model import ChartTokens, TrsTypes, TrsXTypes, ChartSampled
 
 if TYPE_CHECKING:
-    from gleaner.model.attribute import Attribute
+    from waltzboard.model.attribute import Attribute
 
 
 class BaseChart:

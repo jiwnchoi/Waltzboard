@@ -1,5 +1,5 @@
 import json
-from gleaner.model import ChartTokens
+from waltzboard.model import ChartTokens
 
 
 def tokenize(key: str) -> ChartTokens:

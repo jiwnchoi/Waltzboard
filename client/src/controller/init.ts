@@ -7,7 +7,7 @@ import { attributesSignal } from './attribute';
 import { chartTypesSignal } from './chartType';
 import { selectedTaskTypeSignal, taskTypesSignal } from './taskType';
 import { transformationsSignal } from './transformation';
-import { trainGleaner } from './train';
+import { trainWaltzboard } from './train';
 import { inferDashboard } from './infer';
 
 const initializedSignal = signal<boolean>(false);
@@ -23,7 +23,7 @@ const init = async () => {
     configSignal.value = { ...response.configs };
 
     batch(() => {
-        trainGleaner();
+        trainWaltzboard();
         inferDashboard();
         attributesSignal.value = response.attributes.map((attribute) => {
             return {

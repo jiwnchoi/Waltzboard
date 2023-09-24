@@ -2,13 +2,13 @@ from typing import Optional
 from dataclasses import dataclass
 import pandas as pd
 
-from gleaner.explorer import Explorer, TrainResult
-from gleaner.generator import Generator
-from gleaner.model import GleanerDashboard, BaseChart, ChartTokens
-from gleaner.config import GleanerConfig
-from gleaner.oracle import Oracle
-from gleaner.utills import display_function
-from gleaner.model import (
+from waltzboard.explorer import Explorer, TrainResult
+from waltzboard.generator import Generator
+from waltzboard.model import WaltzboardDashboard, BaseChart, ChartTokens
+from waltzboard.config import WaltzboardConfig
+from waltzboard.oracle import Oracle
+from waltzboard.utills import display_function
+from waltzboard.model import (
     is_valid_tokens,
     get_variants_from_charts,
     get_chart_from_tokens,
@@ -16,21 +16,21 @@ from gleaner.model import (
 )
 
 
-class Gleaner:
+class Waltzboard:
     oracle: Oracle
     generator: Generator
     explorer: Explorer
-    config: GleanerConfig
+    config: WaltzboardConfig
     preferences: list[str]
 
     def __init__(
-        self, df: pd.DataFrame, config: GleanerConfig | None = None
+        self, df: pd.DataFrame, config: WaltzboardConfig | None = None
     ) -> None:
         self.df = df
         if config and (df is not config.df):
             raise RuntimeError("df and config.df must be same")
 
-        self.config = GleanerConfig(df)
+        self.config = WaltzboardConfig(df)
         self.update_config()
         self.preferences = []
 

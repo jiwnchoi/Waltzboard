@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 from numpy.random import choice
 
-from gleaner.config import GleanerConfig
-from gleaner.generator import PriorParameters
-from gleaner.model import (
+from waltzboard.config import WaltzboardConfig
+from waltzboard.generator import PriorParameters
+from waltzboard.model import (
     Attribute,
     BaseChart,
     ChartKeyTokens,
     ChartSampled,
-    GleanerDashboard,
+    WaltzboardDashboard,
     get_chart_from_sample,
 )
 
@@ -28,7 +28,7 @@ def is_valid_map(current: list, map: ChartKeyTokens) -> bool:
 
 
 class Generator:
-    def __init__(self, config: "GleanerConfig") -> None:
+    def __init__(self, config: "WaltzboardConfig") -> None:
         self.df = config.df
         self.config = config
         self.prior = PriorParameters(self.config)
@@ -134,5 +134,5 @@ class Generator:
 
         return charts
 
-    def sample_dashboard(self, n: int) -> GleanerDashboard:
-        return GleanerDashboard(self.sample_n(n))
+    def sample_dashboard(self, n: int) -> WaltzboardDashboard:
+        return WaltzboardDashboard(self.sample_n(n))

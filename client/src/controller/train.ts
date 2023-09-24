@@ -56,7 +56,7 @@ const transformationDistSignal = computed(
 
 const scoreDistSignal = computed(() => trainResponseSignal.value.result);
 
-const trainGleaner = async () => {
+const trainWaltzboard = async () => {
   isTrainingSignal.value = true;
   const response: TrainResponse = (
     await axios.post(`${URI}/train`, trainBodySignal.peek())
@@ -91,5 +91,5 @@ export {
   scoreDistSignal,
   isTrainedSignal,
   isTrainingSignal,
-  trainGleaner,
+  trainWaltzboard,
 };

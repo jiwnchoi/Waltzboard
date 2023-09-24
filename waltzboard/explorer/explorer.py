@@ -5,11 +5,11 @@ from itertools import combinations
 import numpy as np
 import pandas as pd
 
-from gleaner.config import GleanerConfig
-from gleaner.explorer import TrainResult
-from gleaner.generator import Generator
-from gleaner.model import BaseChart, GleanerDashboard
-from gleaner.oracle import Oracle, OracleResult
+from waltzboard.config import WaltzboardConfig
+from waltzboard.explorer import TrainResult
+from waltzboard.generator import Generator
+from waltzboard.model import BaseChart, WaltzboardDashboard
+from waltzboard.oracle import Oracle, OracleResult
 
 
 def mean(l):
@@ -25,7 +25,7 @@ class PosteriorCounter(Counter):
 
 
 class Counters:
-    def __init__(self, config: GleanerConfig):
+    def __init__(self, config: WaltzboardConfig):
         self.ct = PosteriorCounter(config.chart_type)
         self.x = PosteriorCounter([None] + config.attr_names)
         self.y = PosteriorCounter([None] + config.attr_names)
@@ -75,13 +75,13 @@ class Normalizer:
 
 
 class Explorer:
-    config: GleanerConfig
+    config: WaltzboardConfig
     df: pd.DataFrame
-    dashboard: GleanerDashboard | None
+    dashboard: WaltzboardDashboard | None
     result: OracleResult | None
     normalizer: Normalizer | None
 
-    def __init__(self, config: "GleanerConfig"):
+    def __init__(self, config: "WaltzboardConfig"):
         self.df = config.df
         self.config = config
         self.dashboard = None
@@ -108,7 +108,7 @@ class Explorer:
 
         if len(fixed_charts):
             n_charts = [max(1, n - len(fixed_charts)) for n in n_charts]
-        candidates: list[GleanerDashboard] = [
+        candidates: list[WaltzboardDashboard] = [
             gen.sample_dashboard(round(n_chart)) for n_chart in n_charts
         ]
 
@@ -163,7 +163,7 @@ class Explorer:
         )
 
         result_n_scores: list[
-            tuple[OracleResult, GleanerDashboard, float, float]
+            tuple[OracleResult, WaltzboardDashboard, float, float]
         ] = [
             (result, candidates[i], raw_scores[i], normalized_scores[i])
             for i, result in enumerate(results)
@@ -252,7 +252,7 @@ class Explorer:
             leaves = [c + [s] for c in current for s in space if s not in c]
             scores = [
                 oracle.get_result(
-                    GleanerDashboard(leaf), set(preferences)
+                    WaltzboardDashboard(leaf), set(preferences)
                 ).get_score()
                 for leaf in leaves
             ]
@@ -269,7 +269,7 @@ class Explorer:
         ]
         pairs_scores = [
             oracle.get_result(
-                GleanerDashboard(pair), set(preferences)
+                WaltzboardDashboard(pair), set(preferences)
             ).get_score()
             for pair in pairs
         ]
@@ -284,6 +284,6 @@ class Explorer:
                 break
             leaves, scores = next_leaves, next_scores
 
-        return GleanerDashboard(leaves[-1]), oracle.get_result(
-            GleanerDashboard(leaves[-1]), set(preferences)
+        return WaltzboardDashboard(leaves[-1]), oracle.get_result(
+            WaltzboardDashboard(leaves[-1]), set(preferences)
         )

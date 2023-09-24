@@ -1,5 +1,5 @@
 import numpy as np
-from gleaner.model import BaseChart
+from waltzboard.model import BaseChart
 
 
 def jcd_index(sets: list[set], preferences: set[str]) -> float:

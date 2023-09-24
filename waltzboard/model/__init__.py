@@ -17,7 +17,7 @@ ChartSampled = tuple[
     MarkTypes, Attribute, Attribute, Attribute, TrsXTypes, TrsTypes, TrsTypes
 ]
 
-from .gleaner_chart import *
+from .waltzboard_chart import *
 from .charts import BaseChart
 from .chart_map import *
-from .gleaner_dahsboard import GleanerDashboard
+from .waltzboard_dahsboard import WaltzboardDashboard

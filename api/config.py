@@ -1,4 +1,4 @@
-from gleaner import Gleaner
+from waltzboard import Waltzboard
 import pandas as pd
 from pydantic_settings import BaseSettings
 
@@ -20,4 +20,4 @@ datasets = {
 }
 
 df = datasets["Movies"]
-gl = Gleaner(df)
+gl = Waltzboard(df)

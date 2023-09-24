@@ -1,5 +1,5 @@
 # type: ignore
-from gleaner.explorer import TrainResult
+from waltzboard.explorer import TrainResult
 import pandas as pd
 from IPython.display import clear_output, display
 import altair as alt

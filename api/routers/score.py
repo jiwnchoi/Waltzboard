@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from api.models import *
 from api.config import gl
 from api.utills import tokenize
-from gleaner import GleanerDashboard
+from waltzboard import WaltzboardDashboard
 
 
 class ScoreBody(BaseModel):
@@ -24,10 +24,10 @@ router = APIRouter(
 
 @router.post("/")
 async def score(body: ScoreBody) -> ScoreResponse:
-    dashboard = GleanerDashboard([gl.get_chart_from_tokens(c) for c in [tokenize(c) for c in body.chartKeys]])  # type: ignore
+    dashboard = WaltzboardDashboard([gl.get_chart_from_tokens(c) for c in [tokenize(c) for c in body.chartKeys]])  # type: ignore
     results = gl.oracle.get_result(dashboard, set(gl.preferences))
     ablated_dashboard = [
-        GleanerDashboard([c for j, c in enumerate(dashboard.charts) if i != j])
+        WaltzboardDashboard([c for j, c in enumerate(dashboard.charts) if i != j])
         for i in range((len(dashboard)))
     ]
     ablated_result = [

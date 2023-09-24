@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from api.models import *
 from api.config import gl
 from api.utills import tokenize
-from gleaner import GleanerDashboard
+from waltzboard import WaltzboardDashboard
 
 
 class VariantsBody(BaseModel):
@@ -12,7 +12,7 @@ class VariantsBody(BaseModel):
 
 
 class VariantsResponse(BaseModel):
-    variants: list[GleanerChartModel]
+    variants: list[WaltzboardChartModel]
 
 
 router = APIRouter(
@@ -31,7 +31,7 @@ async def variants(body: VariantsBody) -> VariantsResponse:
         charts[0 : body.targetIndex] + [v] + charts[body.targetIndex :]
         for v in variants
     ]
-    variant_dashboards = [GleanerDashboard(c) for c in variant_charts]
+    variant_dashboards = [WaltzboardDashboard(c) for c in variant_charts]
     variant_results = [
         gl.oracle.get_result(d, set(gl.preferences)) for d in variant_dashboards
     ]
@@ -45,7 +45,7 @@ async def variants(body: VariantsBody) -> VariantsResponse:
 
     return VariantsResponse(
         variants=[
-            GleanerChartModel.from_gleaner_chart(
+            WaltzboardChartModel.from_waltzboard_chart(
                 c, gl.oracle.get_statistics_from_chart(c)
             )
             for c in top_five_charts

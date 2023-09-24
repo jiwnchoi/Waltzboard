@@ -1,7 +1,7 @@
-import { GleanerChartModel } from '../types/API';
+import { WaltzboardChartModel } from '../types/API';
 import { ChartView } from '../types/ChartView';
 
-export const fromChartView = (chartView: ChartView): GleanerChartModel => {
+export const fromChartView = (chartView: ChartView): WaltzboardChartModel => {
   return {
     key: chartView.key,
     spec: JSON.stringify(chartView.spec),
