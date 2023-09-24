@@ -350,7 +350,7 @@ const InspectionPanel = ({ i }: { i: number }) => (
 const IntentPanel = () => {
   return (
     <Flex flexDir={'column'} w={'full'} px={0} gap={2} maxH={'850px'}>
-      <Section title="Score Weight" gap={1.5} w="full">
+      <Section title="Weight Controller" gap={1.5} w="full">
         <WeightSlider title="specificity" />
         <WeightSlider title="interestingness" />
         <WeightSlider title="coverage" />

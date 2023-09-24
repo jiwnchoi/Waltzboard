@@ -17,9 +17,9 @@ export const toChartView = (chart: WaltzboardChartModel): ChartView => {
   });
   specObject.autosize = { type: 'fit', contains: 'padding' };
   specObject.title = null;
-  if (specObject.encoding && specObject.encoding.color) {
-    specObject.encoding.color.legend = { title: null };
-  }
+  // if (specObject.encoding && specObject.encoding.color) {
+  //   specObject.encoding.color.legend = { title: null };
+  // }
   specObject.background = null;
 
   return {

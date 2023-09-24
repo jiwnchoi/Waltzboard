@@ -46,7 +46,7 @@ const WeightSlider = (props: WeightSliderProps) => {
         <SliderTrack>
           <SliderFilledTrack color={'blue.400'} />
         </SliderTrack>
-        <SliderThumb />
+        <SliderThumb borderColor={'blue.500'} />
       </Slider>
     </Flex>
   );

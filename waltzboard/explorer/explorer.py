@@ -245,7 +245,7 @@ class Explorer:
             results.append(self._train(gen, oracle, preferences))
         return results
 
-    def search(self, gen: Generator, oracle: Oracle, preferences: list[str]):
+    def search(self, gen: Generator, oracle: Oracle, preferences: list[str], fixed_charts: list[BaseChart] = []):
         def _beam_search(
             current: list[list[BaseChart]], space: list[BaseChart]
         ):
@@ -264,9 +264,9 @@ class Explorer:
 
         search_space = gen.sample_n(self.config.n_search_space)
         pairs = [
-            [search_space[i], search_space[j]]
+            [*fixed_charts ,search_space[i], search_space[j]]
             for i, j in combinations(range(len(search_space)), 2)
-        ]
+        ] 
         pairs_scores = [
             oracle.get_result(
                 WaltzboardDashboard(pair), set(preferences)

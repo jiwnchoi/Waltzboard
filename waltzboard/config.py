@@ -44,6 +44,9 @@ class WaltzboardConfig:
         self.df = df
         self.weight = OracleWeight()
         self.init_constraints()
+        self.update_constraints([
+            'arc', 'sum', 'min', 'max', 'tick'
+        ])
 
     def init_constraints(self):
         self.attr_names = [

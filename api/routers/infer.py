@@ -1,3 +1,4 @@
+from api.utills import tokenize
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from api.models import *
@@ -22,8 +23,9 @@ router = APIRouter(
 
 @router.post("/")
 async def infer(body: InferBody) -> InferResponse:
+    fixed_charts = [gl.get_chart_from_tokens(tokenize(key)) for key in body.chartKeys]
     dashboard, result = gl.explorer.search(
-        gl.generator, gl.oracle, gl.preferences
+        gl.generator, gl.oracle, gl.preferences, fixed_charts
     )
     charts = [
         WaltzboardChartModel.from_waltzboard_chart(
