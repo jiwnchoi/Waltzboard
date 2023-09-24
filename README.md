@@ -27,7 +27,13 @@ gl.infer().display()
 
 ## Demo for Web-based Interface
 
-TBA
+```
+pip install .
+python app.py
+cd client
+pnpm install
+pnpm dev
+```
 
 ## Development
 
