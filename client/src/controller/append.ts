@@ -1,14 +1,13 @@
 import { effect, signal } from '@preact/signals-react';
 import axios from 'axios';
 import { URI } from '../../config';
-import { ChartView } from '../types/ChartView';
-import { chartKeysSignal } from './dashboard';
-import { toChartView } from '../utils/toChartView';
-import { inferResponseSignal } from './infer';
-import { fromChartView } from '../utils/fromChartView';
 import { GetChartResponse } from '../types/API';
+import { ChartView } from '../types/ChartView';
+import { toChartView } from '../utils/toChartView';
+import { chartKeysSignal } from './dashboard';
+import { inspectionIndexSignal } from './details';
 
-export const isAppendPanelOpen = signal(false);
+
 
 export const inputTuple = signal<(string | null)[]>([
   null,
@@ -67,8 +66,11 @@ export const getRecommendedChartView = async () => {
   isRecommendingSignal.value = false;
 };
 
+
+export const isAppendPanelOpen = signal(false);
 export const toggleAppendPanel = () => {
   if (!isAppendPanelOpen.value) getRecommendedChartView();
+  inspectionIndexSignal.value = -1;
   isAppendPanelOpen.value = !isAppendPanelOpen.value;
   inputTuple.value = [null, null, null, null, null, null, null];
   inputChart.value = null;

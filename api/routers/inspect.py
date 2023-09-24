@@ -29,14 +29,13 @@ router = APIRouter(
 async def init(body: InspectBody) -> InspectResponse:
     return InspectResponse(
         result=OracleSingleResultModel.from_oracle_result(
-            gl.oracle.get_single_chart_results(
+            gl.oracle.get_result(
                 WaltzboardDashboard(
                     [
                         get_chart_from_tokens(tokenize(key), gl.config)
-                        for key in body.chartKeys
+                        for key in [k for i, k in enumerate(body.chartKeys) if i != body.target]
                     ]
                 ),
-                body.target,
                 set(gl.preferences),
             )
         )

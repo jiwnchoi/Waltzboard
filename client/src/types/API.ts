@@ -59,12 +59,21 @@ export interface InitBody {
     dataset?: string;
 }
 
+export interface Configs {
+    n_epoch: number;
+    n_candidates: number;
+    n_search_space: number;
+    n_beam: number;
+    robustness: number;
+    dataset: string;
+}
+
 export interface InitResponse {
     chartTypes: ChartTypeFetched[];
     taskTypes: TaskTypeFetched[];
     attributes: AttributeFetched[];
     transformations: TransformationFetched[];
-    configs: InitBody;
+    configs: Configs;
 }
 
 export interface InferResponse {

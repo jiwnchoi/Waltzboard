@@ -1,7 +1,6 @@
 import {
   Badge,
   Center,
-  Divider,
   Flex,
   FlexProps,
   Grid,
@@ -15,13 +14,12 @@ import { Handler } from 'vega-tooltip';
 import {
   inspectionChartSignal,
   inspectionIndexSignal,
-  inspectionSignal,
   isInspectionLoadingSignal,
-  isVariantsLoadingSignal,
   replaceChart,
 } from '../controller/details';
-import type { ChartView } from '../types/ChartView';
 import { inferResponseSignal } from '../controller/infer';
+import type { ChartView } from '../types/ChartView';
+import { useRef } from 'react';
 
 interface ChartViewProps extends FlexProps {
   chart: ChartView;
@@ -38,17 +36,11 @@ const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
 };
 
 export const InspectionView = () => {
+  // focuse here when rerendered
   return (
-    <Flex
-      minW={'200px'}
-      flexDir={'column'}
-      bgColor={'white'}
-      borderRadius="md"
-      p={2}
-      my={2}
-    >
+    <Flex minW={'200px'} flexDir={'column'} borderRadius="md" p={2} my={2}>
       <Text fontSize={'md'} fontWeight={600} mb={2}>
-        Without this chart
+        Contribution View
       </Text>
       {isInspectionLoadingSignal.value && (
         <Center w="full" minH={180}>
@@ -103,16 +95,9 @@ export const InspectionView = () => {
 
 export const InsightsView = () => {
   return (
-    <Flex
-      flexDir={'column'}
-      bgColor={'white'}
-      borderRadius="md"
-      p={2}
-      my={2}
-      w={336}
-    >
+    <Flex flexDir={'column'} borderRadius="md" p={2} my={2} w={336}>
       <Text fontSize={'md'} fontWeight={600} mb={2}>
-        This chart contains these insights
+        Statistics View
       </Text>
 
       {inspectionChartSignal.value && (
@@ -150,7 +135,6 @@ export const VariantChartView = (props: ChartViewProps) => {
     <Flex
       flexDir={'column'}
       {...props}
-      bgColor={'white'}
       borderRadius="md"
       my={2}
       p={2}

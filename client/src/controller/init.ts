@@ -1,19 +1,22 @@
 import { batch, effect, signal } from '@preact/signals-react';
 import axios from 'axios';
 import { URI } from '../../config';
-import { InitBody, InitResponse } from '../types/API';
-import { ChartType } from '../types/ChartType';
+import { Configs, InitResponse } from '../types/API';
 import { attributesSignal } from './attribute';
 import { chartTypesSignal } from './chartType';
-import { selectedTaskTypeSignal, taskTypesSignal } from './taskType';
-import { transformationsSignal } from './transformation';
-import { trainWaltzboard } from './train';
 import { inferDashboard } from './infer';
+import { trainWaltzboard } from './train';
+import { transformationsSignal } from './transformation';
 
 const initializedSignal = signal<boolean>(false);
 
-export const configSignal = signal<InitBody>({
+export const configSignal = signal<Configs>({
     dataset: 'Movies',
+    n_beam: 10,
+    n_candidates: 50,
+    n_epoch: 20,
+    n_search_space: 100,
+    robustness: 50,
 });
 
 const init = async () => {
@@ -23,8 +26,6 @@ const init = async () => {
     configSignal.value = { ...response.configs };
 
     batch(() => {
-        trainWaltzboard();
-        inferDashboard();
         attributesSignal.value = response.attributes.map((attribute) => {
             return {
                 ...attribute,
@@ -36,7 +37,7 @@ const init = async () => {
             return {
                 ...chartType,
                 prefer: false,
-                ignore: false,
+                ignore: ['tick', 'arc'].includes(chartType.mark),
             };
         });
         transformationsSignal.value = response.transformations.map(
@@ -44,7 +45,7 @@ const init = async () => {
                 return {
                     ...transformation,
                     prefer: false,
-                    ignore: false,
+                    ignore: ['sum', 'min', 'max'].includes(transformation.type),
                 };
             }
         );
@@ -64,4 +65,5 @@ effect(() => {
     init();
 })();
 
-export { initializedSignal, init };
+export { init, initializedSignal };
+

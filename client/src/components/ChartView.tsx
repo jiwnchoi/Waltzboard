@@ -24,7 +24,7 @@ interface ChartViewProps {
 
 const ChartView = ({ idx, chart, width, height }: ChartViewProps) => {
   const showDetail = useComputed(() => {
-    return inspectionIndexSignal.value === idx && !isAppendPanelOpen.value;
+    return inspectionIndexSignal.value === idx;
   });
 
   return (
@@ -33,12 +33,15 @@ const ChartView = ({ idx, chart, width, height }: ChartViewProps) => {
         flexDir={'column'}
         w={'full'}
         h="fit-content"
-        px={2}
         pt={2}
-        bgColor={showDetail.value ? 'gray.100' : 'white'}
         borderTopRadius={4}
       >
-        <Flex flexDir={'row'} justifyContent={'space-between'} align="center">
+        <Flex
+          flexDir={'row'}
+          justifyContent={'space-between'}
+          align="center"
+          px={2}
+        >
           <Icon
             mr={4}
             as={chart.isPinned ? RiPushpinFill : RiPushpinLine}
@@ -87,13 +90,15 @@ const ChartView = ({ idx, chart, width, height }: ChartViewProps) => {
           as={motion.div}
           flexDir={'row'}
           justifyContent={'space-between'}
+          color={showDetail.value ? 'white' : 'black'}
+          bgColor={showDetail.value ? 'blue.500' : 'transparent'}
           align="center"
           borderTopRadius={4}
           p={2}
-          pb={4}
+          pb={2}
           onClick={() => {
-            isAppendPanelOpen.value = false;
             const cur = inspectionIndexSignal.peek();
+            isAppendPanelOpen.value = false;
             if (cur !== idx) {
               inspectionIndexSignal.value = idx;
             } else {
@@ -101,8 +106,14 @@ const ChartView = ({ idx, chart, width, height }: ChartViewProps) => {
             }
           }}
         >
-          <Text fontSize={'sm'} textAlign="center" fontWeight={400} mr="auto">
-            Inspection
+          <Text
+            fontSize={'sm'}
+            textAlign="center"
+            fontWeight={showDetail.value ? 800 : 500}
+            mr="auto"
+            px={2}
+          >
+            Show Details
           </Text>
 
           {showDetail.value ? (

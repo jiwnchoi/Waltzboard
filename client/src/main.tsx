@@ -57,6 +57,23 @@ const theme = extendTheme({
   },
 });
 
+theme.sizes.container['2xl'] = '1920px';
+
+function setScalingFactor() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const referenceWidth = 1920;
+  const referenceHeight = 1080;
+  const scaleX = vw / referenceWidth;
+  const scaleY = vh / referenceHeight;
+  const scale = scaleX;
+  (document.body.style as any).zoom = scale * 100 + '%';
+}
+window.addEventListener('load', setScalingFactor);
+window.addEventListener('resize', setScalingFactor);
+
+
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
