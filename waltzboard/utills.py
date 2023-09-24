@@ -50,7 +50,7 @@ def display_function(epoch, train_results: list[TrainResult]):
                     )
                     + line.encode(
                         y=alt.Y("n_charts", scale=alt.Scale(zero=False))
-                    ).mark_line(color="orange")
+                    ).mark_line(color="blue")
                 ).resolve_scale(y="independent")
             )
         )

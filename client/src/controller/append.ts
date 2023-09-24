@@ -70,7 +70,7 @@ export const getRecommendedChartView = async () => {
 export const isAppendPanelOpen = signal(false);
 export const toggleAppendPanel = () => {
   if (!isAppendPanelOpen.value) getRecommendedChartView();
-  inspectionIndexSignal.value = -1;
+  // inspectionIndexSignal.value = -1;
   isAppendPanelOpen.value = !isAppendPanelOpen.value;
   inputTuple.value = [null, null, null, null, null, null, null];
   inputChart.value = null;

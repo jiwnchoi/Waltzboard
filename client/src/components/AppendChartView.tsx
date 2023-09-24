@@ -47,14 +47,9 @@ export const ChartAppendPreview = () => {
 export const ChartAppendView = () => {
   
   return (
-    <Flex
-      flexDir={'column'}
-      p={2}
-      bgColor={'white'}
-      borderRadius={'md'}
-    >
+    <Flex flexDir={'column'} p={2} bgColor={'white'} borderRadius={'md'}>
       <Text fontSize={'md'} fontWeight={600} mb={2}>
-        Configure Chart
+        Add a New Chart Manually
       </Text>
       <Flex
         flexDir={'row'}

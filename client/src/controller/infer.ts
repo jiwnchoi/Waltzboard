@@ -3,6 +3,7 @@ import axios from 'axios';
 import { URI } from '../../config';
 import { InferBody, InferResponse } from '../types/API';
 import { pinnedKeysSignal } from './dashboard';
+import { isTrainingSignal } from './train';
 
 const inferResponseSignal = signal<InferResponse>({
   charts: [],
@@ -24,6 +25,10 @@ const inferBodySignal = computed<InferBody>(() => {
 });
 
 const isInferingSignal = signal<boolean>(false);
+
+export const isLoading = computed(() => {
+  return isInferingSignal.value || isTrainingSignal.value;
+})
 
 const inferDashboard = async () => {
   const response = await axios.post(`${URI}/infer`, inferBodySignal.peek());

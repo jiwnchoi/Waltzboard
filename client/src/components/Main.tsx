@@ -29,7 +29,7 @@ import {
 } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { AiFillSetting } from 'react-icons/ai';
-import { RiAddBoxLine, RiLightbulbLine } from 'react-icons/ri';
+import { RiAddBoxLine, RiAddCircleLine, RiLightbulbLine } from 'react-icons/ri';
 import {
   isAppendPanelOpen,
   isRecommendingSignal,
@@ -45,7 +45,7 @@ import {
   isVariantsLoadingSignal,
   variantChartsSignal,
 } from '../controller/details';
-import { inferDashboard } from '../controller/infer';
+import { inferDashboard, isLoading } from '../controller/infer';
 import { configSignal, init } from '../controller/init';
 import { scoreDashboard } from '../controller/score';
 import { isTrainingSignal, trainWaltzboard } from '../controller/train';
@@ -68,6 +68,27 @@ import { Configs } from '../types/API';
 
 export const NUM_COL = 4;
 
+const DesignDashboardButton = () => (
+  <Button
+    w={'full'}
+    boxShadow={'sm'}
+    borderRadius={'md'}
+    colorScheme="blue"
+    color="white"
+    loadingText="Designing..."
+    size="sm"
+    p={4}
+    isLoading={isTrainingSignal.value}
+    onClick={() => {
+      trainWaltzboard();
+      inferDashboard();
+      scoreDashboard();
+    }}
+  >
+    <Box>Design Dashboard</Box>
+  </Button>
+);
+
 export const Main = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef(null);
@@ -84,24 +105,7 @@ export const Main = () => {
         {/* Left Bar */}
         <Flex flexDir={'column'} minW={250} w={250} gap={2}>
           <Flex gap={2}>
-            <Button
-              w={'full'}
-              boxShadow={'sm'}
-              borderRadius={'md'}
-              colorScheme="blue"
-              color="white"
-              loadingText="Designing..."
-              size="sm"
-              p={4}
-              isLoading={isTrainingSignal.value}
-              onClick={() => {
-                trainWaltzboard();
-                inferDashboard();
-                scoreDashboard();
-              }}
-            >
-              <Box>Design Dashboard</Box>
-            </Button>
+            <DesignDashboardButton />
             <Settings />
           </Flex>
           <IntentPanel />
@@ -113,7 +117,6 @@ export const Main = () => {
           bgColor="white"
           borderRadius="md"
           boxShadow="sm"
-          gap={2}
           maxW={'1622px'}
           maxH={'890px'}
           minH={'890px'}
@@ -123,28 +126,24 @@ export const Main = () => {
             justifyContent={'space-between'}
             alignItems={'center'}
           >
-            <Heading mx={1} variant={'section'} as="h1" fontSize={20}>
-              {`Best Dashboard Design (${dashboardSignal.value.length} Charts)`}
-            </Heading>
-            <Flex gap={2}>
-              <Button
-                colorScheme="orange"
-                size={'sm'}
-                leftIcon={<RiAddBoxLine />}
-                onClick={toggleAppendPanel}
-              >
-                <Text>New Chart</Text>
-              </Button>
-              <Button
-                colorScheme="blue"
-                size={'sm'}
-                leftIcon={<RiLightbulbLine />}
-                ref={btnRef}
-                onClick={onOpen}
-              >
-                <Text>Open Reasoning Panel</Text>
-              </Button>
-            </Flex>
+            <Button
+              colorScheme="blue"
+              borderBottomRadius={isAppendPanelOpen.value ? '0px' : 'md'}
+              size={'sm'}
+              leftIcon={<RiAddCircleLine />}
+              onClick={toggleAppendPanel}
+            >
+              <Text>Add a New Chart</Text>
+            </Button>
+            <Button
+              colorScheme="orange"
+              size={'sm'}
+              leftIcon={<RiLightbulbLine />}
+              ref={btnRef}
+              onClick={onOpen}
+            >
+              <Text>Open Reasoning Panel</Text>
+            </Button>
           </Flex>
           <Flex
             flexDir={'column'}
@@ -156,12 +155,28 @@ export const Main = () => {
           >
             <Flex direction={'column'}>
               <AppendChartPanel open={isAppendPanelOpen.value} />
-              {isTrainingSignal.value && dashboardSignal.value.length === 0 && (
-                <Center w="full" minH={180}>
+              {isLoading.value && (
+                <Center w="full" minH={800}>
                   <Spinner size="xl" />
                 </Center>
               )}
-              {dashboardSignal.value.length !== 0 && (
+              {!isLoading.value && dashboardSignal.value.length === 0 && (
+                <Center w="full" minH={800} flexDir={'column'} gap={4}>
+                  <Text fontSize={'xl'} fontWeight={600}>
+                    Dashboard is Empty!
+                  </Text>
+                  <Text fontSize={'md'} fontWeight={400}>
+                    Specify your intent with the left panel and
+                  </Text>
+                  <Flex flexDir={'row'} gap={4} align={'center'}>
+                    <Text fontSize={'md'} fontWeight={400}>
+                      click
+                    </Text>
+                    <DesignDashboardButton />
+                  </Flex>
+                </Center>
+              )}
+              {!isLoading.value && dashboardSignal.value.length !== 0 && (
                 <Grid
                   templateColumns={{
                     xl: `repeat(${NUM_COL}, minmax(280px, 1fr))`,
@@ -212,14 +227,14 @@ const AppendChartPanel = ({ open }: { open: boolean }) => {
   }
   return (
     <Collapse in={open} animateOpacity unmountOnExit ref={ref}>
-      <Box minH={'2px'} />
       <Flex
         flexDir={'row'}
         minH={'260px'}
         mb={2}
         borderRadius={'md'}
+        borderTopLeftRadius={0}
         border={'2px'}
-        borderColor={'orange.500'}
+        borderColor={'blue.500'}
         p={2}
         gap={4}
       >
@@ -234,7 +249,7 @@ const AppendChartPanel = ({ open }: { open: boolean }) => {
           p={2}
         >
           <Text fontSize={'md'} fontWeight={600} mb={2}>
-            Chart Recommendation
+            Recommended Charts
           </Text>
 
           {isRecommendingSignal.value && (
@@ -294,9 +309,9 @@ const InspectionPanel = ({ i }: { i: number }) => (
           my={2}
         >
           <Text fontSize={'md'} fontWeight={600}>
-            Chart Variants
+            Alternatives View
           </Text>
-          <Divider my={1} />
+
           {isVariantsLoadingSignal.value && (
             <Center w="full" minH={180}>
               <Spinner size="md" />

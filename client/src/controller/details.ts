@@ -29,7 +29,7 @@ export const inspectionChartSignal = computed(() => {
 });
 
 export const isDetailExpanded = (idx: number) => {
-  if (isAppendPanelOpen.value) return false;
+  // if (isAppendPanelOpen.value) return false;
   const value = inspectionIndexSignal.value;
   return idx - NUM_COL < value && value <= idx;
 };

@@ -23,7 +23,7 @@ const Header = () => (
     w="container.2xl"
   >
     <Flex alignItems={'center'}>
-      <Icon as={IoIosBowtie} mr={1} boxSize={6} color="gray.500" />
+      {/* <Icon as={IoIosBowtie} mr={1} boxSize={6} color="gray.500" /> */}
       <Heading size="md" variant={'layout'} alignItems="center">
         Waltzboard
       </Heading>
