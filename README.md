@@ -8,7 +8,7 @@ This research is under review
 pip install waltzboard
 ```
 
-## Usage Example - With Interface
+## Demo - With Interface
 
 ```shell
 python -c 'from waltzboard.app import run_app; run_app()'
