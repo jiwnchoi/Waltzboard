@@ -40,7 +40,7 @@ Issues = "https://github.com/jiwnchoi/Waltzboard/issues"
 Source = "https://github.com/jiwnchoi/Waltzboard"
 
 [tool.hatch.version]
-path = "src/waltzboard/__about__.py"
+path = "waltzboard/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -52,6 +52,16 @@ dependencies = [
 [tool.hatch.build]
 only-packages = true
 artifacts = ["waltzboard/api/static/*", "locales"]
+
+[tool.hatch.build.hooks.jupyter-builder]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = ["waltzboard/api/static/index.html"]
+skip-if-exists = ["waltzboard/api/static/index.html"]
+dependencies = ["hatch-jupyter-builder>=0.5.0"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+npm = "pnpm"
+build_cmd = "build"
 
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
@@ -80,11 +90,11 @@ source_pkgs = ["waltzboard", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/waltzboard/__about__.py",
+  "waltzboard/__about__.py",
 ]
 
 [tool.coverage.paths]
-waltzboard = ["src/waltzboard", "*/waltzboard/src/waltzboard"]
+waltzboard = ["waltzboard"]
 tests = ["tests", "*/waltzboard/tests"]
 
 [tool.coverage.report]
@@ -162,11 +172,11 @@ line-ending = "auto"
 
 
 [tool.pyright]
-include = ["src/**/*.py"]
+include = ["waltzboard"]
 exclude = ["**/node_modules",
     "**/__pycache__",
-    "src/experimental",
-    "src/typestubs"
+    "waltzboard/experimental",
+    "waltzboard/typestubs"
 ]
 reportMissingImports = true
 reportMissingTypeStubs = false
