@@ -1,8 +1,8 @@
 import altair as alt
-from altair.utils.schemapi import Undefined
 from altair import Chart
+from altair.utils.schemapi import Undefined
+
 from .base_chart import BaseChart
-from waltzboard.utills import x_to_y, y_to_x
 
 
 class Heatmap(BaseChart):
@@ -10,26 +10,18 @@ class Heatmap(BaseChart):
         dict_x = {
             "field": self.altair_token.x.name,
             "type": self.altair_token.x.type,
-            "bin": True
-            if self.altair_token.x.type == "quantitative"
-            else False,
+            "bin": True if self.altair_token.x.type == "quantitative" else False,
             "axis": alt.Axis(
-                format="~s"
-                if self.altair_token.y.type == "quantitative"
-                else Undefined
+                format="~s" if self.altair_token.x.type == "quantitative" else Undefined
             ),
         }
 
         dict_y = {
             "field": self.altair_token.y.name,
             "type": self.altair_token.y.type,
-            "bin": True
-            if self.altair_token.y.type == "quantitative"
-            else False,
+            "bin": True if self.altair_token.y.type == "quantitative" else False,
             "axis": alt.Axis(
-                format="~s"
-                if self.altair_token.y.type == "quantitative"
-                else Undefined
+                format="~s" if self.altair_token.y.type == "quantitative" else Undefined
             ),
         }
 
@@ -38,9 +30,7 @@ class Heatmap(BaseChart):
             type=self.altair_token.z.type,
             aggregate=self.altair_token.z.aggregate,
             legend=alt.Legend(
-                format="~s"
-                if self.altair_token.z.type == "quantitative"
-                else Undefined
+                format="~s" if self.altair_token.z.type == "quantitative" else Undefined
             ),
         )
 
@@ -61,6 +51,4 @@ class Heatmap(BaseChart):
             x = alt.Y(**dict_x)
             y = alt.X(**dict_y)
 
-        return (
-            alt.Chart(self.df, title=self.title).mark_rect().encode(x, y, color)
-        )
+        return alt.Chart(self.df, title=self.title).mark_rect().encode(x, y, color)

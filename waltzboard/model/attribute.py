@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Literal
-from waltzboard.model import AttrTypes
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from .const import AttrTypes
 
 
 @dataclass
 class Attribute:
     name: str | None
-    type: AttrTypes
+    type: "AttrTypes"
 
     def __str__(self):
         return self.name

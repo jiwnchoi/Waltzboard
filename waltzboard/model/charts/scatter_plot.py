@@ -1,6 +1,7 @@
 import altair as alt
 from altair import Chart
 from altair.utils.schemapi import Undefined
+
 from .base_chart import BaseChart
 
 
@@ -15,7 +16,7 @@ class ScatterPlot(BaseChart):
                     type=self.altair_token.x.type,
                     axis=alt.Axis(
                         format="~s"
-                        if self.altair_token.y.type == "quantitative"
+                        if self.altair_token.x.type == "quantitative"
                         else Undefined
                     ),
                 ),
@@ -31,12 +32,10 @@ class ScatterPlot(BaseChart):
                 alt.Color(
                     self.altair_token.z.name,
                     type=self.altair_token.z.type,
-                    bin=True
-                    if self.altair_token.z.aggregate == "bin"
-                    else False,
+                    bin=True if self.altair_token.z.aggregate == "bin" else False,
                     legend=alt.Legend(
                         format="~s"
-                        if self.altair_token.z.type != "nominal"
+                        if self.altair_token.z.type == "quantitative"
                         else Undefined
                     ),
                 ),

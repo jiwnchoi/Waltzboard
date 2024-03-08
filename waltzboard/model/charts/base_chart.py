@@ -1,15 +1,35 @@
-from dataclasses import dataclass
-from altair import Chart
-from altair.utils.schemapi import UndefinedType, Undefined
-from abc import abstractmethod
-import pandas as pd
+from __future__ import annotations
 
+from abc import abstractmethod
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from waltzboard.model import ChartTokens, TrsTypes, TrsXTypes, ChartSampled
+import pandas as pd
+from altair import Chart
+from altair.utils.schemapi import Undefined, UndefinedType
+
+from ..const import ChartSampled, ChartTokens, TrsTypes, TrsXTypes
 
 if TYPE_CHECKING:
     from waltzboard.model.attribute import Attribute
+
+
+en = {
+    "none": "None",
+    "count": "Count",
+    "mean": "Mean",
+    "sum": "Sum",
+    "min": "Min",
+    "max": "Max",
+    "bin": "Binned",
+    "year": "Year",
+    "month": "Month",
+    "day": "Day",
+}
+
+
+def toFirstUpper(s: str) -> str:
+    return s[0].upper() + s[1:]
 
 
 class BaseChart:
@@ -34,6 +54,7 @@ class BaseChart:
         )
         self.df = df
         self.attrs = [x, y, z]
+        self.mark = mark
         self.sub_df = df[[a.name for a in self.attrs if a.name]]
         self.num_attrs = len([a.name for a in self.attrs if a.name])
         self.trs_types = [tx, ty, tz]
@@ -43,29 +64,38 @@ class BaseChart:
 
     def get_title(self) -> tuple[str, list[str]]:
         quantitatives = [a for a in self.attrs if a.type == "Q"]
-        value_field_name = (
-            quantitatives[-1].name
-            if len(quantitatives)
-            else self.attrs[self.num_attrs - 1].name
-        )
-        rest_field_names = [
-            a.name for a in self.attrs if a.name != value_field_name
-        ]
-        value_trs = (
-            [a for a in self.trs_types if a][-1] if self.num_trss else None
-        )
+        time_trs = [a for a in self.trs_types if a in ["year", "month", "day"]]
+        time_trs = time_trs[0] if time_trs else ""
+        non_quantitatives = [a for a in self.attrs if a.type != "Q" and a.type]
+        value_trs = [a for a in self.trs_types if a][-1] if self.num_trss else None
+        q_and = []
+        for i, q in enumerate(quantitatives):
+            if value_trs and i == len(quantitatives) - 1:
+                q_and.append(f"{toFirstUpper(value_trs)}")
+                q_and.append("of")
+
+            if value_trs == "count" and i == len(quantitatives) - 1:
+                q_and.append("records")
+
+            q_and.append(q)
+            if i != len(quantitatives) - 1:
+                q_and.append("and")
+
+        nonq_and = []
+        for i, nq in enumerate(non_quantitatives):
+            nonq_and.append(nq)
+            if nq.type == "T" and time_trs:
+                nonq_and.append(f"({toFirstUpper(time_trs)})")
+
+            if i != len(non_quantitatives) - 1:
+                nonq_and.append("and")
 
         tokens: list[list[str | None]] = [
-            [f"{value_trs[0].upper()}{value_trs[1:]}"] if value_trs else [],
-            ["of"] if value_trs else [],
-            [f"{value_field_name}"],
-            ["by"] if self.num_attrs > 1 else [],
-            [rest_field_names[0], "and", rest_field_names[1]]
-            if self.num_attrs > 2
-            else [rest_field_names[0]]
-            if self.num_attrs > 1
-            else [],
+            q_and if len(quantitatives) > 0 else ["Count", "of", "Records"],
+            ["by"] if len(non_quantitatives) > 0 else [],
+            nonq_and if len(non_quantitatives) > 0 else [],
         ]
+
         tokens_words = [str(w) for t in tokens for w in t]
         return " ".join(tokens_words), tokens_words
 
@@ -80,7 +110,7 @@ class BaseChart:
         return coverage
 
     def get_vegalite(self) -> str:
-        chart = self.display()
+        chart = self.display().interactive()
         chart.configure_legend(title=None)
         return chart.to_json()
 

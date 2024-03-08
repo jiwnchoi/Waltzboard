@@ -1,8 +1,21 @@
-from waltzboard.model import Attribute
-import pandas as pd
-from waltzboard.oracle import OracleWeight
+from __future__ import annotations
+
 from collections import Counter
-from waltzboard.model import ChartMap, ChartKeyTokens, ChartMapType
+from typing import TYPE_CHECKING
+
+import pandas as pd
+
+from waltzboard.model import (
+    Attribute,
+    ChartKeyTokens,
+    ChartMap,
+    ChartMapType,
+    get_chart_from_tokens,
+)
+from waltzboard.oracle import OracleWeight
+
+if TYPE_CHECKING:
+    from waltzboard.model import BaseChart
 
 
 class WaltzboardConfig:
@@ -21,18 +34,23 @@ class WaltzboardConfig:
     n_beam: int
     halving_ratio: float
 
+    n_min_charts: int
+
     # Oracle Config
     weight: OracleWeight
+    all_charts: list["BaseChart"]
 
     def __init__(
         self,
         df: pd.DataFrame,
-        robustness: int = 50,
-        n_epoch: int = 50,
-        n_candidates: int = 20,
-        halving_ratio: float = 0.5,
+        robustness: int = 1,
+        n_epoch: int = 20,
+        n_candidates: int = 50,
+        halving_ratio: float = 0.2,
         n_search_space: int = 100,
-        n_beam: int = 10,
+        n_beam: int = 5,
+        n_min_charts: int = 3,
+        acceleration: float = 1,
     ) -> None:
         self.robustness = robustness
         self.n_epoch = n_epoch
@@ -41,12 +59,32 @@ class WaltzboardConfig:
         self.halving_ratio = halving_ratio
         self.n_search_space = n_search_space
         self.n_beam = n_beam
+        self.acceleration = acceleration
+        self.n_min_charts = n_min_charts
         self.df = df
         self.weight = OracleWeight()
+        self.all_charts = []
         self.init_constraints()
-        self.update_constraints([
-            'arc', 'sum', 'min', 'max', 'tick'
-        ])
+        self.raw_attr_names = [
+            col
+            for col in self.df.columns
+            if (self.df[col].dtype == "object" and self.df[col].nunique() < 10)
+            or self.df[col].dtype != "object"
+            or "date" in col.lower()
+            or "날짜" in col.lower()
+        ]
+        self.raw_attrs = [Attribute(None, None)] + [
+            Attribute(
+                col,
+                "T"
+                if "date" in col.lower() or "날짜" in col.lower()
+                else "N"
+                if self.df[col].dtype == "object"
+                else "Q",
+            )
+            for col in self.raw_attr_names
+        ]
+        self.update_constraints(["arc", "sum", "min", "max", "tick", "day"])
 
     def init_constraints(self):
         self.attr_names = [
@@ -55,9 +93,11 @@ class WaltzboardConfig:
             if (self.df[col].dtype == "object" and self.df[col].nunique() < 10)
             or self.df[col].dtype != "object"
             or "date" in col.lower()
+            or "날짜" in col.lower()
         ]
         self.df = self.df[self.attr_names]
         self.attrs = self.get_attrs()
+        self.attr_types = [a.type for a in self.attrs]
         self.chart_type = list(set([m[0] for m in ChartMap]))
         self.txs = list(set([m[4] for m in ChartMap]))
         self.tys = list(set([m[5] for m in ChartMap]))
@@ -70,7 +110,7 @@ class WaltzboardConfig:
             Attribute(
                 col,
                 "T"
-                if "date" in col.lower()
+                if "date" in col.lower() or "날짜" in col.lower()
                 else "N"
                 if self.df[col].dtype == "object"
                 else "Q",
@@ -94,7 +134,7 @@ class WaltzboardConfig:
         attr_type_counter = Counter(attr_types)
         filtered_chart_map = {
             key: value
-            for key, value in ChartMap.items()
+            for key, value in filtered_chart_map.items()
             if get_type(Counter(key), "N") <= attr_type_counter["N"]
             and get_type(Counter(key), "Q") <= attr_type_counter["Q"]
             and get_type(Counter(key), "T") <= attr_type_counter["T"]
@@ -111,6 +151,41 @@ class WaltzboardConfig:
         self.tzs = [m for m in self.tzs if m not in constraints]
         self.trs_type = list(set(self.txs + self.tys + self.tzs))
         self.chart_map = self.get_chart_map()
+        self.all_charts = self.get_all_charts()
+
+    def get_all_charts(self) -> list["BaseChart"]:
+        all_charts = []
+        typename = {
+            "Q": [a.name for a in self.attrs if a.type == "Q"],
+            "N": [a.name for a in self.attrs if a.type == "N"],
+            "T": [a.name for a in self.attrs if a.type == "T"],
+            None: [None],
+        }
+        chart_map = self.get_chart_map()
+        for map in chart_map:
+            for x_name in typename[map[1]]:
+                for y_name in typename[map[2]]:
+                    if y_name == x_name:
+                        continue
+                    for z_name in typename[map[3]]:
+                        if z_name == x_name or (
+                            z_name == y_name and z_name is not None
+                        ):
+                            continue
+
+                        all_charts.append(
+                            (
+                                map[0],
+                                x_name,
+                                y_name,
+                                z_name,
+                                map[4],
+                                map[5],
+                                map[6],
+                            )
+                        )
+
+        return [get_chart_from_tokens(k, self) for k in all_charts]
 
     def update_weight(
         self,
@@ -119,14 +194,24 @@ class WaltzboardConfig:
         coverage: float | None = None,
         diversity: float | None = None,
         parsimony: float | None = None,
-    ):
-        if specificity is not None:
+    ) -> bool:
+        updated = False
+        if specificity is not None and self.weight.specificity != specificity:
             self.weight.specificity = specificity
-        if interestingness is not None:
+            updated = True
+        if (
+            interestingness is not None
+            and self.weight.interestingness != interestingness
+        ):
             self.weight.interestingness = interestingness
-        if coverage is not None:
+            updated = True
+        if coverage is not None and self.weight.coverage != coverage:
             self.weight.coverage = coverage
-        if diversity is not None:
+            updated = True
+        if diversity is not None and self.weight.diversity != diversity:
             self.weight.diversity = diversity
-        if parsimony is not None:
+            updated = True
+        if parsimony is not None and self.weight.parsimony != parsimony:
             self.weight.parsimony = parsimony
+            updated = True
+        return updated

@@ -1,7 +1,8 @@
-import altair as alt
-from waltzboard.model import BaseChart
 from dataclasses import dataclass
-from copy import deepcopy
+
+import altair as alt
+
+from waltzboard.model import BaseChart
 
 
 @dataclass
@@ -28,9 +29,7 @@ class WaltzboardDashboard:
             for chart in self.charts
         ]
         rows: list[alt.HConcatChart] = [
-            alt.hconcat(*altairs[i : i + num_cols]).resolve_scale(
-                color="independent"
-            )
+            alt.hconcat(*altairs[i : i + num_cols]).resolve_scale(color="independent")
             for i in range(0, len(altairs), num_cols)
         ]
         return alt.vconcat(*rows)

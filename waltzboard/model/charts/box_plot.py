@@ -1,6 +1,7 @@
 import altair as alt
 from altair import Chart
 from altair.utils.schemapi import Undefined
+
 from .base_chart import BaseChart
 
 
@@ -9,20 +10,13 @@ class BoxPlot(BaseChart):
         dict_x = {
             "field": self.altair_token.x.name,
             "type": self.altair_token.x.type,
-            "axis": alt.Axis(
-                format="~s"
-                if self.altair_token.y.type == "quantitative"
-                else Undefined
-            ),
         }
 
         dict_y = {
             "field": self.altair_token.y.name,
             "type": self.altair_token.y.type,
             "axis": alt.Axis(
-                format="~s"
-                if self.altair_token.y.type == "quantitative"
-                else Undefined
+                format="~s" if self.altair_token.y.type == "quantitative" else Undefined
             ),
         }
 

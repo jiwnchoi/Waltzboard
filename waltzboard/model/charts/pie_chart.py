@@ -1,5 +1,6 @@
 import altair as alt
 from altair import Chart
+
 from .base_chart import BaseChart
 
 

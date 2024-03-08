@@ -1,4 +1,3 @@
-import pandas as pd
 from waltzboard.model import BaseChart
 
 

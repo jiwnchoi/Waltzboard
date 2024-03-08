@@ -1,6 +1,7 @@
 import altair as alt
 from altair import Chart
 from altair.utils.schemapi import Undefined
+
 from .base_chart import BaseChart
 
 

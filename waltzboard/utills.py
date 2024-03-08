@@ -1,8 +1,9 @@
 # type: ignore
-from waltzboard.explorer import TrainResult
+import altair as alt
 import pandas as pd
 from IPython.display import clear_output, display
-import altair as alt
+
+from waltzboard.explorer import TrainResult
 
 
 def display_function(epoch, train_results: list[TrainResult]):
@@ -12,9 +13,7 @@ def display_function(epoch, train_results: list[TrainResult]):
             "scores": [r.score.mean() for r in train_results],
             "maxs": [r.score.max() for r in train_results],
             "specificity": [r.specificity.mean() for r in train_results],
-            "interestingness": [
-                r.interestingness.mean() for r in train_results
-            ],
+            "interestingness": [r.interestingness.mean() for r in train_results],
             "coverage": [r.coverage.mean() for r in train_results],
             "diversity": [r.diversity.mean() for r in train_results],
             "parsimony": [r.parsimony.mean() for r in train_results],
@@ -39,24 +38,17 @@ def display_function(epoch, train_results: list[TrainResult]):
             )
             & (
                 line.encode(y=alt.Y("specificity", scale=alt.Scale(zero=False)))
-                | line.encode(
-                    y=alt.Y("interestingness", scale=alt.Scale(zero=False))
-                )
+                | line.encode(y=alt.Y("interestingness", scale=alt.Scale(zero=False)))
                 | line.encode(y=alt.Y("coverage", scale=alt.Scale(zero=False)))
                 | line.encode(y=alt.Y("diversity", scale=alt.Scale(zero=False)))
                 | (
-                    line.encode(
-                        y=alt.Y("parsimony", scale=alt.Scale(zero=False))
-                    )
+                    line.encode(y=alt.Y("parsimony", scale=alt.Scale(zero=False)))
                     + line.encode(
                         y=alt.Y("n_charts", scale=alt.Scale(zero=False))
                     ).mark_line(color="blue")
                 ).resolve_scale(y="independent")
             )
         )
-
-
-import altair as alt
 
 
 def x_to_y(x: alt.X) -> alt.Y:

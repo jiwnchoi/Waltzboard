@@ -1,22 +1,22 @@
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING
+
 import pandas as pd
 
-from waltzboard.model import Attribute, ChartTokens, ChartSampled
+from .attribute import Attribute
 from .chart_map import ChartMap
-from itertools import product
+from .const import ChartSampled, ChartTokens
 
 if TYPE_CHECKING:
-    from waltzboard.model import BaseChart
     from waltzboard.config import WaltzboardConfig
+
+    from .charts import BaseChart
 
 
 chart_hash: dict[ChartTokens, "BaseChart"] = {}
 
 
-def get_chart_from_tokens(
-    key: ChartTokens, config: "WaltzboardConfig"
-) -> "BaseChart":
-    name_type_map = {a.name: a.type for a in config.attrs}
+def get_chart_from_tokens(key: ChartTokens, config: "WaltzboardConfig") -> "BaseChart":
+    name_type_map = {a.name: a.type for a in config.raw_attrs}
     type_key = (
         key[0],
         name_type_map[key[1]],
@@ -40,7 +40,7 @@ def get_chart_from_tokens(
 
 
 def is_valid_tokens(key: ChartTokens, config: "WaltzboardConfig") -> bool:
-    name_type_map = {a.name: a.type for a in config.attrs}
+    name_type_map = {a.name: a.type for a in config.raw_attrs}
     type_key = (
         key[0],
         name_type_map[key[1]],
@@ -60,9 +60,7 @@ def is_valid_tokens(key: ChartTokens, config: "WaltzboardConfig") -> bool:
     return True
 
 
-def get_chart_from_sample(
-    sample: ChartSampled, df: pd.DataFrame
-) -> "BaseChart":
+def get_chart_from_sample(sample: ChartSampled, df: pd.DataFrame) -> "BaseChart":
     if not (sample[0] and sample[1].name):
         raise Exception("Chart sample is not valid")
     chart_tokens = (
@@ -94,43 +92,34 @@ def get_variants_from_charts(
     charts: "BaseChart", config: "WaltzboardConfig"
 ) -> list["BaseChart"]:
     variants = []
-    for c in config.chart_type:
-        if c != charts.tokens[0]:
-            new_key = (c, *charts.tokens[1:])
-            if is_valid_tokens(new_key, config):
-                variants.append(get_chart_from_tokens(new_key, config))
+    for new_chart in config.all_charts:
+        new_token = new_chart.tokens
+        current_token = charts.tokens
+        if current_token == new_token:
+            continue
 
-    for i, attr in enumerate(config.attrs):
-        for j in range(1, 4):
-            if attr.name != charts.tokens[j]:
-                new_key = (
-                    charts.tokens[0],
-                    *charts.tokens[1:j],
-                    attr.name,
-                    *charts.tokens[j + 1 :],
-                )
-                if is_valid_tokens(new_key, config):
-                    variants.append(get_chart_from_tokens(new_key, config))
-    for c, tx, ty, tz in product(
-        config.chart_type, config.txs, config.tys, config.tzs
-    ):
+        diff_new_token = (
+            new_token[0],
+            new_token[1],
+            new_token[2],
+            new_token[3],
+            str(new_token[4:]),
+        )
+
+        current_new_token = (
+            current_token[0],
+            current_token[1],
+            current_token[2],
+            current_token[3],
+            str(current_token[4:]),
+        )
+
         if (
-            c != charts.tokens[0]
-            and tx != charts.tokens[4]
-            and ty != charts.tokens[5]
-            and tz != charts.tokens[6]
+            sum([1 if x != y else 0 for x, y in zip(diff_new_token, current_new_token)])
+            == 1
         ):
-            new_key = (
-                c,
-                charts.tokens[1],
-                charts.tokens[2],
-                charts.tokens[3],
-                tx,
-                ty,
-                tz,
-            )
-            if is_valid_tokens(new_key, config):
-                variants.append(get_chart_from_tokens(new_key, config))
+            variants.append(new_chart)
+
     return variants
 
 
@@ -165,3 +154,12 @@ def get_all_charts(config: "WaltzboardConfig") -> list["BaseChart"]:
                     )
 
     return [get_chart_from_tokens(k, config) for k in all_charts]
+
+
+__all__ = [
+    "get_chart_from_tokens",
+    "is_valid_tokens",
+    "get_chart_from_sample",
+    "get_variants_from_charts",
+    "get_all_charts",
+]

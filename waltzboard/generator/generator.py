@@ -1,30 +1,46 @@
-import numpy as np
-import pandas as pd
-from numpy.random import choice
+from random import choices
+from typing import TYPE_CHECKING
 
-from waltzboard.config import WaltzboardConfig
-from waltzboard.generator import PriorParameters
+import numpy as np
+
 from waltzboard.model import (
     Attribute,
     BaseChart,
     ChartKeyTokens,
     ChartSampled,
+    ChartTokens,
     WaltzboardDashboard,
     get_chart_from_sample,
 )
+
+from .generator_parameters import PriorParameters
+
+if TYPE_CHECKING:
+    from waltzboard.config import WaltzboardConfig
 
 
 def p(x: np.ndarray) -> np.ndarray:
     return x / x.sum()
 
 
+def choice(a, p: np.ndarray) -> object:
+    return choices(a, weights=p, k=1)[0]
+
+
 def is_valid_map(current: list, map: ChartKeyTokens) -> bool:
-    return all(
-        [
-            map[i] == c.type if isinstance(c, Attribute) else map[i] == c
-            for i, c in enumerate(current)
-        ]
-    )
+    for i, c in enumerate(current):
+        if isinstance(c, Attribute):
+            if map[i] != c.type:
+                return False
+        elif map[i] != c:
+            return False
+    return True
+
+
+def get_next_token_and_map(current: list, maps: list[ChartKeyTokens]):
+    valid_maps = [e for e in maps if is_valid_map(current, e)]
+    next_tokens = [e[len(current)] for e in valid_maps]
+    return set(next_tokens), valid_maps
 
 
 class Generator:
@@ -34,102 +50,67 @@ class Generator:
         self.prior = PriorParameters(self.config)
         self.chart_keys = self.config.get_chart_map().keys()
 
-    def attr_mask(self, current: list):
-        valid_map = [
-            key for key in self.chart_keys if is_valid_map(current, key)
-        ]
-        valid_type = set([map[len(current)] for map in valid_map])
-        weight_mask = np.array(
-            [
-                attr.type in valid_type
-                and attr.name
-                not in [
-                    c.name
-                    for c in current
-                    if isinstance(c, Attribute) and c.name
-                ]
-                for attr in self.config.attrs
-            ]
-        )
-        return weight_mask
-
-    def ct_mask(self, current: list):
-        valid_map = [e for e in self.chart_keys if is_valid_map(current, e)]
-        valid_type = set([e[len(current)] for e in valid_map])
-        weight_mask = np.array(
-            [e in valid_type for e in self.config.chart_type]
-        )
-        return weight_mask
-
-    def at_mask(self, current: list):
-        trss = (
-            self.config.txs
-            if len(current) == 4
-            else self.config.tys
-            if len(current) == 5
-            else self.config.tzs
-        )
-        valid_map = [
-            e for e in self.config.chart_map if is_valid_map(current, e)
-        ]
-        valid_type = set([e[len(current)] for e in valid_map])
-        weight_mask = np.array([e in valid_type for e in trss])
-        return weight_mask
-
     def sample_one(self) -> BaseChart:
         current = []
-        mask_ct = self.ct_mask(current)
-        current.append(
-            choice(
-                self.config.chart_type, p=p(self.prior.ct.sample() * mask_ct)
-            )
-        )
+        maps = self.config.chart_map
+        it = {
+            "ct": self.config.chart_type,
+            "x": self.config.attrs,
+            "y": self.config.attrs,
+            "z": self.config.attrs,
+            "tx": self.config.txs,
+            "ty": self.config.tys,
+            "tz": self.config.tzs,
+        }
 
-        mask_x = self.attr_mask(current)
-        current.append(
-            choice(self.config.attrs, p=p(self.prior.x.sample() * mask_x))
-        )
+        for t, domain in it.items():
+            next_tokens, maps = get_next_token_and_map(current, maps)
+            mask = np.ones(len(domain))
 
-        mask_y = self.attr_mask(current)
-        current.append(
-            choice(self.config.attrs, p=p(self.prior.y.sample() * mask_y))
-        )
+            if t == "x":
+                for i, token in enumerate(domain):
+                    if token.type not in next_tokens:
+                        mask[i] = 0
 
-        mask_z = self.attr_mask(current)
-        current.append(
-            choice(self.config.attrs, p=p(self.prior.z.sample() * mask_z))
-        )
+            elif t == "y":
+                for i, token in enumerate(domain):
+                    if token.type not in next_tokens:
+                        mask[i] = 0
+                    if token.name == current[1].name:
+                        mask[i] = 0 if token.name is not None else 1
 
-        mask_trs_x = self.at_mask(current)
-        current.append(
-            choice(self.config.txs, p=p(self.prior.tx.sample() * mask_trs_x))
-        )
+            elif t == "z":
+                for i, token in enumerate(domain):
+                    if token.type not in next_tokens:
+                        mask[i] = 0
+                    if token.name == current[1].name or token.name == current[2].name:
+                        mask[i] = 0 if token.name is not None else 1
 
-        mask_trs_y = self.at_mask(current)
-        current.append(
-            choice(self.config.tys, p=p(self.prior.ty.sample() * mask_trs_y))
-        )
+            else:
+                for i, token in enumerate(domain):
+                    if token not in next_tokens:
+                        mask[i] = 0
+            alpha = self.prior[t].sample()
+            p_token = p(alpha * mask)
+            current.append(choice(domain, p=p_token))
 
-        mask_trs_z = self.at_mask(current)
-        current.append(
-            choice(self.config.tzs, p=p(self.prior.tz.sample() * mask_trs_z))
-        )
-        sampled: ChartSampled = tuple(current)
+        sampled: ChartSampled = tuple(current)  # type: ignore
         return get_chart_from_sample(sampled, self.df)
 
     def sample_n(self, n: int) -> list[BaseChart]:
-        keys: set[str] = set()
+        keys: set[ChartTokens] = set()
         charts: list[BaseChart] = []
 
         limit = 0
         while len(charts) < n:
             limit += 1
             if limit > 10000:
-                print("Cannot sample enough charts", len(charts), n)
-                break
+                return charts
+
             chart = self.sample_one()
-            if str(chart.tokens) not in keys:
-                keys.add(str(chart.tokens))
+
+            if chart.tokens not in keys:
+                keys.add(chart.tokens)
                 charts.append(chart)
 
         return charts

@@ -1,30 +1,27 @@
-import pandas as pd
-from waltzboard.config import WaltzboardConfig
-from waltzboard.model import Attribute
 import numpy as np
+import pandas as pd
 from IPython.display import display
+
+from waltzboard.config import WaltzboardConfig
 
 
 class DirichletPrior:
     count: np.ndarray
     history: list[np.ndarray]
 
-    def __init__(self, count: np.ndarray) -> None:
+    def __init__(self, count: np.ndarray, config: WaltzboardConfig) -> None:
         self.count = count
         self.history = [count]
-
-    def parameters(self):
-        return self.count / np.sum(self.count)
+        self.acceleration = config.acceleration
 
     def update(self, x: np.ndarray):
-        r = np.sum(self.count)
-        self.count += x
-        self.count = self.count / np.sum(self.count) * r  # type: ignore
+        self.count += x * self.acceleration
         self.history.append(np.copy(self.count))
 
     def sample(self):
         c = np.random.dirichlet(self.count)
-        if c.sum() == 0:
+        # check if nan in c
+        if np.isnan(c).any():
             print(c)
         return c
 
@@ -34,15 +31,21 @@ class NormalPrior:
     var: float = 1
     history: list[float]
 
-    def __init__(self, mean: float) -> None:
+    def __init__(self, mean: float, config: WaltzboardConfig) -> None:
         self.mean = mean
         self.history = [mean]
+        self.config = config
+        self.acceleration = config.acceleration
 
     def update(self, n, observed_mean, observed_var):
         self.mean = (
             self.mean / (self.var + 1e-10)
-            + observed_mean * n / (observed_var + 1e-10)
-        ) / (1 / (self.var + 1e-10) + n / (observed_var + 1e-10) + 1e-10)
+            + observed_mean * n * self.acceleration / (observed_var + 1e-10)
+        ) / (
+            1 / (self.var + 1e-10)
+            + n * self.acceleration / (observed_var + 1e-10)
+            + 1e-10
+        )
         # self.var = 1 / (1 / self.var + n / observed_var)
         self.history.append(self.mean)
 
@@ -50,7 +53,11 @@ class NormalPrior:
         sampled = np.random.normal(self.mean, np.sqrt(self.var))
         if np.isnan(sampled):
             sampled = 0
-        return max(2, sampled)
+        return max(self.config.n_min_charts, sampled)
+
+    def score(self, x, num_attr):
+        # print(np.exp(-(x-self.mean)**2/(2* self.var)))
+        return np.exp(-((x - self.mean) ** 2) / (2 * self.var))
 
 
 class PriorParameters:
@@ -69,27 +76,37 @@ class PriorParameters:
     ) -> None:
         self.config = config
         self.ct = DirichletPrior(
-            np.ones(len(self.config.chart_type)) * self.config.robustness
+            np.ones(len(self.config.chart_type)) * self.config.robustness,
+            self.config,
         )
         self.x = DirichletPrior(
-            np.ones(len(self.config.attrs)) * self.config.robustness
+            np.ones(len(self.config.attrs)) * self.config.robustness,
+            self.config,
         )
         self.y = DirichletPrior(
-            np.ones(len(self.config.attrs)) * self.config.robustness
+            np.ones(len(self.config.attrs)) * self.config.robustness,
+            self.config,
         )
         self.z = DirichletPrior(
-            np.ones(len(self.config.attrs)) * self.config.robustness
+            np.ones(len(self.config.attrs)) * self.config.robustness,
+            self.config,
         )
         self.tx = DirichletPrior(
-            np.ones(len(self.config.txs)) * self.config.robustness
+            np.ones(len(self.config.txs)) * self.config.robustness,
+            self.config,
         )
         self.ty = DirichletPrior(
-            np.ones(len(self.config.tys)) * self.config.robustness
+            np.ones(len(self.config.tys)) * self.config.robustness,
+            self.config,
         )
         self.tz = DirichletPrior(
-            np.ones(len(self.config.tzs)) * self.config.robustness
+            np.ones(len(self.config.tzs)) * self.config.robustness,
+            self.config,
         )
-        self.n_charts = NormalPrior(len(self.config.attrs) - 1)
+        self.n_charts = NormalPrior(len(self.config.attrs) - 1, self.config)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
 
     def display(self):
         attribute_data = pd.DataFrame(
@@ -136,16 +153,13 @@ class PriorParameters:
         ags = [
             {
                 "name": str(at),
-                "x": self.tx.count[self.config.txs.index(at)]
-                / np.sum(self.tx.count)
+                "x": self.tx.count[self.config.txs.index(at)] / np.sum(self.tx.count)
                 if at in self.config.txs
                 else 0,
-                "y": self.ty.count[self.config.tys.index(at)]
-                / np.sum(self.ty.count)
+                "y": self.ty.count[self.config.tys.index(at)] / np.sum(self.ty.count)
                 if at in self.config.tys
                 else 0,
-                "z": self.tz.count[self.config.tzs.index(at)]
-                / np.sum(self.tz.count)
+                "z": self.tz.count[self.config.tzs.index(at)] / np.sum(self.tz.count)
                 if at in self.config.tzs
                 else 0,
             }
