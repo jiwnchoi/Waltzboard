@@ -82,6 +82,7 @@ const ChartView = ({ idx, chart, width, height }: ChartViewProps) => {
             height={height}
             width={width}
             spec={chart.spec}
+            // renderer="svg"
             actions={false}
             tooltip={new Handler().call}
           />

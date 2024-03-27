@@ -25,7 +25,7 @@ const WeightSlider = (props: WeightSliderProps) => {
   const ref = useRef<HTMLInputElement>(null);
 
   return (
-    <Flex flexDir="column">
+    <Flex flexDir="column" mb={1}>
       <Flex flexDir={"row"} justifyContent={"space-between"}>
         <Text fontSize={"sm"} color={"gray.500"} fontWeight={500}>
           {t[`text-${props.title}` as keyof typeof t]}
@@ -34,8 +34,12 @@ const WeightSlider = (props: WeightSliderProps) => {
         <Input
           ref={ref}
           size={"sm"}
-          w={10}
-          h={8}
+          w={4}
+          border={"none"}
+          m={1}
+          p={0}
+          h={4}
+          textAlign={"end"}
           defaultValue={weightSignal.value[props.title]}
           onKeyUp={(e) => {
             if (e.key === "Enter") {

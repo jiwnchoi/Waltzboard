@@ -30,7 +30,7 @@ const Header = () => (
     </Flex>
     <Flex alignItems={"center"} gap={4}>
       <Link href="https://idclab.skku.edu" isExternal>
-        <Button variant={"layout"} leftIcon={<FiExternalLink />} p={0} m={0}>
+        {/* <Button variant={"layout"} leftIcon={<FiExternalLink />} p={0} m={0}>
           <Text
             variant={"layout"}
             fontFamily="Rajdhani"
@@ -47,7 +47,7 @@ const Header = () => (
           >
             Lab
           </Text>
-        </Button>
+        </Button> */}
       </Link>
       <Link href="https://github.com/jason-choi/waltzboard" isExternal>
         <Button variant={"layout"} leftIcon={<AiFillGithub />} p={0} m={0}>

@@ -21,6 +21,9 @@ export const toChartView = (chart: WaltzboardChartModel): ChartView => {
   //   specObject.encoding.color.legend = { title: null };
   // }
   specObject.background = null;
+  if ("color" in specObject.encoding) {
+    specObject.encoding.color.legend = { orient: "bottom" };
+  }
 
   return {
     key: chart.key,

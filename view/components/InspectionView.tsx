@@ -173,6 +173,7 @@ export const VariantChartView = (props: ChartViewProps) => {
       </Center>
       <Center height="full" px={4}>
         <VegaLite
+          // renderer="svg"
           height={props.chartHeight}
           width={props.chartWidth}
           spec={props.chart.spec}

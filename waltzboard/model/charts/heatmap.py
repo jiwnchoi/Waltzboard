@@ -14,6 +14,9 @@ class Heatmap(BaseChart):
             "axis": alt.Axis(
                 format="~s" if self.altair_token.x.type == "quantitative" else Undefined
             ),
+            "timeUnit": self.altair_token.x.aggregate
+            if self.altair_token.x.type == "temporal"
+            else Undefined,
         }
 
         dict_y = {
@@ -23,6 +26,9 @@ class Heatmap(BaseChart):
             "axis": alt.Axis(
                 format="~s" if self.altair_token.y.type == "quantitative" else Undefined
             ),
+            "timeUnit": self.altair_token.y.aggregate
+            if self.altair_token.y.type == "temporal"
+            else Undefined,
         }
 
         color = alt.Color(

@@ -8,6 +8,7 @@ import {
   DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
+  Fade,
   Flex,
   Grid,
   GridItem,
@@ -88,6 +89,7 @@ const DesignDashboardButton = () => {
     </Button>
   );
 };
+const HEIGHT = 1000;
 
 export const Main = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -118,8 +120,8 @@ export const Main = () => {
           borderRadius="md"
           boxShadow="sm"
           maxW={"1622px"}
-          maxH={"890px"}
-          minH={"890px"}
+          maxH={HEIGHT}
+          minH={HEIGHT}
         >
           <Flex flexDir={"row"} justifyContent={"end"} alignItems={"center"}>
             <Button
@@ -129,7 +131,7 @@ export const Main = () => {
               ref={btnRef}
               onClick={onOpen}
             >
-              <Text>{t["btn-open_reasoning_view"]}</Text>
+              <Text>{t["btn-open_reasoning_panel"]}</Text>
             </Button>
           </Flex>
 
@@ -137,18 +139,18 @@ export const Main = () => {
             flexDir={"column"}
             w="full"
             gap={2}
-            maxH={"890px"}
+            maxH={HEIGHT}
             overflowX={"hidden"}
             overflowY={"scroll"}
           >
             <Flex direction={"column"}>
               {isLoading.value && (
-                <Center w="full" minH={800}>
+                <Center w="full" minH={HEIGHT - 100}>
                   <Spinner size="xl" />
                 </Center>
               )}
               {!isLoading.value && dashboardSignal.value.length === 0 && (
-                <Center w="full" minH={800} flexDir={"column"} gap={4}>
+                <Center w="full" minH={HEIGHT - 100} flexDir={"column"} gap={4}>
                   <Text fontSize={"xl"} fontWeight={600}>
                     {t["text-no_dashboard"]}
                   </Text>
@@ -172,7 +174,7 @@ export const Main = () => {
                           chart={chart}
                           key={`chart-${i}`}
                           width={380}
-                          height={190}
+                          height={200}
                         />
 
                         {i % NUM_COL == NUM_COL - 1 && (
@@ -219,6 +221,7 @@ export const Main = () => {
                   })}
                 </Grid>
               )}
+
               <AppendChartPanel open={isAppendPanelOpen.value} />
             </Flex>
           </Flex>
@@ -235,10 +238,10 @@ const AppendChartPanel = ({ open }: { open: boolean }) => {
     ref.current.scrollIntoView({ behavior: "smooth" });
   }
   return (
-    <Collapse in={open} unmountOnExit ref={ref}>
+    <Fade in={open} ref={ref} unmountOnExit>
       <Flex
         flexDir={"row"}
-        minH={"260px"}
+        minH={"335px"}
         mb={2}
         borderRadius={"md"}
         borderTopLeftRadius={0}
@@ -278,14 +281,14 @@ const AppendChartPanel = ({ open }: { open: boolean }) => {
               <RecommendChartView
                 chart={chart}
                 key={`recommend-${j}`}
-                chartWidth={250}
-                chartHeight={125}
+                chartWidth={300}
+                chartHeight={200}
               />
             ))}
           </Flex>
         </Flex>
       </Flex>
-    </Collapse>
+    </Fade>
   );
 };
 
@@ -297,7 +300,7 @@ const InspectionPanel = ({ i }: { i: number }) => {
           flexDir={"row"}
           border={"2px"}
           borderColor={"blue.500"}
-          h={"280px"}
+          h={"340px"}
           mb={2}
           borderRadius={"md"}
           borderTopLeftRadius={
@@ -324,17 +327,18 @@ const InspectionPanel = ({ i }: { i: number }) => {
             </Text>
 
             {isVariantsLoadingSignal.value && (
-              <Center w="full" minH={180}>
+              <Center w="full" minH={200}>
                 <Spinner size="md" />
               </Center>
             )}
-            {variantChartsSignal.value.length == 0 && (
-              <Center w="full" minH={180}>
-                <Text fontSize={"md"} fontWeight={600}>
-                  {t["text-no_alternative"]}
-                </Text>
-              </Center>
-            )}
+            {!isVariantsLoadingSignal.value &&
+              variantChartsSignal.value.length == 0 && (
+                <Center w="full" minH={200}>
+                  <Text fontSize={"md"} fontWeight={600}>
+                    {t["text-no_alternative"]}
+                  </Text>
+                </Center>
+              )}
 
             <Flex
               w={"full"}
@@ -347,8 +351,8 @@ const InspectionPanel = ({ i }: { i: number }) => {
                 <VariantChartView
                   chart={variantChart}
                   key={`variant-${j}`}
-                  chartHeight={125}
-                  chartWidth={250}
+                  chartWidth={300}
+                  chartHeight={200}
                 />
               ))}
             </Flex>
@@ -361,7 +365,7 @@ const InspectionPanel = ({ i }: { i: number }) => {
 
 const IntentPanel = () => {
   return (
-    <Flex flexDir={"column"} w={"full"} px={0} gap={2} maxH={"850px"}>
+    <Flex flexDir={"column"} w={"full"} px={0} gap={2} maxH={HEIGHT - 40}>
       <Section title={t["sect-weight-controller"]} gap={1.5} w="full">
         <WeightSlider title="specificity" />
         <WeightSlider title="interestingness" />

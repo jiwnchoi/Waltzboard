@@ -15,7 +15,7 @@ const isInitializing = signal<boolean>(false);
 
 export const configSignal = signal<Configs>({
   userId: null,
-  dataset: "Birdstrikes",
+  dataset: "Movies",
   n_beam: 10,
   n_candidates: 50,
   n_epoch: 20,
@@ -50,7 +50,8 @@ const init = async (code: string) => {
       return {
         ...chartType,
         prefer: false,
-        ignore: ["tick", "arc"].includes(chartType.mark),
+        // ignore: ["tick", "arc"].includes(chartType.mark),
+        ignore: false,
       };
     });
     transformationsSignal.value = response.transformations.map(
@@ -58,7 +59,8 @@ const init = async (code: string) => {
         return {
           ...transformation,
           prefer: false,
-          ignore: ["min", "max", "day"].includes(transformation.type),
+          ignore: false,
+          // ignore: ["min", "max", "day"].includes(transformation.type),
         };
       },
     );

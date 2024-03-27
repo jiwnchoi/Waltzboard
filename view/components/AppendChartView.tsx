@@ -28,8 +28,8 @@ export const ChartAppendPreview = () => {
       {inputChart.value && (
         <RecommendChartView
           chart={inputChart.value}
-          chartWidth={250}
-          chartHeight={125}
+          chartWidth={300}
+          chartHeight={200}
         />
       )}
       {!inputChart.value && (
