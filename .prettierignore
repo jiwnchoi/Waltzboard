@@ -1,1 +1,4 @@
 waltzboard/api/static
+*.json
+*.log
+*.yaml

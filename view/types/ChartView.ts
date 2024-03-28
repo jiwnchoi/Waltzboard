@@ -3,7 +3,7 @@ import { WaltzboardChartModel } from "./API";
 import { OracleResult } from "./OracleResult";
 
 interface StatisticFeature {
-  key: string;
+  key: string[];
   features: (string | null)[];
 }
 

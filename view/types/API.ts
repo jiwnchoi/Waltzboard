@@ -1,11 +1,11 @@
-import { TransformationFetched } from "./Transformation";
 import type { AttributeFetched } from "./Attribute";
 import type { ChartTypeFetched } from "./ChartType";
-import { ChartView, StatisticFeature } from "./ChartView";
+import { StatisticFeature } from "./ChartView";
 import type { OracleResult, OracleSingleResult } from "./OracleResult";
 import { OracleWeight } from "./OracleWeight";
-import { TransformationDist, AttributeDist, ChartTypeDist } from "./Space";
+import { AttributeDist, ChartTypeDist, TransformationDist } from "./Space";
 import { TaskTypeFetched } from "./TaskType";
+import { TransformationFetched } from "./Transformation";
 
 export interface AttributeModel {
   name: string;

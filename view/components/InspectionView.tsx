@@ -26,6 +26,11 @@ interface ChartViewProps extends FlexProps {
   chartWidth: number;
   chartHeight: number;
 }
+
+const getAndKey = (key: string[]) => {
+  return key.join(" & ");
+};
+
 const StatisticFeatureBadge = ({ feature }: { feature: string | null }) => {
   if (feature === null) return null;
   return (
@@ -115,7 +120,7 @@ export const InsightsView = () => {
                   w={"full"}
                 >
                   <Text fontSize={"sm"} w={"140px"} mr={4}>
-                    {key}
+                    {getAndKey(key)}
                   </Text>
                   <Grid w={"170px"} templateColumns={"repeat(2, 1fr)"} gap={1}>
                     {features.map((feature, i) => (
