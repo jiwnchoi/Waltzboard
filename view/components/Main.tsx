@@ -26,7 +26,7 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { AiFillSetting } from "react-icons/ai";
 import { RiAddCircleLine, RiLightbulbLine } from "react-icons/ri";
 import t from "../../locales/default.json";
@@ -168,7 +168,7 @@ export const Main = () => {
                 >
                   {dashboardSignal.value.map((chart, i) => {
                     return (
-                      <>
+                      <Fragment key={`chart-container-${i}`}>
                         <ChartView
                           idx={i}
                           chart={chart}
@@ -216,7 +216,7 @@ export const Main = () => {
                             />
                           </>
                         )}
-                      </>
+                      </Fragment>
                     );
                   })}
                 </Grid>
@@ -498,7 +498,7 @@ const Settings = () => {
             {Object.keys(configSignal.value)
               .filter((key) => key !== "dataset")
               .map((key) => (
-                <>
+                <Fragment key={key}>
                   <GridItem>{key}</GridItem>
                   <GridItem>
                     <Input
@@ -509,7 +509,7 @@ const Settings = () => {
                       }}
                     />
                   </GridItem>
-                </>
+                </Fragment>
               ))}
             <GridItem colSpan={2}>
               <Button

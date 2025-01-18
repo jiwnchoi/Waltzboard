@@ -30,7 +30,8 @@ dependencies = [
   "altair",
   "scikit-learn",
   "ipython",
-  "fastapi",
+  "fastapi[standard]",
+  "vega-datasets",
   "uvicorn",
   "pydantic-settings",
 ]
@@ -43,10 +44,7 @@ Source = "https://github.com/jiwnchoi/Waltzboard"
 path = "waltzboard/__about__.py"
 
 [tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-]
+dependencies = ["coverage[toml]>=6.5", "pytest"]
 
 
 [tool.hatch.build]
@@ -66,22 +64,14 @@ build_cmd = "build"
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
+cov-report = ["- coverage combine", "coverage report"]
+cov = ["test-cov", "cov-report"]
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.types]
-dependencies = [
-  "pyright"
-]
+dependencies = ["pyright"]
 [tool.hatch.envs.types.scripts]
 check = "pyright"
 
@@ -89,51 +79,45 @@ check = "pyright"
 source_pkgs = ["waltzboard", "tests"]
 branch = true
 parallel = true
-omit = [
-  "waltzboard/__about__.py",
-]
+omit = ["waltzboard/__about__.py"]
 
 [tool.coverage.paths]
 waltzboard = ["waltzboard"]
 tests = ["tests", "*/waltzboard/tests"]
 
 [tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".ipynb_checkpoints",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pyenv",
-    ".pytest_cache",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    ".vscode",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "site-packages",
-    "venv",
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".ipynb_checkpoints",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pyenv",
+  ".pytest_cache",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  ".vscode",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "site-packages",
+  "venv",
 ]
 
 # Same as Black.
@@ -173,10 +157,11 @@ line-ending = "auto"
 
 [tool.pyright]
 include = ["waltzboard"]
-exclude = ["**/node_modules",
-    "**/__pycache__",
-    "waltzboard/experimental",
-    "waltzboard/typestubs"
+exclude = [
+  "**/node_modules",
+  "**/__pycache__",
+  "waltzboard/experimental",
+  "waltzboard/typestubs",
 ]
 reportMissingImports = true
 reportMissingTypeStubs = false

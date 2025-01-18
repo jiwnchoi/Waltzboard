@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from .api.config import config
-from .api.routers import (
+from waltzboard.api.config import config
+from waltzboard.api.routers import (
     get_chart,
     infer,
     init,
@@ -31,7 +31,7 @@ app.add_middleware(
 
 app.mount(
     "/waltzboard",
-    StaticFiles(directory=f"{pathlib.Path(__file__).parent}/api/static"),
+    StaticFiles(directory=f"{pathlib.Path(__file__).parent}/waltzboard/api/static"),
     name="waltzboard",
 )
 app.include_router(train.router)

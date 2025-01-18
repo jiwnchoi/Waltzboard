@@ -1,13 +1,16 @@
-import t from "../../locales/default.json";
+import { Box, Portal } from "@chakra-ui/react";
+import { Group } from "@visx/group";
 import { Point } from "@visx/point";
+import { ScaleSVG } from "@visx/responsive";
 import { scaleLinear } from "@visx/scale";
 import { Line, LineRadial } from "@visx/shape";
 import { Text } from "@visx/text";
-import { inferResponseSignal } from "../controller/infer";
-import { ScaleSVG } from "@visx/responsive";
-import { Group } from "@visx/group";
 import { schemeCategory10 } from "d3-scale-chromatic";
+import { useState } from "react";
+import t from "../../locales/default.json";
+import { inferResponseSignal } from "../controller/infer";
 import { scoreDistSignal } from "../controller/train";
+import type { OracleResult } from "../types/OracleResult";
 
 interface Margin {
   top: number;
@@ -232,6 +235,7 @@ export const RadarMark = (props: RadarMarkProps) => {
   );
 };
 export const ScoreDistView = ({ width, height }: ScoreDistViewProps) => {
+  const [showTooltip, setShowTooltip] = useState(false);
   const scoreDist = scoreDistSignal.value;
   const sortedScoreDist = {
     score: scoreDist.score.sort((a, b) => a - b),
@@ -287,84 +291,118 @@ export const ScoreDistView = ({ width, height }: ScoreDistViewProps) => {
         Math.floor((sortedScoreDist.parsimony.length * 3) / 4)
       ],
   };
-  // const medianScores = {
-  //   score: sortedScoreDist.score[Math.floor(sortedScoreDist.score.length / 2)],
-  //   specificity: sortedScoreDist.specificity[Math.floor(sortedScoreDist.specificity.length / 2)],
-  //   interestingness:
-  //     sortedScoreDist.interestingness[Math.floor(sortedScoreDist.interestingness.length / 2)],
-  //   coverage: sortedScoreDist.coverage[Math.floor(sortedScoreDist.coverage.length / 2)],
-  //   diversity: sortedScoreDist.diversity[Math.floor(sortedScoreDist.diversity.length / 2)],
-  //   parsimony: sortedScoreDist.parsimony[Math.floor(sortedScoreDist.parsimony.length / 2)],
-  // };
 
-  // const minScores = {
-  //   score: sortedScoreDist.score[0],
-  //   specificity: sortedScoreDist.specificity[0],
-  //   interestingness: sortedScoreDist.interestingness[0],
-  //   coverage: sortedScoreDist.coverage[0],
-  //   diversity: sortedScoreDist.diversity[0],
-  //   parsimony: sortedScoreDist.parsimony[0],
-  // };
+  const meanScores = {
+    score: scoreDist.score.reduce((a, b) => a + b, 0) / scoreDist.score.length,
+    specificity:
+      scoreDist.specificity.reduce((a, b) => a + b, 0) /
+      scoreDist.specificity.length,
+    interestingness:
+      scoreDist.interestingness.reduce((a, b) => a + b, 0) /
+      scoreDist.interestingness.length,
+    coverage:
+      scoreDist.coverage.reduce((a, b) => a + b, 0) / scoreDist.coverage.length,
+    diversity:
+      scoreDist.diversity.reduce((a, b) => a + b, 0) /
+      scoreDist.diversity.length,
+    parsimony:
+      scoreDist.parsimony.reduce((a, b) => a + b, 0) /
+      scoreDist.parsimony.length,
+  };
 
-  // const maxScores = {
-  //   score: sortedScoreDist.score[sortedScoreDist.score.length - 1],
-  //   specificity: sortedScoreDist.specificity[sortedScoreDist.specificity.length - 1],
-  //   interestingness: sortedScoreDist.interestingness[sortedScoreDist.interestingness.length - 1],
-  //   coverage: sortedScoreDist.coverage[sortedScoreDist.coverage.length - 1],
-  //   diversity: sortedScoreDist.diversity[sortedScoreDist.diversity.length - 1],
-  //   parsimony: sortedScoreDist.parsimony[sortedScoreDist.parsimony.length - 1],
-  // };
   const currentScore = inferResponseSignal.value.result;
 
+  const argmaxCurrentScore = Object.keys({
+    specificity: currentScore.specificity,
+    interestingness: currentScore.interestingness,
+    coverage: currentScore.coverage,
+    diversity: currentScore.diversity,
+    parsimony: currentScore.parsimony,
+  }).reduce((a, b) =>
+    currentScore[a as keyof OracleResult] >
+    currentScore[b as keyof OracleResult]
+      ? a
+      : b,
+  ) as keyof OracleResult;
+
   return (
-    <ScaleSVG width={width} height={height}>
-      <Group top={height / 2} left={width / 2}>
-        <RadarAxis
-          width={width}
-          height={height}
-          margin={margin}
-          data={[
-            currentScore.specificity,
-            currentScore.interestingness,
-            currentScore.coverage,
-            currentScore.diversity,
-            currentScore.parsimony,
-          ]}
-        />
-        <RadarRangeMark
-          width={width}
-          height={height}
-          margin={margin}
-          color={"gray"}
-          dataMin={[
-            q1Scores.specificity,
-            q1Scores.interestingness,
-            q1Scores.coverage,
-            q1Scores.diversity,
-            q1Scores.parsimony,
-          ]}
-          dataMax={[
-            q3Scores.specificity,
-            q3Scores.interestingness,
-            q3Scores.coverage,
-            q3Scores.diversity,
-            q3Scores.parsimony,
-          ]}
-        />
-        <RadarMark
-          width={width}
-          height={height}
-          margin={margin}
-          color={schemeCategory10[0]}
-          data={[
-            currentScore.specificity,
-            currentScore.interestingness,
-            currentScore.coverage,
-            currentScore.diversity,
-            currentScore.parsimony,
-          ]}
-        />
-      </Group>
-    </ScaleSVG>
+    <Box
+      w={width}
+      h={height}
+      m={0}
+      p={0}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      {showTooltip && (
+        <Portal>
+          <Box
+            p={4}
+            w={300}
+            maxW={300}
+            position={"absolute"}
+            top={50}
+            right={300}
+            bg={"white"}
+            borderRadius={"md"}
+            boxShadow={"md"}
+            overflowWrap={"break-word"}
+            fontSize={"lg"}
+          >
+            {`Overall score is ${(((currentScore.score - meanScores.score) / meanScores.score) * 100).toFixed(2)}% above average.`}
+            {`${argmaxCurrentScore[0].toUpperCase() + argmaxCurrentScore.slice(1)} Score has significant effect, which ${(currentScore[argmaxCurrentScore] * 100).toFixed(2)}% above average.`}
+          </Box>
+        </Portal>
+      )}
+      <ScaleSVG width={width} height={height}>
+        <Group top={height / 2} left={width / 2}>
+          <RadarAxis
+            width={width}
+            height={height}
+            margin={margin}
+            data={[
+              currentScore.specificity,
+              currentScore.interestingness,
+              currentScore.coverage,
+              currentScore.diversity,
+              currentScore.parsimony,
+            ]}
+          />
+          <RadarRangeMark
+            width={width}
+            height={height}
+            margin={margin}
+            color={"gray"}
+            dataMin={[
+              q1Scores.specificity,
+              q1Scores.interestingness,
+              q1Scores.coverage,
+              q1Scores.diversity,
+              q1Scores.parsimony,
+            ]}
+            dataMax={[
+              q3Scores.specificity,
+              q3Scores.interestingness,
+              q3Scores.coverage,
+              q3Scores.diversity,
+              q3Scores.parsimony,
+            ]}
+          />
+          <RadarMark
+            width={width}
+            height={height}
+            margin={margin}
+            color={schemeCategory10[0]}
+            data={[
+              currentScore.specificity,
+              currentScore.interestingness,
+              currentScore.coverage,
+              currentScore.diversity,
+              currentScore.parsimony,
+            ]}
+          />
+        </Group>
+      </ScaleSVG>
+    </Box>
   );
 };
