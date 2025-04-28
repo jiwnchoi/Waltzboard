@@ -167,3 +167,6 @@ reportMissingImports = true
 reportMissingTypeStubs = false
 
 pythonVersion = "3.9"
+
+[dependency-groups]
+dev = ["ruff>=0.11.7"]
